@@ -131,7 +131,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Create and apply the first Prisma migration when a valid local PostgreSQL database is available.
+1. Apply the existing initial Prisma migration when a valid local PostgreSQL database is available.
 2. Add user account routes and password handling.
 3. Add character creation after accounts exist.
 4. Add the first database-backed activity log foundation.

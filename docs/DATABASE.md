@@ -26,6 +26,33 @@ Local development requires a PostgreSQL database connection before migrations ca
 
 Do not run migrations unless `DATABASE_URL` points to a valid local PostgreSQL database.
 
+After `DATABASE_URL` is configured for a real local PostgreSQL database, use:
+
+```bash
+npx prisma migrate dev
+```
+
+This applies pending migrations locally and updates Prisma migration state.
+
+## Migrations
+
+The initial migration file exists at:
+
+```text
+prisma/migrations/20260610130000_add_user_model/migration.sql
+```
+
+This migration creates:
+
+- The `UserRole` enum
+- The `User` table
+- A unique index for `email`
+- A unique index for `username`
+
+The migration has not been applied to a database yet.
+
+For deployment, use the normal Prisma and Vercel migration flow with a real production `DATABASE_URL`.
+
 ## Current Models
 
 ### User
@@ -52,6 +79,6 @@ This model is auth-ready, but authentication routes, sessions, login UI, and reg
 
 Future models should be added step by step as the project needs them.
 
-The next recommended database work is to create and apply the first migration after a valid local PostgreSQL database is available.
+The next recommended database work is to apply the existing initial migration after a valid local PostgreSQL database is available.
 
 Do not add character, combat, inventory, quest, map, or gameplay models until the account foundation is ready.

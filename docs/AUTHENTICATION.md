@@ -12,8 +12,9 @@ Current authentication-related pieces:
 - The migration should be applied before using database-backed auth routes.
 - Password helper functions exist in `lib/auth/password.js`.
 - The registration API route exists at `POST /api/auth/register`.
+- The login API route exists at `POST /api/auth/login`.
 
-No registration pages, login pages, login API route, sessions, cookies, or test users exist yet.
+No registration pages, login pages, sessions, cookies, or test users exist yet.
 
 ## Password Storage
 
@@ -78,13 +79,57 @@ No session or cookie is created yet.
 
 ## Planned Login Flow
 
-The planned login flow is:
+The login API now supports credential verification. The full login flow will be complete after session handling exists.
 
 1. Accept an email or username and password from a login form.
 2. Find the matching `User` record.
 3. Compare the submitted password with `verifyPassword`.
 4. Reject invalid credentials with a generic error.
 5. Start a session only after session handling exists.
+
+## Login API
+
+`POST /api/auth/login` verifies a user's login credentials.
+
+Expected JSON body:
+
+```json
+{
+  "identifier": "player@example.com",
+  "password": "example-password"
+}
+```
+
+The `identifier` field may be either an email address or a username.
+
+The route:
+
+- Accepts only `POST` requests.
+- Trims `identifier`.
+- Treats identifiers containing `@` as email addresses and lowercases them.
+- Treats other identifiers as usernames.
+- Requires `identifier` and `password`.
+- Requires `password` to be at least 8 characters.
+- Uses `verifyPassword(password, user.passwordHash)`.
+- Returns the same generic `401` error for an unknown account or a wrong password.
+
+Safe response shape:
+
+```json
+{
+  "user": {
+    "id": "user_id",
+    "email": "player@example.com",
+    "username": "playername",
+    "role": "PLAYER",
+    "createdAt": "date"
+  }
+}
+```
+
+The response must never include `passwordHash`.
+
+No session or cookie is created yet.
 
 ## Planned Session And Cookie Flow
 
@@ -106,4 +151,4 @@ Future session work may need another secret environment variable, such as `SESSI
 
 ## Next Recommended Step
 
-Add the login API route next. Sessions and UI pages should come after registration and login APIs are working.
+Add the session and cookie foundation next. UI pages should come after registration, login, and session handling are working.

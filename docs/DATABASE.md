@@ -15,7 +15,7 @@ Do not use SQLite as the deployed database. The project is being built with Verc
 The placeholder format is documented in `.env.example`:
 
 ```text
-DATABASE_URL="postgresql://zakzum:zakzum_dev_password@localhost:5432/zakzum_online_dev?schema=public"
+DATABASE_URL="postgresql://zakzum:zakzum_dev_password@localhost:55432/zakzum_online_dev?schema=public"
 ```
 
 Do not commit real database passwords, tokens, or connection strings.
@@ -23,6 +23,8 @@ Do not commit real database passwords, tokens, or connection strings.
 ## Local Development
 
 Local development uses PostgreSQL through Docker Compose.
+
+The local Docker service runs PostgreSQL inside the container on port `5432` and exposes it on host port `55432`. The host port avoids conflicts with other PostgreSQL services that may already use common PostgreSQL ports such as `5432` or `5433`.
 
 To start local database work:
 

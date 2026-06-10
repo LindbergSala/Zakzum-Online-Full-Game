@@ -16,8 +16,10 @@ Current authentication-related pieces:
 - The login API route exists at `POST /api/auth/login`.
 - The current-user API route exists at `GET /api/auth/me`.
 - The logout API route exists at `POST /api/auth/logout`.
+- The registration page exists at `/register`.
+- The login page exists at `/login`.
 
-No registration pages, login pages, middleware, protected page redirects, or test users exist yet.
+No middleware, protected page redirects, character creation, gameplay systems, or test users exist yet.
 
 ## Password Storage
 
@@ -79,6 +81,20 @@ Safe response shape:
 The response must never include `passwordHash`.
 
 No session or cookie is created yet.
+
+## Registration Page
+
+`/register` provides the first account creation UI.
+
+The page:
+
+- Uses a mobile-first form.
+- Collects email, username, and password.
+- Calls `POST /api/auth/register`.
+- Shows loading, error, and success states.
+- Tells the user to log in after a successful registration.
+- Links to `/login`.
+- Never displays `passwordHash`.
 
 ## Login Flow
 
@@ -203,6 +219,27 @@ The route:
 - Clears the `zakzum_session` cookie.
 - Returns a simple success response.
 
+## Login Page
+
+`/login` provides the first account login UI.
+
+The page:
+
+- Uses a mobile-first form.
+- Collects an identifier and password.
+- Explains that the identifier can be an email or username.
+- Calls `POST /api/auth/login`.
+- Calls `GET /api/auth/me` after successful login to confirm the session.
+- Shows safe current user data: username, email, and role.
+- Calls `POST /api/auth/logout` when the user logs out.
+- Clears local UI session state after logout.
+- Never displays `passwordHash`.
+- Never displays the raw session token.
+
+Protected pages and protected redirects have not been added yet.
+
+Character creation has not been added yet.
+
 ## Vercel And Environment Notes
 
 Vercel must have `DATABASE_URL` configured before database-backed auth can work.
@@ -211,4 +248,4 @@ Vercel must also have `AUTH_SESSION_SECRET` configured before session cookies ca
 
 ## Next Recommended Step
 
-Add simple registration and login UI pages next. Character creation and gameplay systems should come after account access is usable.
+Add a small account landing page or protected-page foundation next. Character creation and gameplay systems should come after protected account access is ready.

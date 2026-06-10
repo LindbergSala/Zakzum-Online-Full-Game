@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -24,6 +25,15 @@ export default function Home() {
             The Freefolk still endure beneath prophecy and ruin. Your first
             character will begin here when character creation is ready.
           </p>
+
+          <nav className="home-actions" aria-label="Account navigation">
+            <Link className="primary-button" href="/register">
+              Create Account
+            </Link>
+            <Link className="secondary-button" href="/login">
+              Enter Zakzum
+            </Link>
+          </nav>
 
           <div className="coming-soon" aria-label="Coming soon">
             <span className="coming-soon-label">Begin Journey</span>

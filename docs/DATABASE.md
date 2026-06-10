@@ -31,25 +31,25 @@ To start local database work:
 3. Start PostgreSQL:
 
 ```bash
-docker compose up -d
+npm run db:up
 ```
 
 4. Apply pending migrations locally:
 
 ```bash
-npx prisma migrate dev
+npm run db:migrate
 ```
 
 5. Validate the Prisma schema:
 
 ```bash
-npx prisma validate
+npm run db:validate
 ```
 
 6. Stop the local database when finished:
 
 ```bash
-docker compose down
+npm run db:down
 ```
 
 `docker compose down` stops the database container but keeps the local database volume.
@@ -57,6 +57,19 @@ docker compose down
 `docker compose down -v` stops the database and deletes the local PostgreSQL volume. This removes local database data.
 
 Do not run migrations unless `DATABASE_URL` points to a valid local PostgreSQL database.
+
+## Database Scripts
+
+The project includes simple package scripts for local database work:
+
+- `npm run db:up` starts the local PostgreSQL container.
+- `npm run db:down` stops the local PostgreSQL container and keeps the volume.
+- `npm run db:reset` stops the local PostgreSQL container and deletes the local volume.
+- `npm run db:migrate` applies pending migrations locally with Prisma.
+- `npm run db:validate` validates `prisma/schema.prisma`.
+- `npm run db:studio` opens Prisma Studio.
+
+Use `npm run db:reset` carefully. It deletes local database data.
 
 ## Migrations
 

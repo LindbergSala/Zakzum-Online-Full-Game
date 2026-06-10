@@ -1,5 +1,6 @@
 import prisma from "../../../lib/prisma";
 import { verifyPassword } from "../../../lib/auth/password";
+import { createSessionToken, setSessionCookie } from "../../../lib/auth/session";
 
 const INVALID_CREDENTIALS_MESSAGE = "Invalid identifier or password.";
 
@@ -77,6 +78,9 @@ export default async function handler(req, res) {
     if (!passwordIsValid) {
       return res.status(401).json({ error: INVALID_CREDENTIALS_MESSAGE });
     }
+
+    const sessionToken = await createSessionToken(user);
+    setSessionCookie(res, sessionToken);
 
     return res.status(200).json({ user: toSafeUser(user) });
   } catch (error) {

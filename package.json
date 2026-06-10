@@ -1,0 +1,21 @@
+{
+  "name": "zakzum-online",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A DnD-inspired text-based RPG web game set in the world of Zakzum.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.9"
+  }
+}

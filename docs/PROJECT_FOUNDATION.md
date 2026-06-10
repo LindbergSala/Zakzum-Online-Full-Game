@@ -12,20 +12,20 @@ The project should grow carefully from a simple foundation into a web game with 
 
 ## Current Repository Setup
 
-This repository is not yet a Next.js project.
+This repository now has a minimal Next.js app shell.
 
 Current setup review:
 
-- `package.json`: missing
-- `pages` directory: missing
-- `public` directory: missing
-- `styles` directory or global CSS: missing
+- `package.json`: present
+- `pages` directory: present
+- `public` directory: present
+- `styles` directory or global CSS: present
 - `prisma` directory: missing
 - `.env`: missing
 - `.env.example`: missing
 - `core-lore.md`: present
 
-Because the Next.js project has not been created yet, future setup work should start by scaffolding a small JavaScript Next.js project that uses the Pages Router.
+The app shell uses JavaScript and the Next.js Pages Router.
 
 ## Tech Stack
 
@@ -131,14 +131,11 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Scaffold a minimal Next.js project with JavaScript and the Pages Router.
-2. Add basic mobile-first global styling.
-3. Add `public` and `styles` directories if the scaffold does not create them.
-4. Add Prisma with a SQL database connection.
-5. Add `.env.example` with required variable names, but no secrets.
-6. Add user accounts.
-7. Add character creation.
-8. Add the first database-backed activity log foundation.
-9. Add starter journey content only after the foundation is stable.
+1. Add Prisma with a SQL database connection.
+2. Add `.env.example` with required variable names, but no secrets.
+3. Add user accounts.
+4. Add character creation.
+5. Add the first database-backed activity log foundation.
+6. Add starter journey content only after the foundation is stable.
 
 Do not add combat, quests, inventory, maps, or gameplay data before the base project, database, accounts, and character ownership are ready.

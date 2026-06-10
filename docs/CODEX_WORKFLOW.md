@@ -82,15 +82,18 @@ When Codex finishes a task, report:
 
 ## Current Foundation Status
 
-At the time this workflow note was created, the repository was not yet a Next.js project.
+The repository now has a minimal JavaScript Next.js app shell using the Pages Router.
 
-Missing foundation pieces:
+Present foundation pieces:
 
 - `package.json`
 - `pages` directory
 - `public` directory
 - `styles` directory or global CSS
+
+Missing foundation pieces:
+
 - `prisma` directory
 - `.env` or `.env.example`
 
-The next safe step is to scaffold a minimal JavaScript Next.js project using the Pages Router.
+The next safe step is to add Prisma setup and a documented SQL database environment variable.

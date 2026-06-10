@@ -1,0 +1,18 @@
+# Local PostgreSQL database for development only.
+# Do not use these credentials for production.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: zakzum-online-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: zakzum_online_dev
+      POSTGRES_USER: zakzum
+      POSTGRES_PASSWORD: zakzum_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - zakzum_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  zakzum_postgres_data:

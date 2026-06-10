@@ -105,6 +105,8 @@ The planned database approach is:
 
 The first model is `User`, with a simple `UserRole` enum for player and admin accounts.
 
+Local PostgreSQL development is configured with Docker Compose.
+
 ## Early User Account Plan
 
 User accounts should be added early, before character creation or gameplay systems.
@@ -133,7 +135,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Apply the existing initial Prisma migration when a valid local PostgreSQL database is available.
+1. Copy `.env.example` to `.env`, start PostgreSQL with Docker Compose, and apply the existing initial Prisma migration locally.
 2. Add user account routes and password handling.
 3. Add character creation after accounts exist.
 4. Add the first database-backed activity log foundation.

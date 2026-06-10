@@ -15,24 +15,48 @@ Do not use SQLite as the deployed database. The project is being built with Verc
 The placeholder format is documented in `.env.example`:
 
 ```text
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+DATABASE_URL="postgresql://zakzum:zakzum_dev_password@localhost:5432/zakzum_online_dev?schema=public"
 ```
 
 Do not commit real database passwords, tokens, or connection strings.
 
 ## Local Development
 
-Local development requires a PostgreSQL database connection before migrations can run.
+Local development uses PostgreSQL through Docker Compose.
 
-Do not run migrations unless `DATABASE_URL` points to a valid local PostgreSQL database.
+To start local database work:
 
-After `DATABASE_URL` is configured for a real local PostgreSQL database, use:
+1. Copy `.env.example` to `.env` on your machine.
+2. Keep the local Docker `DATABASE_URL` unless you use a different local PostgreSQL database.
+3. Start PostgreSQL:
+
+```bash
+docker compose up -d
+```
+
+4. Apply pending migrations locally:
 
 ```bash
 npx prisma migrate dev
 ```
 
-This applies pending migrations locally and updates Prisma migration state.
+5. Validate the Prisma schema:
+
+```bash
+npx prisma validate
+```
+
+6. Stop the local database when finished:
+
+```bash
+docker compose down
+```
+
+`docker compose down` stops the database container but keeps the local database volume.
+
+`docker compose down -v` stops the database and deletes the local PostgreSQL volume. This removes local database data.
+
+Do not run migrations unless `DATABASE_URL` points to a valid local PostgreSQL database.
 
 ## Migrations
 
@@ -51,7 +75,7 @@ This migration creates:
 
 The migration has not been applied to a database yet.
 
-For deployment, use the normal Prisma and Vercel migration flow with a real production `DATABASE_URL`.
+For deployment, use the normal Prisma and Vercel migration flow with a real production `DATABASE_URL`. Do not use the local Docker database for production.
 
 ## Current Models
 
@@ -79,6 +103,6 @@ This model is auth-ready, but authentication routes, sessions, login UI, and reg
 
 Future models should be added step by step as the project needs them.
 
-The next recommended database work is to apply the existing initial migration after a valid local PostgreSQL database is available.
+The next recommended database work is to start the local PostgreSQL service, create a local `.env`, and apply the existing initial migration.
 
 Do not add character, combat, inventory, quest, map, or gameplay models until the account foundation is ready.

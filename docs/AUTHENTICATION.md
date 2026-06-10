@@ -62,4 +62,4 @@ Future session work may need another secret environment variable, such as `SESSI
 
 ## Next Recommended Step
 
-Apply the existing initial Prisma migration after a valid local PostgreSQL `DATABASE_URL` is available. After the migration is applied, add registration and login API routes before building UI pages.
+Start the local PostgreSQL database, create an uncommitted `.env`, and apply the existing initial Prisma migration. After the migration is applied, add registration and login API routes before building UI pages.

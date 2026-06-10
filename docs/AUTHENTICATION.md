@@ -9,10 +9,11 @@ Current authentication-related pieces:
 - The `User` model exists in `prisma/schema.prisma`.
 - The `UserRole` enum exists in `prisma/schema.prisma`.
 - The initial User migration file exists at `prisma/migrations/20260610130000_add_user_model/migration.sql`.
-- The migration may not be applied yet.
+- The migration should be applied before using database-backed auth routes.
 - Password helper functions exist in `lib/auth/password.js`.
+- The registration API route exists at `POST /api/auth/register`.
 
-No registration pages, login pages, API routes, sessions, cookies, or test users exist yet.
+No registration pages, login pages, login API route, sessions, cookies, or test users exist yet.
 
 ## Password Storage
 
@@ -31,6 +32,49 @@ The planned registration flow is:
 3. Hash the password with `hashPassword`.
 4. Create a `User` record with `passwordHash`.
 5. Start a session only after session handling exists.
+
+## Registration API
+
+`POST /api/auth/register` creates a new user account.
+
+Expected JSON body:
+
+```json
+{
+  "email": "player@example.com",
+  "username": "playername",
+  "password": "example-password"
+}
+```
+
+The route:
+
+- Accepts only `POST` requests.
+- Trims and lowercases `email`.
+- Trims `username`.
+- Requires `email`, `username`, and `password`.
+- Requires `username` to be at least 3 characters.
+- Requires `password` to be at least 8 characters.
+- Rejects duplicate email or username with status `409`.
+- Stores only `passwordHash`, never the plain text password.
+
+Safe response shape:
+
+```json
+{
+  "user": {
+    "id": "user_id",
+    "email": "player@example.com",
+    "username": "playername",
+    "role": "PLAYER",
+    "createdAt": "date"
+  }
+}
+```
+
+The response must never include `passwordHash`.
+
+No session or cookie is created yet.
 
 ## Planned Login Flow
 
@@ -62,4 +106,4 @@ Future session work may need another secret environment variable, such as `SESSI
 
 ## Next Recommended Step
 
-Start the local PostgreSQL database, create an uncommitted `.env`, and apply the existing initial Prisma migration. After the migration is applied, add registration and login API routes before building UI pages.
+Add the login API route next. Sessions and UI pages should come after registration and login APIs are working.

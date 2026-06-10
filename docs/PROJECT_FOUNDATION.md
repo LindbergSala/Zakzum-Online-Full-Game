@@ -103,7 +103,7 @@ The planned database approach is:
 - Add models only when a feature needs them
 - Validate Prisma changes with `npx prisma validate`
 
-No database models exist yet.
+The first model is `User`, with a simple `UserRole` enum for player and admin accounts.
 
 ## Early User Account Plan
 
@@ -131,9 +131,9 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add the first `User` model.
-2. Add user accounts.
-3. Add character creation.
+1. Create and apply the first Prisma migration when a valid local PostgreSQL database is available.
+2. Add user account routes and password handling.
+3. Add character creation after accounts exist.
 4. Add the first database-backed activity log foundation.
 5. Add starter journey content only after the foundation is stable.
 

@@ -99,4 +99,4 @@ Missing foundation pieces:
 
 - `.env` with local secrets
 
-The next safe step is to add the first `User` model, then build user accounts before character creation.
+The next safe step is to create and apply the first Prisma migration when a valid local PostgreSQL database is available, then build user accounts before character creation.

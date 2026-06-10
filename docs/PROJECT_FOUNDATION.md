@@ -119,6 +119,8 @@ The recommended account path is:
 
 Authentication has not been added yet.
 
+Password hashing utilities exist in `lib/auth/password.js`, but registration, login, sessions, and authentication UI have not been added yet.
+
 ## Core Lore Rule
 
 `core-lore.md` is the canon source for Zakzum Online.

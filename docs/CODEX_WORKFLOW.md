@@ -70,6 +70,8 @@ If a command is missing, Codex should report that it is unavailable instead of i
 
 Run `npx prisma validate` after changing `prisma/schema.prisma`.
 
+Authentication work should use the password helpers in `lib/auth/password.js` and must never store plain text passwords.
+
 ## Reporting Back
 
 When Codex finishes a task, report:
@@ -94,6 +96,7 @@ Present foundation pieces:
 - `styles` directory or global CSS
 - `prisma` directory
 - `.env.example`
+- Password hashing helper
 
 Missing foundation pieces:
 

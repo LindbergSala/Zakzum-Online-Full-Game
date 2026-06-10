@@ -20,12 +20,12 @@ Current setup review:
 - `pages` directory: present
 - `public` directory: present
 - `styles` directory or global CSS: present
-- `prisma` directory: missing
+- `prisma` directory: present
 - `.env`: missing
-- `.env.example`: missing
+- `.env.example`: present
 - `core-lore.md`: present
 
-The app shell uses JavaScript and the Next.js Pages Router.
+The app shell uses JavaScript and the Next.js Pages Router. The Prisma foundation exists with PostgreSQL configured as the database provider.
 
 ## Tech Stack
 
@@ -93,17 +93,17 @@ Future setup should:
 
 ## Prisma And Database Plan
 
-Prisma should be added after the base Next.js project exists.
+Prisma has been added after the base Next.js project shell.
 
 The planned database approach is:
 
 - Use Prisma as the database ORM
-- Use a SQL database
+- Use PostgreSQL as the SQL database provider
 - Keep the schema simple and readable
 - Add models only when a feature needs them
 - Validate Prisma changes with `npx prisma validate`
 
-Do not create database models during foundation documentation work.
+No database models exist yet.
 
 ## Early User Account Plan
 
@@ -131,11 +131,10 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add Prisma with a SQL database connection.
-2. Add `.env.example` with required variable names, but no secrets.
-3. Add user accounts.
-4. Add character creation.
-5. Add the first database-backed activity log foundation.
-6. Add starter journey content only after the foundation is stable.
+1. Add the first `User` model.
+2. Add user accounts.
+3. Add character creation.
+4. Add the first database-backed activity log foundation.
+5. Add starter journey content only after the foundation is stable.
 
 Do not add combat, quests, inventory, maps, or gameplay data before the base project, database, accounts, and character ownership are ready.

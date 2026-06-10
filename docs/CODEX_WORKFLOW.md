@@ -68,6 +68,8 @@ Expected checks once the project supports them:
 
 If a command is missing, Codex should report that it is unavailable instead of inventing a result.
 
+Run `npx prisma validate` after changing `prisma/schema.prisma`.
+
 ## Reporting Back
 
 When Codex finishes a task, report:
@@ -90,10 +92,11 @@ Present foundation pieces:
 - `pages` directory
 - `public` directory
 - `styles` directory or global CSS
+- `prisma` directory
+- `.env.example`
 
 Missing foundation pieces:
 
-- `prisma` directory
-- `.env` or `.env.example`
+- `.env` with local secrets
 
-The next safe step is to add Prisma setup and a documented SQL database environment variable.
+The next safe step is to add the first `User` model, then build user accounts before character creation.

@@ -29,6 +29,8 @@ The app shell uses JavaScript and the Next.js Pages Router. The Prisma foundatio
 
 The protected dashboard shell now exists at `/dashboard`. It is the future home for player characters and saved progress, but character creation and gameplay systems have not been added yet.
 
+Protected character API routes now exist at `/api/characters`. They let logged-in users list and create their own characters, but no character creation UI or gameplay systems have been added yet.
+
 ## Tech Stack
 
 Required project stack:
@@ -131,8 +133,9 @@ Authentication foundations now exist:
 - Registration and login UI pages
 - Protected `/account` page
 - Protected `/dashboard` shell
+- Protected `/api/characters` routes
 
-The Character model foundation exists. Character creation UI, character API routes, and gameplay systems have not been added yet.
+The Character model foundation and protected character API routes exist. Character creation UI and gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -146,8 +149,8 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Plan a small character creation API and UI inside the protected dashboard.
-2. Build simple character creation after the Character model migration is verified.
+1. Build simple character creation UI inside the protected dashboard.
+2. Add a basic character list to the dashboard using `GET /api/characters`.
 3. Add the first database-backed activity log foundation.
 4. Add starter journey content only after character ownership is stable.
 5. Add broader gameplay systems after the saved-progress foundation works.

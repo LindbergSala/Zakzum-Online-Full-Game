@@ -107,6 +107,8 @@ The planned database approach is:
 
 The first model is `User`, with a simple `UserRole` enum for player and admin accounts.
 
+The `Character` model foundation now exists and belongs to `User`. It stores the first character identity, progression, and survival fields, but it does not include inventory, quests, combat, shops, resting, or activity logs yet.
+
 Local PostgreSQL development is configured with Docker Compose.
 
 ## Early User Account Plan
@@ -130,7 +132,7 @@ Authentication foundations now exist:
 - Protected `/account` page
 - Protected `/dashboard` shell
 
-Character creation, character models, and gameplay systems have not been added yet.
+The Character model foundation exists. Character creation UI, character API routes, and gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -144,8 +146,8 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add the Character model after the protected account and dashboard foundation is stable.
-2. Build simple character creation inside the protected account area.
+1. Plan a small character creation API and UI inside the protected dashboard.
+2. Build simple character creation after the Character model migration is verified.
 3. Add the first database-backed activity log foundation.
 4. Add starter journey content only after character ownership is stable.
 5. Add broader gameplay systems after the saved-progress foundation works.

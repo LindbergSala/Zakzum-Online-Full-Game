@@ -8,13 +8,35 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  username     String   @unique
+  id           String      @id @default(cuid())
+  email        String      @unique
+  username     String      @unique
   passwordHash String
-  role         UserRole @default(PLAYER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         UserRole    @default(PLAYER)
+  characters   Character[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Character {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  race            String
+  characterClass  String
+  level           Int      @default(1)
+  experience      Int      @default(0)
+  gold            Int      @default(0)
+  stamina         Int      @default(10)
+  maxStamina      Int      @default(10)
+  stress          Int      @default(0)
+  renown          Int      @default(0)
+  currentLocation String   @default("Kingstone")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 
 enum UserRole {

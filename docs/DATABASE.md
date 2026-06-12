@@ -88,7 +88,20 @@ This migration creates:
 - A unique index for `email`
 - A unique index for `username`
 
-The migration has not been applied to a database yet.
+The Character migration file exists at:
+
+```text
+prisma/migrations/20260612220435_add_character_model/migration.sql
+```
+
+This migration creates:
+
+- The `Character` table
+- An index on `userId`
+- A foreign key from `Character.userId` to `User.id`
+- `ON DELETE CASCADE` so local character records are removed when their owning user is removed
+
+The current migrations have been applied to the local Docker PostgreSQL database.
 
 For deployment, use the normal Prisma and Vercel migration flow with a real production `DATABASE_URL`. Do not use the local Docker database for production.
 
@@ -105,6 +118,7 @@ It includes:
 - Unique `username`
 - `passwordHash` for future password-based authentication
 - `role` using the `UserRole` enum
+- `characters` relation for account-owned characters
 - `createdAt` and `updatedAt` timestamps
 
 `UserRole` currently supports:
@@ -112,12 +126,32 @@ It includes:
 - `PLAYER`
 - `ADMIN`
 
-This model is auth-ready, but authentication routes, sessions, login UI, and registration UI have not been added yet.
+This model is the account owner for future saved progress.
+
+### Character
+
+The `Character` model is the first player character foundation for Zakzum Online.
+
+Each character belongs to one `User`.
+
+It includes:
+
+- A generated string `id`
+- `userId` and a required `User` relation
+- `name`, `race`, and `characterClass`
+- Basic progression fields: `level`, `experience`, `gold`, and `renown`
+- Early survival fields: `stamina`, `maxStamina`, and `stress`
+- `currentLocation`, defaulting to `Kingstone`
+- `createdAt` and `updatedAt` timestamps
+
+The relation uses `onDelete: Cascade`, so deleting a user deletes that user's characters.
+
+This model does not include inventory, quests, combat, shops, resting, or activity logs yet.
 
 ## Future Models
 
 Future models should be added step by step as the project needs them.
 
-The next recommended database work is to start the local PostgreSQL service, create a local `.env`, and apply the existing initial migration.
+The next recommended database work is to add models only when character creation or saved progress needs them.
 
-Do not add character, combat, inventory, quest, map, or gameplay models until the account foundation is ready.
+Do not add combat, inventory, quest, map, shop, rest, or activity log models until character creation and ownership are stable.

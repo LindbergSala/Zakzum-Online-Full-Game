@@ -322,7 +322,9 @@ select:focus {
   gap: 0.75rem;
   border: 1px solid var(--line);
   background: rgba(16, 17, 15, 0.76);
+  color: inherit;
   padding: 1rem;
+  text-decoration: none;
 }
 
 .character-card h3 {
@@ -359,6 +361,50 @@ select:focus {
   margin: 0;
   color: var(--text);
   overflow-wrap: anywhere;
+}
+
+.character-sheet h1 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.sheet-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.sheet-grid div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.sheet-grid dt {
+  color: var(--muted);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sheet-grid dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.placeholder-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 @media (min-width: 48rem) {

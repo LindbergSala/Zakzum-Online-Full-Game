@@ -2,9 +2,9 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work includes the database model, protected API routes, and a simple protected character creation UI on `/dashboard`.
+The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, and a read-only character detail page.
 
-Character detail pages, inventory, quests, combat, resting, shops, and activity logs have not been added yet.
+Character update and delete actions, inventory, quests, combat, resting, shops, and activity logs have not been added yet.
 
 ## Character Model Summary
 
@@ -65,6 +65,20 @@ The API ignores `userId` from the request body. Character ownership always comes
 
 The response must never include `passwordHash` or a raw session token.
 
+The protected single-character API route is:
+
+```text
+/api/characters/[id]
+```
+
+Supported methods:
+
+- `GET`
+
+`GET /api/characters/[id]` requires a valid logged-in user and returns only a character owned by that user. If the character does not exist or belongs to another user, the route returns `404`.
+
+The response contains safe character data only. It does not include user data, `passwordHash`, or raw session tokens.
+
 ## Dashboard Character Creation UI
 
 `/dashboard` now includes the first character creation UI.
@@ -81,6 +95,33 @@ The dashboard:
 - Shows simple loading, error, and success states.
 
 The UI must never display `passwordHash` or raw session tokens.
+
+Character cards on `/dashboard` link to the read-only character sheet at `/characters/[id]`.
+
+## Read-Only Character Detail Page
+
+`/characters/[id]` is a protected Pages Router page that uses `getServerSideProps`.
+
+If there is no valid logged-in user, the page redirects to `/login`.
+
+If the requested character does not exist or does not belong to the logged-in user, the page returns `notFound: true`.
+
+The page shows:
+
+- `name`
+- `race`
+- `characterClass`
+- `level`
+- `experience`
+- `gold`
+- `stamina`
+- `maxStamina`
+- `stress`
+- `renown`
+- `currentLocation`
+- `createdAt`
+
+It also includes placeholder sections for Journey Record, Equipment, and future Actions.
 
 ## Allowed Races
 
@@ -117,9 +158,8 @@ The UI must never display `passwordHash` or raw session tokens.
 
 ## Current Limitations
 
-- No character detail route exists yet.
 - No update or delete character API exists yet.
-- No character detail page exists yet.
+- Character detail is read-only.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
 - Inventory has not been added.
@@ -131,4 +171,4 @@ The UI must never display `passwordHash` or raw session tokens.
 
 ## Next Recommended Step
 
-Add a simple character detail planning document or read-only character detail page foundation. Gameplay systems should still wait until character ownership and display are stable.
+Add the next small character foundation step, such as a planning document for activity logs or a carefully scoped starter equipment model. Gameplay systems should still wait until character ownership and display are stable.

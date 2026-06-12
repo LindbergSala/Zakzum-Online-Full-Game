@@ -144,7 +144,11 @@ export default function Dashboard({ user }) {
             {characters.length > 0 ? (
               <div className="character-list">
                 {characters.map((character) => (
-                  <article className="character-card" key={character.id}>
+                  <Link
+                    className="character-card"
+                    href={`/characters/${character.id}`}
+                    key={character.id}
+                  >
                     <h3>{character.name}</h3>
                     <p className="supporting-text">
                       {character.race} {character.characterClass}
@@ -173,7 +177,7 @@ export default function Dashboard({ user }) {
                         <dd>{character.currentLocation}</dd>
                       </div>
                     </dl>
-                  </article>
+                  </Link>
                 ))}
               </div>
             ) : null}

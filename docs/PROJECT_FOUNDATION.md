@@ -27,6 +27,8 @@ Current setup review:
 
 The app shell uses JavaScript and the Next.js Pages Router. The Prisma foundation exists with PostgreSQL configured as the database provider.
 
+The protected dashboard shell now exists at `/dashboard`. It is the future home for player characters and saved progress, but character creation and gameplay systems have not been added yet.
+
 ## Tech Stack
 
 Required project stack:
@@ -119,9 +121,16 @@ The recommended account path is:
 4. Add character creation after accounts exist.
 5. Add gameplay systems after characters can belong to users.
 
-Authentication has not been added yet.
+Authentication foundations now exist:
 
-Password hashing utilities exist in `lib/auth/password.js`, but registration, login, sessions, and authentication UI have not been added yet.
+- Password hashing utilities in `lib/auth/password.js`
+- Session helpers in `lib/auth/session.js`
+- Registration and login API routes
+- Registration and login UI pages
+- Protected `/account` page
+- Protected `/dashboard` shell
+
+Character creation, character models, and gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -135,10 +144,10 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Copy `.env.example` to `.env`, start PostgreSQL with Docker Compose, and apply the existing initial Prisma migration locally.
-2. Add user account routes and password handling.
-3. Add character creation after accounts exist.
-4. Add the first database-backed activity log foundation.
-5. Add starter journey content only after the foundation is stable.
+1. Add the Character model after the protected account and dashboard foundation is stable.
+2. Build simple character creation inside the protected account area.
+3. Add the first database-backed activity log foundation.
+4. Add starter journey content only after character ownership is stable.
+5. Add broader gameplay systems after the saved-progress foundation works.
 
 Do not add combat, quests, inventory, maps, or gameplay data before the base project, database, accounts, and character ownership are ready.

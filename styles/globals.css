@@ -86,11 +86,21 @@ h1 {
   line-height: 1.45;
 }
 
+.compact-lead {
+  font-size: 1.1rem;
+}
+
 .supporting-text {
   margin: 0;
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.7;
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.05rem;
 }
 
 .home-actions,
@@ -322,7 +332,7 @@ input:focus {
   }
 
   .home-actions {
-    max-width: 34rem;
+    max-width: 44rem;
     flex-direction: row;
   }
 

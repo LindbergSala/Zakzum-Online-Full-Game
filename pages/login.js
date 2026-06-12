@@ -172,6 +172,9 @@ export default function Login() {
                   <dd>{currentUser.role}</dd>
                 </div>
               </dl>
+              <Link className="primary-button" href="/dashboard">
+                Open Dashboard
+              </Link>
               <Link className="primary-button" href="/account">
                 Open Account
               </Link>

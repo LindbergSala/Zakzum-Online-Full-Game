@@ -58,10 +58,13 @@ export default function Account({ user }) {
           <p className="form-message success">Character creation coming soon.</p>
 
           <div className="account-actions">
+            <Link className="primary-button" href="/dashboard">
+              Dashboard
+            </Link>
             <Link className="secondary-button" href="/">
               Home
             </Link>
-            <button className="primary-button" type="button" onClick={handleLogout}>
+            <button className="secondary-button" type="button" onClick={handleLogout}>
               Log Out
             </button>
           </div>

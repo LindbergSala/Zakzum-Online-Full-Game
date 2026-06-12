@@ -36,6 +36,9 @@ export default function Home() {
             <Link className="secondary-button" href="/account">
               Account
             </Link>
+            <Link className="secondary-button" href="/dashboard">
+              Dashboard
+            </Link>
           </nav>
 
           <div className="coming-soon" aria-label="Coming soon">

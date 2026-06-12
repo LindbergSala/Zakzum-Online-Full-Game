@@ -20,6 +20,7 @@ Current authentication-related pieces:
 - The registration page exists at `/register`.
 - The login page exists at `/login`.
 - The first protected page exists at `/account`.
+- The protected dashboard shell exists at `/dashboard`.
 
 No middleware, complex role permissions, character creation, gameplay systems, or test users exist yet.
 
@@ -260,6 +261,25 @@ Middleware and protected redirects outside `/account` have not been added yet.
 
 Character creation has not been added yet.
 
+## Protected Dashboard Page
+
+`/dashboard` is the protected game shell for future characters and saved progress.
+
+The page:
+
+- Uses `getServerSideProps`.
+- Reuses `lib/auth/currentUser.js`.
+- Redirects unauthenticated users to `/login`.
+- Welcomes the logged-in user by username.
+- Shows a `Characters` section with the empty state `No characters yet.`
+- Shows that character creation is coming soon.
+- Links to `/account` and the homepage.
+- Calls `POST /api/auth/logout` and then sends the user to `/login`.
+- Never displays `passwordHash`.
+- Never displays the raw session token.
+
+Character creation, character models, and gameplay systems have not been added yet.
+
 ## Vercel And Environment Notes
 
 Vercel must have `DATABASE_URL` configured before database-backed auth can work.
@@ -268,4 +288,4 @@ Vercel must also have `AUTH_SESSION_SECRET` configured before session cookies ca
 
 ## Next Recommended Step
 
-Add the next protected account-area foundation, such as a simple dashboard shell. Character creation and gameplay systems should come after protected account access is ready.
+Add the Character model and a simple character creation plan next. Gameplay systems should come after character ownership is stable.

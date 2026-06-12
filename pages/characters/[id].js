@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { getCurrentUser } from "../../lib/auth/currentUser";
+import { getStarterEquipmentForClass } from "../../lib/game/starterEquipment";
 import prisma from "../../lib/prisma";
 
 function toSafeCharacter(character) {
@@ -26,6 +27,8 @@ function formatDate(dateValue) {
 }
 
 export default function CharacterDetail({ character }) {
+  const starterEquipment = getStarterEquipmentForClass(character.characterClass);
+
   return (
     <>
       <Head>
@@ -104,7 +107,27 @@ export default function CharacterDetail({ character }) {
 
           <section className="session-panel" aria-labelledby="equipment-title">
             <h2 id="equipment-title">Equipment</h2>
-            <p className="empty-state">Starter equipment coming soon.</p>
+            <p className="empty-state">Inventory persistence coming soon.</p>
+          </section>
+
+          <section className="session-panel" aria-labelledby="starter-equipment-title">
+            <h2 id="starter-equipment-title">Starter Equipment Preview</h2>
+            <p className="supporting-text">
+              This class-based kit is a preview only. It is not saved inventory yet.
+            </p>
+            <div className="equipment-preview-list">
+              {starterEquipment.map((item) => (
+                <article className="equipment-preview-item" key={item.key}>
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p className="item-meta">
+                      {item.type} / {item.slot}
+                    </p>
+                  </div>
+                  <p className="supporting-text">{item.description}</p>
+                </article>
+              ))}
+            </div>
           </section>
 
           <section className="session-panel" aria-labelledby="actions-title">

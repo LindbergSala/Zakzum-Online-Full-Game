@@ -2,7 +2,7 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, and a read-only character detail page.
+The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, and starter equipment preview data.
 
 Character update and delete actions, inventory, quests, combat, resting, shops, and activity logs have not been added yet.
 
@@ -123,6 +123,10 @@ The page shows:
 
 It also includes placeholder sections for Journey Record, Equipment, and future Actions.
 
+The Equipment section explains that inventory persistence is coming soon.
+
+The Starter Equipment Preview section shows class-based starter equipment from `lib/game/starterEquipment.js`. This is preview-only data and is not saved as character inventory yet.
+
 ## Allowed Races
 
 - Human
@@ -156,13 +160,39 @@ It also includes placeholder sections for Journey Record, Equipment, and future 
 - Bard
 - Druid
 
+## Starter Equipment Data
+
+Starter equipment data now exists in `lib/game/starterEquipment.js`.
+
+Starter equipment is based on the character's class:
+
+- Warrior
+- Ranger
+- Rogue
+- Cleric
+- Mage
+- Paladin
+- Bard
+- Druid
+
+Each starter item currently has:
+
+- `key`
+- `name`
+- `type`
+- `slot`
+- `description`
+
+The current item data is meant to help future inventory work assign grounded starter gear when a character is created. It does not create saved inventory yet.
+
 ## Current Limitations
 
 - No update or delete character API exists yet.
 - Character detail is read-only.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
-- Inventory has not been added.
+- Inventory persistence has not been added.
+- Starter equipment is preview-only.
 - Quests have not been added.
 - Combat has not been added.
 - Resting has not been added.
@@ -171,4 +201,4 @@ It also includes placeholder sections for Journey Record, Equipment, and future 
 
 ## Next Recommended Step
 
-Add the next small character foundation step, such as a planning document for activity logs or a carefully scoped starter equipment model. Gameplay systems should still wait until character ownership and display are stable.
+Add the inventory model foundation so starter equipment can later be saved to a character. Gameplay systems should still wait until character ownership and display are stable.

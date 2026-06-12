@@ -191,7 +191,8 @@ h1 {
   line-height: 1.5;
 }
 
-input {
+input,
+select {
   width: 100%;
   min-height: 3rem;
   border: 1px solid var(--line);
@@ -201,7 +202,8 @@ input {
   padding: 0.8rem 0.85rem;
 }
 
-input:focus {
+input:focus,
+select:focus {
   border-color: var(--gold);
   outline: 2px solid rgba(196, 164, 93, 0.25);
   outline-offset: 2px;
@@ -304,6 +306,55 @@ input:focus {
 }
 
 .session-list dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.character-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.character-card {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--line);
+  background: rgba(16, 17, 15, 0.76);
+  padding: 1rem;
+}
+
+.character-card h3 {
+  margin: 0;
+  color: var(--gold);
+  font-size: 1.25rem;
+}
+
+.character-stats {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.character-stats div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.character-stats dt {
+  color: var(--muted);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.character-stats dd {
   min-width: 0;
   margin: 0;
   color: var(--text);

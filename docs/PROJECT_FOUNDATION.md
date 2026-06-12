@@ -29,7 +29,9 @@ The app shell uses JavaScript and the Next.js Pages Router. The Prisma foundatio
 
 The protected dashboard shell now exists at `/dashboard`. It is the future home for player characters and saved progress, but character creation and gameplay systems have not been added yet.
 
-Protected character API routes now exist at `/api/characters`. They let logged-in users list and create their own characters, but no character creation UI or gameplay systems have been added yet.
+Protected character API routes now exist at `/api/characters`. They let logged-in users list and create their own characters.
+
+The protected dashboard now includes a simple character creation UI and character list. Gameplay systems have not been added yet.
 
 ## Tech Stack
 
@@ -135,7 +137,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation and protected character API routes exist. Character creation UI and gameplay systems have not been added yet.
+The Character model foundation, protected character API routes, and dashboard character creation UI exist. Gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -149,10 +151,9 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Build simple character creation UI inside the protected dashboard.
-2. Add a basic character list to the dashboard using `GET /api/characters`.
-3. Add the first database-backed activity log foundation.
-4. Add starter journey content only after character ownership is stable.
-5. Add broader gameplay systems after the saved-progress foundation works.
+1. Add a simple character detail planning document or read-only character detail page foundation.
+2. Add the first database-backed activity log foundation.
+3. Add starter journey content only after character ownership is stable.
+4. Add broader gameplay systems after the saved-progress foundation works.
 
 Do not add combat, quests, inventory, maps, or gameplay data before the base project, database, accounts, and character ownership are ready.

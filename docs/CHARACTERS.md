@@ -2,7 +2,9 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work is database and API foundation only. Character creation UI, character detail pages, inventory, quests, combat, resting, shops, and activity logs have not been added yet.
+The current work includes the database model, protected API routes, and a simple protected character creation UI on `/dashboard`.
+
+Character detail pages, inventory, quests, combat, resting, shops, and activity logs have not been added yet.
 
 ## Character Model Summary
 
@@ -63,6 +65,23 @@ The API ignores `userId` from the request body. Character ownership always comes
 
 The response must never include `passwordHash` or a raw session token.
 
+## Dashboard Character Creation UI
+
+`/dashboard` now includes the first character creation UI.
+
+The dashboard:
+
+- Calls `GET /api/characters` when it loads in the browser.
+- Shows existing characters owned by the logged-in user.
+- Shows `No characters yet.` when the user has no characters.
+- Uses race options from `lib/game/characterOptions.js`.
+- Uses class options from `lib/game/characterOptions.js`.
+- Calls `POST /api/characters` to create a new character.
+- Refreshes the character list after successful creation.
+- Shows simple loading, error, and success states.
+
+The UI must never display `passwordHash` or raw session tokens.
+
 ## Allowed Races
 
 - Human
@@ -98,9 +117,9 @@ The response must never include `passwordHash` or a raw session token.
 
 ## Current Limitations
 
-- No character creation UI exists yet.
 - No character detail route exists yet.
 - No update or delete character API exists yet.
+- No character detail page exists yet.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
 - Inventory has not been added.
@@ -112,4 +131,4 @@ The response must never include `passwordHash` or a raw session token.
 
 ## Next Recommended Step
 
-Build a simple protected character creation UI on the dashboard using the existing `POST /api/characters` route.
+Add a simple character detail planning document or read-only character detail page foundation. Gameplay systems should still wait until character ownership and display are stable.

@@ -94,6 +94,7 @@ h1 {
 }
 
 .home-actions,
+.account-actions,
 .auth-form {
   display: flex;
   width: 100%;
@@ -103,6 +104,10 @@ h1 {
 
 .home-actions {
   margin-top: 0.5rem;
+}
+
+.account-actions {
+  margin-top: 0.25rem;
 }
 
 .coming-soon {
@@ -317,12 +322,18 @@ input:focus {
   }
 
   .home-actions {
-    max-width: 24rem;
+    max-width: 34rem;
     flex-direction: row;
   }
 
   .home-actions .primary-button,
-  .home-actions .secondary-button {
+  .home-actions .secondary-button,
+  .account-actions .primary-button,
+  .account-actions .secondary-button {
     flex: 1;
+  }
+
+  .account-actions {
+    flex-direction: row;
   }
 }

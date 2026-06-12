@@ -33,6 +33,9 @@ export default function Home() {
             <Link className="secondary-button" href="/login">
               Enter Zakzum
             </Link>
+            <Link className="secondary-button" href="/account">
+              Account
+            </Link>
           </nav>
 
           <div className="coming-soon" aria-label="Coming soon">

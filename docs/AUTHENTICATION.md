@@ -12,14 +12,16 @@ Current authentication-related pieces:
 - The migration should be applied before using database-backed auth routes.
 - Password helper functions exist in `lib/auth/password.js`.
 - Session helper functions exist in `lib/auth/session.js`.
+- Current user lookup for server-side code exists in `lib/auth/currentUser.js`.
 - The registration API route exists at `POST /api/auth/register`.
 - The login API route exists at `POST /api/auth/login`.
 - The current-user API route exists at `GET /api/auth/me`.
 - The logout API route exists at `POST /api/auth/logout`.
 - The registration page exists at `/register`.
 - The login page exists at `/login`.
+- The first protected page exists at `/account`.
 
-No middleware, protected page redirects, character creation, gameplay systems, or test users exist yet.
+No middleware, complex role permissions, character creation, gameplay systems, or test users exist yet.
 
 ## Password Storage
 
@@ -231,12 +233,30 @@ The page:
 - Calls `POST /api/auth/login`.
 - Calls `GET /api/auth/me` after successful login to confirm the session.
 - Shows safe current user data: username, email, and role.
+- Links to `/account` after the session is confirmed.
 - Calls `POST /api/auth/logout` when the user logs out.
 - Clears local UI session state after logout.
 - Never displays `passwordHash`.
 - Never displays the raw session token.
 
-Protected pages and protected redirects have not been added yet.
+## Protected Account Page
+
+`/account` is the first protected page foundation.
+
+The page:
+
+- Uses `getServerSideProps`.
+- Reads and verifies the session cookie on the server.
+- Looks up the user by id through `lib/auth/currentUser.js`.
+- Redirects unauthenticated users to `/login`.
+- Shows safe account data only: username, email, and role.
+- Shows a note that character creation is coming soon.
+- Links back to the homepage.
+- Calls `POST /api/auth/logout` and then sends the user to `/login`.
+- Never displays `passwordHash`.
+- Never displays the raw session token.
+
+Middleware and protected redirects outside `/account` have not been added yet.
 
 Character creation has not been added yet.
 
@@ -248,4 +268,4 @@ Vercel must also have `AUTH_SESSION_SECRET` configured before session cookies ca
 
 ## Next Recommended Step
 
-Add a small account landing page or protected-page foundation next. Character creation and gameplay systems should come after protected account access is ready.
+Add the next protected account-area foundation, such as a simple dashboard shell. Character creation and gameplay systems should come after protected account access is ready.

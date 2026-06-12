@@ -172,6 +172,9 @@ export default function Login() {
                   <dd>{currentUser.role}</dd>
                 </div>
               </dl>
+              <Link className="primary-button" href="/account">
+                Open Account
+              </Link>
               <button className="secondary-button" type="button" onClick={handleLogout}>
                 Log Out
               </button>

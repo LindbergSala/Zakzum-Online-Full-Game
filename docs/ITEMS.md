@@ -97,6 +97,8 @@ Starter equipment can only be assigned when the character's inventory is empty. 
 
 The response never includes `passwordHash` or raw session tokens.
 
+Starter equipment assignment does not write an activity log yet. Activity logging should be added in a separate step after activity log API behavior is defined.
+
 ## Character Detail Inventory UI
 
 `/characters/[id]` now shows saved inventory from `CharacterItem` records.
@@ -170,6 +172,7 @@ Current item slots are intentionally simple:
 - Items do not have prices.
 - Shops have not been added.
 - Equipment actions have not been added.
+- Activity logs are not written by item actions yet.
 
 ## Next Recommended Step
 

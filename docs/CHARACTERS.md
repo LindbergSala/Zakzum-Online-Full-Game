@@ -2,9 +2,9 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, and starter equipment preview data.
+The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, starter equipment preview data, persisted inventory, and the activity log model foundation.
 
-Character update and delete actions, inventory API routes, inventory UI, quests, combat, resting, shops, and activity logs have not been added yet.
+Character update and delete actions, activity log API routes, activity log UI, quests, combat, resting, shops, and map systems have not been added yet.
 
 ## Character Model Summary
 
@@ -26,6 +26,7 @@ Each character includes:
 - `renown`
 - `currentLocation`
 - `items`
+- `activityLogs`
 - `createdAt`
 - `updatedAt`
 
@@ -194,6 +195,14 @@ Each `CharacterItem` belongs to one `Character`, and deleting a character delete
 
 Protected inventory API routes now exist for listing character-owned items and assigning starter equipment once. The character detail page now shows saved inventory and can assign starter equipment once when inventory is empty. Automatic starter equipment assignment during character creation has not been added yet.
 
+## Activity Logs
+
+The `ActivityLog` Prisma model now exists as the persisted activity log foundation.
+
+Each `ActivityLog` belongs to one `Character`, and deleting a character deletes that character's activity log records through cascade deletion.
+
+Activity log API routes, activity log UI, and automatic activity logging have not been added yet.
+
 ## Current Limitations
 
 - No update or delete character API exists yet.
@@ -207,8 +216,8 @@ Protected inventory API routes now exist for listing character-owned items and a
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Activity logs have not been added.
+- Activity log persistence foundation exists, but activity log API routes and UI have not been added.
 
 ## Next Recommended Step
 
-Add a carefully scoped equip and unequip plan, or add the first activity log foundation. Gameplay systems should still wait until character ownership and inventory display are stable.
+Add protected activity log API routes, or plan exactly which future systems should write activity logs. Gameplay systems should still wait until character ownership, inventory display, and activity log ownership are stable.

@@ -114,7 +114,21 @@ This migration creates:
 - A foreign key from `CharacterItem.characterId` to `Character.id`
 - `ON DELETE CASCADE` so item records are removed when their owning character is removed
 
-The User and Character migrations have been applied to the local Docker PostgreSQL database. The CharacterItem migration should be applied locally with `npm run db:migrate` after Docker PostgreSQL is running.
+The ActivityLog migration file exists at:
+
+```text
+prisma/migrations/20260615133609_add_activity_log_model/migration.sql
+```
+
+This migration creates:
+
+- The `ActivityLog` table
+- An index on `characterId`
+- An index on `characterId` and `createdAt`
+- A foreign key from `ActivityLog.characterId` to `Character.id`
+- `ON DELETE CASCADE` so activity log records are removed when their owning character is removed
+
+The current migrations have been applied to the local Docker PostgreSQL database.
 
 For deployment, use the normal Prisma and Vercel migration flow with a real production `DATABASE_URL`. Do not use the local Docker database for production.
 
@@ -156,11 +170,12 @@ It includes:
 - Early survival fields: `stamina`, `maxStamina`, and `stress`
 - `currentLocation`, defaulting to `Kingstone`
 - `items` relation for character-owned inventory records
+- `activityLogs` relation for character-owned activity records
 - `createdAt` and `updatedAt` timestamps
 
 The relation uses `onDelete: Cascade`, so deleting a user deletes that user's characters.
 
-This model does not include quests, combat, shops, resting, or activity logs yet.
+This model does not include quests, combat, shops, resting, map systems, or story systems yet.
 
 ### CharacterItem
 
@@ -179,12 +194,34 @@ It includes:
 
 The relation uses `onDelete: Cascade`, so deleting a character deletes that character's item records.
 
-This model does not include item stats, damage values, armor values, rarity, prices, global item templates, inventory API routes, inventory UI, shops, or equipment actions yet.
+This model does not include item stats, damage values, armor values, rarity, prices, global item templates, shops, or equipment actions yet.
+
+### ActivityLog
+
+The `ActivityLog` model is the first database foundation for the character's living memory.
+
+Each activity log record belongs to one `Character`.
+
+It includes:
+
+- A generated string `id`
+- `characterId` and a required `Character` relation
+- `type` as a string for flexible early system design
+- `title`
+- `description`
+- Optional `details` JSON
+- `createdAt`
+
+The relation uses `onDelete: Cascade`, so deleting a character deletes that character's activity log records.
+
+The model includes indexes on `characterId` and on `characterId` with `createdAt` for future character timeline queries.
+
+This model does not include activity log API routes, activity log UI, automatic logging, quests, combat, resting, map systems, shops, or story systems yet.
 
 ## Future Models
 
 Future models should be added step by step as the project needs them.
 
-The next recommended database work is to apply the CharacterItem migration locally when Docker PostgreSQL is running, then add inventory API routes in a separate small step.
+The next recommended database work is to add protected activity log API routes in a separate small step.
 
-Do not add combat, quest, map, shop, rest, or activity log models until character ownership and persisted inventory are stable.
+Do not add combat, quest, map, shop, rest, or story models until character ownership, persisted inventory, and activity log ownership are stable.

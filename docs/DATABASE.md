@@ -101,7 +101,20 @@ This migration creates:
 - A foreign key from `Character.userId` to `User.id`
 - `ON DELETE CASCADE` so local character records are removed when their owning user is removed
 
-The current migrations have been applied to the local Docker PostgreSQL database.
+The CharacterItem migration file exists at:
+
+```text
+prisma/migrations/20260615120000_add_character_item_model/migration.sql
+```
+
+This migration creates:
+
+- The `CharacterItem` table
+- An index on `characterId`
+- A foreign key from `CharacterItem.characterId` to `Character.id`
+- `ON DELETE CASCADE` so item records are removed when their owning character is removed
+
+The User and Character migrations have been applied to the local Docker PostgreSQL database. The CharacterItem migration should be applied locally with `npm run db:migrate` after Docker PostgreSQL is running.
 
 For deployment, use the normal Prisma and Vercel migration flow with a real production `DATABASE_URL`. Do not use the local Docker database for production.
 
@@ -142,16 +155,36 @@ It includes:
 - Basic progression fields: `level`, `experience`, `gold`, and `renown`
 - Early survival fields: `stamina`, `maxStamina`, and `stress`
 - `currentLocation`, defaulting to `Kingstone`
+- `items` relation for character-owned inventory records
 - `createdAt` and `updatedAt` timestamps
 
 The relation uses `onDelete: Cascade`, so deleting a user deletes that user's characters.
 
-This model does not include inventory, quests, combat, shops, resting, or activity logs yet.
+This model does not include quests, combat, shops, resting, or activity logs yet.
+
+### CharacterItem
+
+The `CharacterItem` model is the first persisted inventory foundation for Zakzum Online.
+
+Each item record belongs to one `Character`.
+
+It includes:
+
+- A generated string `id`
+- `characterId` and a required `Character` relation
+- `key`, `name`, `type`, `slot`, and `description`
+- `quantity`, defaulting to `1`
+- `isEquipped`, defaulting to `false`
+- `createdAt` and `updatedAt` timestamps
+
+The relation uses `onDelete: Cascade`, so deleting a character deletes that character's item records.
+
+This model does not include item stats, damage values, armor values, rarity, prices, global item templates, inventory API routes, inventory UI, shops, or equipment actions yet.
 
 ## Future Models
 
 Future models should be added step by step as the project needs them.
 
-The next recommended database work is to add models only when character creation or saved progress needs them.
+The next recommended database work is to apply the CharacterItem migration locally when Docker PostgreSQL is running, then add inventory API routes in a separate small step.
 
-Do not add combat, inventory, quest, map, shop, rest, or activity log models until character creation and ownership are stable.
+Do not add combat, quest, map, shop, rest, or activity log models until character ownership and persisted inventory are stable.

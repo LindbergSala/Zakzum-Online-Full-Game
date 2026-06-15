@@ -1,14 +1,16 @@
 # Zakzum Online Item Foundation
 
-Items are not persisted in the database yet.
+The persisted inventory foundation now exists through the `CharacterItem` Prisma model.
 
-The current item foundation is a small starter equipment data file for preview and planning:
+Starter equipment preview data still lives in:
 
 ```text
 lib/game/starterEquipment.js
 ```
 
 Starter equipment should feel practical, worn, grounded, and useful for survival. Characters should feel like new travelers at the start of a dangerous road, not finished heroes.
+
+The inventory API and inventory UI have not been added yet.
 
 ## Starter Equipment Data Summary
 
@@ -27,7 +29,29 @@ Each supported class has a small starter kit:
 
 The read-only character detail page at `/characters/[id]` shows a Starter Equipment Preview based on the character's class.
 
-This preview is not saved inventory.
+This preview is still not saved inventory. Starter equipment is not automatically assigned when a character is created yet.
+
+## CharacterItem Persistence
+
+The `CharacterItem` model is the first database foundation for character-owned inventory.
+
+Each `CharacterItem` belongs to one `Character`.
+
+Stored fields are:
+
+- `id`
+- `characterId`
+- `key`
+- `name`
+- `type`
+- `slot`
+- `description`
+- `quantity`
+- `isEquipped`
+- `createdAt`
+- `updatedAt`
+
+Deleting a character deletes that character's items through the Prisma relation cascade.
 
 ## Item Object Shape
 
@@ -73,10 +97,11 @@ Current item slots are intentionally simple:
 
 ## Current Limitations
 
-- No item database models exist yet.
-- No inventory database models exist yet.
+- No global `Item` database model exists yet.
 - Starter equipment is not assigned during character creation yet.
 - Starter equipment is not saved to a character yet.
+- Inventory API routes have not been added yet.
+- Inventory UI has not been added yet.
 - Items do not have stats.
 - Items do not have damage values.
 - Items do not have armor values.
@@ -87,4 +112,4 @@ Current item slots are intentionally simple:
 
 ## Next Recommended Step
 
-Add the inventory model foundation. The next step should create persistence for character-owned items before any equipment mechanics, shops, combat, or item rewards are added.
+Apply the CharacterItem migration locally when Docker PostgreSQL is running, then add protected inventory API routes in a separate step. Equipment mechanics, shops, combat, and item rewards should still wait.

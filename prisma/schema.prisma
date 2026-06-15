@@ -19,24 +19,42 @@ model User {
 }
 
 model Character {
-  id              String   @id @default(cuid())
+  id              String          @id @default(cuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   name            String
   race            String
   characterClass  String
-  level           Int      @default(1)
-  experience      Int      @default(0)
-  gold            Int      @default(0)
-  stamina         Int      @default(10)
-  maxStamina      Int      @default(10)
-  stress          Int      @default(0)
-  renown          Int      @default(0)
-  currentLocation String   @default("Kingstone")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  level           Int             @default(1)
+  experience      Int             @default(0)
+  gold            Int             @default(0)
+  stamina         Int             @default(10)
+  maxStamina      Int             @default(10)
+  stress          Int             @default(0)
+  renown          Int             @default(0)
+  currentLocation String          @default("Kingstone")
+  items           CharacterItem[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@index([userId])
+}
+
+model CharacterItem {
+  id          String    @id @default(cuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  key         String
+  name        String
+  type        String
+  slot        String
+  description String
+  quantity    Int       @default(1)
+  isEquipped  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([characterId])
 }
 
 enum UserRole {

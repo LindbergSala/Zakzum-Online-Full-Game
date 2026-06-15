@@ -4,7 +4,7 @@ Characters are the player-owned records that will later carry saved progress thr
 
 The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, and starter equipment preview data.
 
-Character update and delete actions, inventory, quests, combat, resting, shops, and activity logs have not been added yet.
+Character update and delete actions, inventory API routes, inventory UI, quests, combat, resting, shops, and activity logs have not been added yet.
 
 ## Character Model Summary
 
@@ -25,6 +25,7 @@ Each character includes:
 - `stress`
 - `renown`
 - `currentLocation`
+- `items`
 - `createdAt`
 - `updatedAt`
 
@@ -185,13 +186,21 @@ Each starter item currently has:
 
 The current item data is meant to help future inventory work assign grounded starter gear when a character is created. It does not create saved inventory yet.
 
+## Character Items
+
+The `CharacterItem` Prisma model now exists as the persisted inventory foundation.
+
+Each `CharacterItem` belongs to one `Character`, and deleting a character deletes that character's item records through cascade deletion.
+
+Inventory API routes, inventory UI, and automatic starter equipment assignment have not been added yet.
+
 ## Current Limitations
 
 - No update or delete character API exists yet.
 - Character detail is read-only.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
-- Inventory persistence has not been added.
+- Inventory persistence foundation exists, but inventory API routes and UI have not been added.
 - Starter equipment is preview-only.
 - Quests have not been added.
 - Combat has not been added.
@@ -201,4 +210,4 @@ The current item data is meant to help future inventory work assign grounded sta
 
 ## Next Recommended Step
 
-Add the inventory model foundation so starter equipment can later be saved to a character. Gameplay systems should still wait until character ownership and display are stable.
+Add protected inventory API routes after the CharacterItem migration is applied locally. Gameplay systems should still wait until character ownership and inventory persistence are stable.

@@ -31,7 +31,7 @@ The protected dashboard shell now exists at `/dashboard`. It is the future home 
 
 Protected character API routes now exist at `/api/characters`. They let logged-in users list and create their own characters.
 
-The protected dashboard now includes a simple character creation UI and character list. Character cards link to read-only character sheets at `/characters/[id]`. Starter equipment preview data exists, but inventory persistence and gameplay systems have not been added yet.
+The protected dashboard now includes a simple character creation UI and character list. Character cards link to read-only character sheets at `/characters/[id]`. Starter equipment preview data exists, and the CharacterItem inventory persistence foundation has been added. Inventory API routes, inventory UI, and gameplay systems have not been added yet.
 
 ## Tech Stack
 
@@ -111,9 +111,11 @@ The planned database approach is:
 
 The first model is `User`, with a simple `UserRole` enum for player and admin accounts.
 
-The `Character` model foundation now exists and belongs to `User`. It stores the first character identity, progression, and survival fields, but it does not include inventory, quests, combat, shops, resting, or activity logs yet.
+The `Character` model foundation now exists and belongs to `User`. It stores the first character identity, progression, and survival fields. It now has an `items` relation for future persisted inventory, but it does not include quests, combat, shops, resting, or activity logs yet.
 
-Starter equipment data exists in `lib/game/starterEquipment.js`. It is preview-only and is not saved in the database yet.
+Starter equipment data exists in `lib/game/starterEquipment.js`. It is preview-only and is not automatically saved as inventory yet.
+
+The `CharacterItem` model foundation now exists and belongs to `Character`. It stores simple item identity, type, slot, description, quantity, and equipped state.
 
 Local PostgreSQL development is configured with Docker Compose.
 
@@ -139,7 +141,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation, protected character API routes, dashboard character creation UI, read-only character detail page, and starter equipment preview data exist. Gameplay systems have not been added yet.
+The Character model foundation, protected character API routes, dashboard character creation UI, read-only character detail page, starter equipment preview data, and CharacterItem inventory persistence foundation exist. Gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -153,9 +155,10 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add the inventory model foundation.
-2. Add the first database-backed activity log foundation.
-3. Add starter journey content only after character ownership is stable.
-4. Add broader gameplay systems after the saved-progress foundation works.
+1. Apply the CharacterItem migration locally when Docker PostgreSQL is running.
+2. Add protected inventory API routes.
+3. Add the first database-backed activity log foundation.
+4. Add starter journey content only after character ownership is stable.
+5. Add broader gameplay systems after the saved-progress foundation works.
 
 Do not add combat, quests, inventory, maps, or gameplay data before the base project, database, accounts, and character ownership are ready.

@@ -10,7 +10,7 @@ lib/game/starterEquipment.js
 
 Starter equipment should feel practical, worn, grounded, and useful for survival. Characters should feel like new travelers at the start of a dangerous road, not finished heroes.
 
-The protected inventory API foundation now exists. The inventory UI has not been added yet.
+The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI.
 
 ## Starter Equipment Data Summary
 
@@ -31,7 +31,7 @@ The read-only character detail page at `/characters/[id]` shows a Starter Equipm
 
 This preview is still not saved inventory. Starter equipment is not automatically assigned when a character is created yet.
 
-Starter equipment can be assigned to a character through the protected inventory API only when that character's inventory is empty.
+Starter equipment can be assigned to a character through the protected inventory API or the character detail UI only when that character's inventory is empty.
 
 ## CharacterItem Persistence
 
@@ -97,6 +97,22 @@ Starter equipment can only be assigned when the character's inventory is empty. 
 
 The response never includes `passwordHash` or raw session tokens.
 
+## Character Detail Inventory UI
+
+`/characters/[id]` now shows saved inventory from `CharacterItem` records.
+
+The character detail page:
+
+- Calls `GET /api/characters/[id]/inventory` when it loads in the browser.
+- Shows `No saved equipment yet.` when the inventory is empty.
+- Shows each saved item with name, type, slot, quantity, equipped status, and description.
+- Shows an `Assign Starter Equipment` button only when the saved inventory is empty.
+- Calls `POST /api/characters/[id]/inventory` with `action: "assignStarterEquipment"`.
+- Refreshes saved inventory after starter equipment is assigned.
+- Handles duplicate starter assignment safely if the API returns `409`.
+
+The Starter Equipment Preview section remains reference-only. Saved inventory appears in the Equipment section.
+
 ## Item Object Shape
 
 Each starter item is a plain JavaScript object:
@@ -144,8 +160,9 @@ Current item slots are intentionally simple:
 - No global `Item` database model exists yet.
 - Starter equipment is not assigned during character creation yet.
 - Starter equipment is not assigned automatically.
-- Inventory UI has not been added yet.
+- Inventory UI is limited to listing saved items and assigning starter equipment once.
 - Update, delete, equip, and unequip item routes have not been added yet.
+- Equip and unequip UI has not been added yet.
 - Items do not have stats.
 - Items do not have damage values.
 - Items do not have armor values.
@@ -156,4 +173,4 @@ Current item slots are intentionally simple:
 
 ## Next Recommended Step
 
-Add a simple inventory UI section to the read-only character detail page. Equipment mechanics, shops, combat, and item rewards should still wait.
+Add a carefully scoped equip and unequip plan, or add the first activity log foundation before item mechanics. Equipment mechanics, shops, combat, and item rewards should still wait.

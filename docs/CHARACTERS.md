@@ -192,7 +192,7 @@ The `CharacterItem` Prisma model now exists as the persisted inventory foundatio
 
 Each `CharacterItem` belongs to one `Character`, and deleting a character deletes that character's item records through cascade deletion.
 
-Protected inventory API routes now exist for listing character-owned items and assigning starter equipment once. Inventory UI and automatic starter equipment assignment during character creation have not been added yet.
+Protected inventory API routes now exist for listing character-owned items and assigning starter equipment once. The character detail page now shows saved inventory and can assign starter equipment once when inventory is empty. Automatic starter equipment assignment during character creation has not been added yet.
 
 ## Current Limitations
 
@@ -200,7 +200,8 @@ Protected inventory API routes now exist for listing character-owned items and a
 - Character detail is read-only.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
-- Inventory persistence and protected inventory API routes exist, but inventory UI has not been added.
+- Inventory persistence, protected inventory API routes, and basic inventory UI exist.
+- Equip and unequip actions have not been added.
 - Starter equipment is preview-only.
 - Quests have not been added.
 - Combat has not been added.
@@ -210,4 +211,4 @@ Protected inventory API routes now exist for listing character-owned items and a
 
 ## Next Recommended Step
 
-Add a simple inventory UI section to the character detail page. Gameplay systems should still wait until character ownership and inventory display are stable.
+Add a carefully scoped equip and unequip plan, or add the first activity log foundation. Gameplay systems should still wait until character ownership and inventory display are stable.

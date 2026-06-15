@@ -31,7 +31,7 @@ The protected dashboard shell now exists at `/dashboard`. It is the future home 
 
 Protected character API routes now exist at `/api/characters`. They let logged-in users list and create their own characters.
 
-The protected dashboard now includes a simple character creation UI and character list. Character cards link to read-only character sheets at `/characters/[id]`. Starter equipment preview data exists, the CharacterItem inventory persistence foundation has been added, and protected inventory API routes now exist. Inventory UI and gameplay systems have not been added yet.
+The protected dashboard now includes a simple character creation UI and character list. Character cards link to read-only character sheets at `/characters/[id]`. Starter equipment preview data exists, the CharacterItem inventory persistence foundation has been added, protected inventory API routes now exist, and the character detail page can show saved inventory. Gameplay systems have not been added yet.
 
 ## Tech Stack
 
@@ -141,7 +141,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation, protected character API routes, dashboard character creation UI, read-only character detail page, starter equipment preview data, CharacterItem inventory persistence foundation, and protected inventory API routes exist. Gameplay systems have not been added yet.
+The Character model foundation, protected character API routes, dashboard character creation UI, read-only character detail page, starter equipment preview data, CharacterItem inventory persistence foundation, protected inventory API routes, and basic inventory UI exist. Gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -155,9 +155,8 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add a simple inventory UI section to the character detail page.
-2. Add the first database-backed activity log foundation.
-3. Add starter journey content only after character ownership is stable.
-4. Add broader gameplay systems after the saved-progress foundation works.
+1. Add a carefully scoped equip and unequip plan, or add the first database-backed activity log foundation.
+2. Add starter journey content only after character ownership is stable.
+3. Add broader gameplay systems after the saved-progress foundation works.
 
 Do not add combat, quests, inventory, maps, or gameplay data before the base project, database, accounts, and character ownership are ready.

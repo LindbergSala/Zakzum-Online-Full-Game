@@ -10,7 +10,9 @@ The database foundation now exists through the `ActivityLog` Prisma model.
 
 The protected read API route now exists for logged-in users to read activity logs for their own characters.
 
-Activity log write routes and activity log UI have not been added yet.
+The protected character detail page now displays a read-only Activity Log section.
+
+Activity log write routes have not been added yet.
 
 No automatic logs are written yet during character creation, starter equipment assignment, rest, travel, combat, quests, or story progress.
 
@@ -66,6 +68,36 @@ The response does not include user data, `passwordHash`, or raw session tokens.
 
 No `POST`, `PUT`, `PATCH`, or `DELETE` activity log routes exist yet.
 
+## Activity Log UI Summary
+
+The protected character detail page now displays read-only activity logs:
+
+```text
+/characters/[id]
+```
+
+The page uses:
+
+```text
+GET /api/characters/[id]/activity-logs
+```
+
+The Activity Log section shows:
+
+- `title`
+- `type`
+- `description`
+- `createdAt`
+- a readable `details` preview when details exist
+
+If no logs exist, the page shows:
+
+```text
+No recorded activity yet.
+```
+
+The UI does not include an activity log form and does not write logs.
+
 ## Relation To Character
 
 Each `ActivityLog` belongs to one `Character`.
@@ -107,7 +139,7 @@ Future activity logs may record:
 ## Current Limitations
 
 - A protected activity log read API route exists, but no write routes exist yet.
-- No activity log UI exists yet.
+- A read-only activity log UI exists on `/characters/[id]`.
 - No automatic activity logs are written yet.
 - Character creation does not write activity logs yet.
 - Starter equipment assignment does not write activity logs yet.
@@ -119,4 +151,4 @@ Future activity logs may record:
 
 ## Next Recommended Step
 
-Add an activity log UI section to the protected character detail page, or plan the first deliberate automatic log source. Automatic log creation should wait until each source system is built deliberately.
+Plan the first deliberate automatic log source, such as character creation or starter equipment assignment. Automatic log creation should wait until each source system is built deliberately.

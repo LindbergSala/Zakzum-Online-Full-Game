@@ -27,6 +27,18 @@ function formatDate(dateValue) {
   return dateValue.split("T")[0];
 }
 
+function formatDetails(details) {
+  if (!details) {
+    return "";
+  }
+
+  if (typeof details === "string") {
+    return details;
+  }
+
+  return JSON.stringify(details, null, 2);
+}
+
 export default function CharacterDetail({ character }) {
   const starterEquipment = getStarterEquipmentForClass(character.characterClass);
   const [inventoryItems, setInventoryItems] = useState([]);
@@ -34,6 +46,9 @@ export default function CharacterDetail({ character }) {
   const [inventoryError, setInventoryError] = useState("");
   const [inventorySuccess, setInventorySuccess] = useState("");
   const [assigningStarterEquipment, setAssigningStarterEquipment] = useState(false);
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [activityLogLoading, setActivityLogLoading] = useState(true);
+  const [activityLogError, setActivityLogError] = useState("");
 
   async function loadInventory() {
     setInventoryLoading(true);
@@ -87,6 +102,46 @@ export default function CharacterDetail({ character }) {
     }
 
     loadInitialInventory();
+
+    return () => {
+      isActive = false;
+    };
+  }, [character.id]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadActivityLogs() {
+      setActivityLogLoading(true);
+      setActivityLogError("");
+
+      try {
+        const response = await fetch(`/api/characters/${character.id}/activity-logs`);
+        const data = await response.json();
+
+        if (!isActive) {
+          return;
+        }
+
+        if (!response.ok) {
+          setActivityLogError(data.error || "Activity log could not be loaded.");
+          setActivityLogs([]);
+          return;
+        }
+
+        setActivityLogs(data.activityLogs || []);
+      } catch {
+        if (isActive) {
+          setActivityLogError("Activity log could not be loaded.");
+        }
+      } finally {
+        if (isActive) {
+          setActivityLogLoading(false);
+        }
+      }
+    }
+
+    loadActivityLogs();
 
     return () => {
       isActive = false;
@@ -202,9 +257,41 @@ export default function CharacterDetail({ character }) {
             </dl>
           </section>
 
-          <section className="session-panel" aria-labelledby="journey-record-title">
-            <h2 id="journey-record-title">Journey Record</h2>
-            <p className="empty-state">Activity log coming soon.</p>
+          <section className="session-panel" aria-labelledby="activity-log-title">
+            <h2 id="activity-log-title">Activity Log</h2>
+            <p className="supporting-text">
+              The road remembers what this character has survived. For now, this
+              record is read-only.
+            </p>
+            {activityLogLoading ? (
+              <p className="supporting-text">Reading the character record...</p>
+            ) : null}
+            {activityLogError ? (
+              <p className="form-message error">{activityLogError}</p>
+            ) : null}
+            {!activityLogLoading && !activityLogError && activityLogs.length === 0 ? (
+              <p className="empty-state">No recorded activity yet.</p>
+            ) : null}
+            {!activityLogLoading && !activityLogError && activityLogs.length > 0 ? (
+              <div className="activity-log-list">
+                {activityLogs.map((activityLog) => (
+                  <article className="activity-log-item" key={activityLog.id}>
+                    <div>
+                      <h3>{activityLog.title}</h3>
+                      <p className="item-meta">
+                        {activityLog.type} / {formatDate(activityLog.createdAt)}
+                      </p>
+                    </div>
+                    <p className="supporting-text">{activityLog.description}</p>
+                    {activityLog.details ? (
+                      <pre className="activity-log-details">
+                        {formatDetails(activityLog.details)}
+                      </pre>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : null}
           </section>
 
           <section className="session-panel" aria-labelledby="equipment-title">

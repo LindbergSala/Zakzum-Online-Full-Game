@@ -2,9 +2,9 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, starter equipment preview data, persisted inventory, and the activity log model foundation with a protected read API route.
+The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, starter equipment preview data, persisted inventory, and the activity log model foundation with a protected read API route and read-only UI section.
 
-Character update and delete actions, activity log write routes, activity log UI, quests, combat, resting, shops, and map systems have not been added yet.
+Character update and delete actions, activity log write routes, quests, combat, resting, shops, and map systems have not been added yet.
 
 ## Character Model Summary
 
@@ -123,7 +123,7 @@ The page shows:
 - `currentLocation`
 - `createdAt`
 
-It also includes placeholder sections for Journey Record, Equipment, and future Actions.
+It also includes sections for Activity Log, Equipment, and future Actions.
 
 The Equipment section explains that inventory persistence is coming soon.
 
@@ -203,7 +203,9 @@ Each `ActivityLog` belongs to one `Character`, and deleting a character deletes 
 
 The protected read route `GET /api/characters/[id]/activity-logs` now returns logs for a character owned by the logged-in user.
 
-Activity log write routes, activity log UI, and automatic activity logging have not been added yet.
+The character detail page now shows a read-only Activity Log section. It loads logs from the protected read route and shows `No recorded activity yet.` when the character has no logs.
+
+Activity log write routes and automatic activity logging have not been added yet.
 
 ## Current Limitations
 
@@ -218,8 +220,8 @@ Activity log write routes, activity log UI, and automatic activity logging have 
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Activity log persistence and the protected read API route exist, but activity log UI and write routes have not been added.
+- Activity log persistence, the protected read API route, and the read-only UI section exist, but write routes have not been added.
 
 ## Next Recommended Step
 
-Add an activity log UI section, or plan exactly which future systems should write activity logs. Gameplay systems should still wait until character ownership, inventory display, and activity log ownership are stable.
+Plan exactly which future systems should write activity logs. Gameplay systems should still wait until character ownership, inventory display, and activity log ownership are stable.

@@ -12,9 +12,11 @@ The protected read API route now exists for logged-in users to read activity log
 
 The protected character detail page now displays a read-only Activity Log section.
 
-Activity log write routes have not been added yet.
+Public activity log write routes have not been added yet.
 
 Automatic log sources now exist for character creation and starter equipment assignment.
+
+Automatic log sources also exist for successful item equip and unequip actions.
 
 No automatic logs are written yet during rest, travel, combat, quests, or story progress.
 
@@ -136,6 +138,76 @@ This log is connected to the same character that receives the starter equipment.
 
 If the character already has items and the inventory API returns `409`, no `starter_equipment_assigned` log is created.
 
+### Item Equipped
+
+When a logged-in user equips one of their own character's equippable items through:
+
+```text
+PATCH /api/characters/[id]/inventory/[itemId]
+```
+
+with this body:
+
+```json
+{
+  "action": "equip"
+}
+```
+
+the server creates one `ActivityLog` record for that character.
+
+The log uses:
+
+- `type`: `item_equipped`
+- `title`: `Item Equipped`
+- `description`: `A tool was made ready for the road ahead.`
+
+The log details store:
+
+- `characterName`
+- `itemName`
+- `itemType`
+- `itemSlot`
+
+The log is only created when the item changes from unequipped to equipped.
+
+No `item_equipped` log is created for invalid slots, same-slot conflicts, missing items, unauthorized requests, or an item that is already equipped.
+
+### Item Unequipped
+
+When a logged-in user unequips one of their own character's items through:
+
+```text
+PATCH /api/characters/[id]/inventory/[itemId]
+```
+
+with this body:
+
+```json
+{
+  "action": "unequip"
+}
+```
+
+the server creates one `ActivityLog` record for that character.
+
+The log uses:
+
+- `type`: `item_unequipped`
+- `title`: `Item Unequipped`
+- `description`: `A tool was returned to the pack.`
+
+The log details store:
+
+- `characterName`
+- `itemName`
+- `itemType`
+- `itemSlot`
+
+The log is only created when the item changes from equipped to unequipped.
+
+No `item_unequipped` log is created for missing items, unauthorized requests, or an item that is already unequipped.
+
 ## Activity Log UI Summary
 
 The protected character detail page now displays read-only activity logs:
@@ -184,6 +256,8 @@ Future log types may include:
 
 - `character_created`
 - `starter_equipment_assigned`
+- `item_equipped`
+- `item_unequipped`
 - `rest_completed`
 - `travel_completed`
 - `quest_progress`
@@ -210,6 +284,9 @@ Future activity logs may record:
 - A read-only activity log UI exists on `/characters/[id]`.
 - Character creation now writes one automatic `character_created` activity log.
 - Starter equipment assignment now writes one automatic `starter_equipment_assigned` activity log when assignment succeeds.
+- Item equip now writes one automatic `item_equipped` activity log when equipment changes.
+- Item unequip now writes one automatic `item_unequipped` activity log when equipment changes.
+- No equip or unequip logs are written for no-op, conflict, invalid slot, not found, or unauthorized requests.
 - Resting has not been added.
 - Travel and map systems have not been added.
 - Quests have not been added.

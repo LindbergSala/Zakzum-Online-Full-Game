@@ -10,7 +10,7 @@ lib/game/starterEquipment.js
 
 Starter equipment should feel practical, worn, grounded, and useful for survival. Characters should feel like new travelers at the start of a dangerous road, not finished heroes.
 
-The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI. Successful starter equipment assignment now writes one automatic `starter_equipment_assigned` activity log.
+The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI. Successful starter equipment assignment, equip, and unequip actions write automatic activity logs.
 
 The equipment rules foundation now exists in:
 
@@ -106,6 +106,53 @@ The response never includes `passwordHash` or raw session tokens.
 
 Duplicate starter equipment assignment does not create another starter equipment activity log.
 
+The protected inventory item action route is:
+
+```text
+/api/characters/[id]/inventory/[itemId]
+```
+
+Supported methods:
+
+- `PATCH`
+
+The route requires a valid logged-in user and verifies that the requested character and item belong to that user.
+
+Supported actions:
+
+```json
+{
+  "action": "equip"
+}
+```
+
+```json
+{
+  "action": "unequip"
+}
+```
+
+Equip behavior:
+
+- Only `mainHand`, `offHand`, and `body` items can be equipped.
+- `pack` and `none` items return `400` when equip is requested.
+- Only one item can be equipped in a slot at a time.
+- If another item is already equipped in the same slot, the route returns `409`.
+- If the same item is already equipped, the route returns the safe item data and does not create another activity log.
+
+Unequip behavior:
+
+- Equipped items can be unequipped.
+- If the item is already unequipped, the route returns the safe item data and does not create another activity log.
+
+Successful equip creates one `item_equipped` activity log.
+
+Successful unequip creates one `item_unequipped` activity log.
+
+No activity logs are created for no-op, conflict, invalid slot, not found, or unauthorized requests.
+
+The equip and unequip API returns safe item data only and never returns user data, `passwordHash`, or raw session tokens.
+
 ## Character Detail Inventory UI
 
 `/characters/[id]` now shows saved inventory from `CharacterItem` records.
@@ -188,11 +235,11 @@ The helper exports:
 - `canEquipItem(item)`
 - `getEquippedSlotConflict(items, item)`
 
-Future equip behavior should allow only one equipped item per equippable slot.
+Equip behavior allows only one equipped item per equippable slot.
 
 `getEquippedSlotConflict(items, item)` checks an inventory list for an already equipped item in the same slot and returns that item when there is a conflict. It returns `null` when there is no conflict.
 
-Equip and unequip API routes have not been added yet.
+Equip and unequip API behavior now reuses these rules.
 
 Equip and unequip UI has not been added yet.
 
@@ -202,18 +249,16 @@ Equip and unequip UI has not been added yet.
 - Starter equipment is not assigned during character creation yet.
 - Starter equipment is not assigned automatically.
 - Inventory UI is limited to listing saved items and assigning starter equipment once.
-- Update, delete, equip, and unequip item routes have not been added yet.
+- Update and delete item routes have not been added yet.
 - Equip and unequip UI has not been added yet.
-- Equipment rules exist, but they are not wired into API behavior yet.
 - Items do not have stats.
 - Items do not have damage values.
 - Items do not have armor values.
 - Items do not have rarity.
 - Items do not have prices.
 - Shops have not been added.
-- Equipment actions have not been added.
-- Starter equipment assignment writes an activity log, but other item actions have not been added yet.
+- Starter equipment assignment, equip, and unequip write activity logs when the action succeeds.
 
 ## Next Recommended Step
 
-Add protected equip and unequip API routes that reuse `lib/game/equipmentRules.js`. Equipment mechanics, shops, combat, and item rewards should still wait.
+Add simple equip and unequip controls to the character detail inventory UI. Equipment stats, shops, combat, and item rewards should still wait.

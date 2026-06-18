@@ -4,6 +4,10 @@ import {
   getTravelDestinationSummary,
   getTravelValidationError,
 } from "../../../../lib/game/travelRules";
+import {
+  getTravelCost,
+  getTravelCostValidationError,
+} from "../../../../lib/game/travelCostRules";
 import { getLocationByKey } from "../../../../lib/game/worldLocations";
 import prisma from "../../../../lib/prisma";
 
@@ -35,6 +39,9 @@ async function getOwnedCharacter(characterId, userId) {
       id: true,
       name: true,
       currentLocation: true,
+      stamina: true,
+      maxStamina: true,
+      stress: true,
     },
   });
 }
@@ -76,17 +83,37 @@ export default async function handler(req, res) {
 
     const destinationSummary = getTravelDestinationSummary(destinationLocationKey);
     const fromLocationName = getLocationName(character.currentLocation);
+    const travelCost = getTravelCost({
+      currentLocationKey: character.currentLocation,
+      destinationLocationKey,
+    });
+    const costValidationError = getTravelCostValidationError({
+      stamina: character.stamina,
+      travelCost,
+    });
+
+    if (costValidationError) {
+      return res.status(400).json({ error: costValidationError });
+    }
+
+    const staminaAfter = Math.max(0, character.stamina - travelCost.staminaCost);
+    const stressAfter = character.stress + travelCost.stressGain;
 
     const updatedCharacter = await prisma.$transaction(async (tx) => {
       const traveledCharacter = await tx.character.update({
         where: { id: character.id },
         data: {
           currentLocation: destinationLocationKey,
+          stamina: staminaAfter,
+          stress: stressAfter,
         },
         select: {
           id: true,
           name: true,
           currentLocation: true,
+          stamina: true,
+          maxStamina: true,
+          stress: true,
         },
       });
 
@@ -104,6 +131,12 @@ export default async function handler(req, res) {
             destinationLocationName: destinationSummary.name,
             destinationRealmKey: destinationSummary.realmKey,
             destinationRealmName: destinationSummary.realmName,
+            staminaCost: travelCost.staminaCost,
+            stressGain: travelCost.stressGain,
+            staminaBefore: character.stamina,
+            staminaAfter,
+            stressBefore: character.stress,
+            stressAfter,
           },
         },
         tx,
@@ -119,7 +152,11 @@ export default async function handler(req, res) {
         name: updatedCharacter.name,
         currentLocation: updatedCharacter.currentLocation,
         currentLocationName: destinationSummary.name,
+        stamina: updatedCharacter.stamina,
+        maxStamina: updatedCharacter.maxStamina,
+        stress: updatedCharacter.stress,
       },
+      travelCost,
       destination: destinationSummary,
     });
   } catch (error) {

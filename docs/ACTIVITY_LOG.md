@@ -241,10 +241,16 @@ The log details store:
 - `destinationLocationName`
 - `destinationRealmKey`
 - `destinationRealmName`
+- `staminaCost`
+- `stressGain`
+- `staminaBefore`
+- `staminaAfter`
+- `stressBefore`
+- `stressAfter`
 
 The log is only created when travel succeeds.
 
-No `travel_completed` log is created for missing destinations, invalid destinations, same-location travel, missing characters, unauthorized requests, or failed requests.
+No `travel_completed` log is created for missing destinations, invalid destinations, same-location travel, insufficient stamina, missing characters, unauthorized requests, or failed requests.
 
 ## Activity Log UI Summary
 
@@ -327,8 +333,8 @@ Future activity logs may record:
 - Item equip now writes one automatic `item_equipped` activity log when equipment changes.
 - Item unequip now writes one automatic `item_unequipped` activity log when equipment changes.
 - No equip or unequip logs are written for no-op, conflict, invalid slot, not found, or unauthorized requests.
-- Travel now writes one automatic `travel_completed` activity log when a protected travel request succeeds.
-- No travel logs are written for invalid, same-location, not found, unauthorized, or failed requests.
+- Travel now writes one automatic `travel_completed` activity log with stamina and stress cost details when a protected travel request succeeds.
+- No travel logs are written for invalid, same-location, insufficient stamina, not found, unauthorized, or failed requests.
 - Resting has not been added.
 - Travel UI and map systems have not been added.
 - Quests have not been added.

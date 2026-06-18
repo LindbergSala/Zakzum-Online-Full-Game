@@ -235,9 +235,10 @@ Public activity log write routes have not been added yet.
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Map UI, travel costs, stamina costs, stress costs, danger rules, and random encounters have not been added.
+- Travel now consumes stamina and increases stress through the protected travel API, but the Travel UI does not display costs yet.
+- Map UI, danger rules, random encounters, and rest recovery have not been added.
 - Activity log persistence, the protected read API route, the read-only UI section, and automatic logs for character creation, starter equipment assignment, equip, unequip, and travel exist, but public write routes have not been added.
 
 ## Next Recommended Step
 
-Add travel cost rules only after the basic travel UI and protected travel API stay stable.
+Update the Travel UI to display stamina cost and stress gain before travel.

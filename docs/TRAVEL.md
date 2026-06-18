@@ -4,7 +4,7 @@ The travel foundation prepares Zakzum Online for movement between canon location
 
 The project now has reusable travel validation helpers, reusable travel cost helpers, a protected API route, and a simple protected character detail UI section that can move a logged-in user's own character between valid location keys.
 
-This foundation does not create a map, apply stamina costs, apply stress gain, trigger encounters, or add travel danger rolls.
+This foundation does not create a map, trigger encounters, add travel danger rolls, or add a rest system.
 
 ## Source File
 
@@ -81,9 +81,9 @@ For valid location keys, it returns:
 
 `getTravelCostValidationError(...)` returns a safe message for invalid costs or insufficient stamina, and returns `null` when the cost is usable.
 
-These costs are not applied by the travel API yet.
+The protected travel API now applies these costs when travel succeeds.
 
-The travel API still does not consume stamina or add stress.
+The Travel UI does not display these costs yet.
 
 ## Travel API
 
@@ -111,6 +111,10 @@ If the destination is invalid or matches the character's current location, the r
 
 Successful travel updates `Character.currentLocation` to the destination location key.
 
+Successful travel also reduces `Character.stamina` by the calculated `staminaCost` and increases `Character.stress` by the calculated `stressGain`.
+
+If the character does not have enough stamina, the route returns `400`, leaves `currentLocation`, `stamina`, and `stress` unchanged, and does not create a `travel_completed` log.
+
 Safe response shape:
 
 ```json
@@ -120,7 +124,21 @@ Safe response shape:
     "id": "character_id",
     "name": "Character Name",
     "currentLocation": "golden-citadel",
-    "currentLocationName": "Golden Citadel"
+    "currentLocationName": "Golden Citadel",
+    "stamina": 9,
+    "maxStamina": 10,
+    "stress": 1
+  },
+  "travelCost": {
+    "staminaCost": 1,
+    "stressGain": 1,
+    "isSameRealm": true,
+    "fromLocationKey": "kingstone",
+    "fromLocationName": "Kingstone",
+    "destinationLocationKey": "golden-citadel",
+    "destinationLocationName": "Golden Citadel",
+    "destinationRealmKey": "heartlands",
+    "destinationRealmName": "Heartlands"
   },
   "destination": {
     "key": "golden-citadel",
@@ -156,7 +174,7 @@ The destination selector uses `getAvailableTravelDestinations(...)`, so the char
 
 When travel succeeds, the UI updates the displayed current location and refreshes the Activity Log so the new `travel_completed` log appears.
 
-The Travel section does not include a map, displayed costs, distance, danger, random encounters, or stamina and stress changes yet.
+The Travel section does not include a map, displayed costs, distance, danger, random encounters, or rest controls yet.
 
 ## Exported Helpers
 
@@ -236,17 +254,21 @@ The log details store:
 - `destinationLocationName`
 - `destinationRealmKey`
 - `destinationRealmName`
+- `staminaCost`
+- `stressGain`
+- `staminaBefore`
+- `staminaAfter`
+- `stressBefore`
+- `stressAfter`
 
-No travel log is created for missing destinations, invalid destinations, same-location travel, missing characters, unauthorized requests, or failed requests.
+No travel log is created for missing destinations, invalid destinations, same-location travel, insufficient stamina, missing characters, unauthorized requests, or failed requests.
 
 ## Current Limitations
 
 - No map UI exists yet.
 - No travel distance exists yet.
-- Travel cost rules exist, but the travel API does not apply them yet.
 - Travel UI does not display travel costs yet.
-- Character stamina is not reduced by travel yet.
-- Character stress is not increased by travel yet.
+- Travel now consumes stamina and increases stress, but no rest system exists yet.
 - No random encounters exist yet.
 - No dangerous-road logic exists yet.
 - No coordinates or adjacency graph exists yet.
@@ -254,4 +276,4 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 ## Next Recommended Step
 
-Apply travel costs to the protected travel API only after the rules foundation stays stable. The next step should reduce stamina, increase stress, include costs in the travel response, and keep the UI clear about what changed.
+Update the Travel UI to show stamina cost and stress gain before travel. After that, add a small rest foundation so characters can recover from travel pressure.

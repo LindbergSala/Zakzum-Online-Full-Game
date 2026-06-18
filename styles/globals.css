@@ -422,6 +422,25 @@ select:focus {
   gap: 0.85rem;
 }
 
+.equipped-summary-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.equipped-slot-card {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid var(--line);
+  background: rgba(16, 17, 15, 0.64);
+  padding: 0.85rem;
+}
+
+.equipped-slot-card h3 {
+  margin: 0;
+  color: var(--gold);
+  font-size: 1.05rem;
+}
+
 .inventory-item,
 .equipment-preview-item,
 .activity-log-item {

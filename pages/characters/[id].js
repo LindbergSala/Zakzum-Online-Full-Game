@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../../lib/auth/currentUser";
-import { isEquippableSlot } from "../../lib/game/equipmentRules";
+import { EQUIPPABLE_SLOTS, isEquippableSlot } from "../../lib/game/equipmentRules";
 import { getStarterEquipmentForClass } from "../../lib/game/starterEquipment";
 import prisma from "../../lib/prisma";
 
@@ -54,6 +54,10 @@ export default function CharacterDetail({ character }) {
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogLoading, setActivityLogLoading] = useState(true);
   const [activityLogError, setActivityLogError] = useState("");
+  const equippedSlots = EQUIPPABLE_SLOTS.map((slot) => ({
+    slot,
+    item: inventoryItems.find((item) => item.slot === slot && item.isEquipped),
+  }));
 
   async function loadInventory() {
     setInventoryLoading(true);
@@ -377,6 +381,36 @@ export default function CharacterDetail({ character }) {
                         {formatDetails(activityLog.details)}
                       </pre>
                     ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : null}
+          </section>
+
+          <section className="session-panel" aria-labelledby="currently-equipped-title">
+            <h2 id="currently-equipped-title">Currently Equipped</h2>
+            <p className="supporting-text">
+              The gear made ready for the road. This summary is read-only for now.
+            </p>
+            {inventoryLoading ? (
+              <p className="supporting-text">Checking equipped gear...</p>
+            ) : null}
+            {!inventoryLoading ? (
+              <div className="equipped-summary-list">
+                {equippedSlots.map(({ slot, item }) => (
+                  <article className="equipped-slot-card" key={slot}>
+                    <p className="item-meta">{slot}</p>
+                    {item ? (
+                      <>
+                        <h3>{item.name}</h3>
+                        <p className="item-meta">
+                          {item.type} / {item.slot}
+                        </p>
+                        <p className="supporting-text">{item.description}</p>
+                      </>
+                    ) : (
+                      <p className="empty-state">Nothing equipped</p>
+                    )}
                   </article>
                 ))}
               </div>

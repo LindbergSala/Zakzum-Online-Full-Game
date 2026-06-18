@@ -10,7 +10,7 @@ lib/game/starterEquipment.js
 
 Starter equipment should feel practical, worn, grounded, and useful for survival. Characters should feel like new travelers at the start of a dangerous road, not finished heroes.
 
-The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI.
+The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI. Successful starter equipment assignment now writes one automatic `starter_equipment_assigned` activity log.
 
 ## Starter Equipment Data Summary
 
@@ -92,12 +92,13 @@ This action:
 - Sets `quantity` to `1`.
 - Sets `isEquipped` to `true` for `mainHand`, `offHand`, and `body` slots.
 - Sets `isEquipped` to `false` for `pack` and `none` slots.
+- Writes one `starter_equipment_assigned` activity log for the character.
 
 Starter equipment can only be assigned when the character's inventory is empty. If the character already has items, the route returns `409`.
 
 The response never includes `passwordHash` or raw session tokens.
 
-Starter equipment assignment does not write an activity log yet. Activity logging should be added in a separate step after activity log API behavior is defined.
+Duplicate starter equipment assignment does not create another starter equipment activity log.
 
 ## Character Detail Inventory UI
 
@@ -112,6 +113,7 @@ The character detail page:
 - Calls `POST /api/characters/[id]/inventory` with `action: "assignStarterEquipment"`.
 - Refreshes saved inventory after starter equipment is assigned.
 - Handles duplicate starter assignment safely if the API returns `409`.
+- The Activity Log section shows the starter equipment assignment log after the page is refreshed.
 
 The Starter Equipment Preview section remains reference-only. Saved inventory appears in the Equipment section.
 
@@ -172,8 +174,8 @@ Current item slots are intentionally simple:
 - Items do not have prices.
 - Shops have not been added.
 - Equipment actions have not been added.
-- Activity logs are not written by item actions yet.
+- Starter equipment assignment writes an activity log, but other item actions have not been added yet.
 
 ## Next Recommended Step
 
-Add a carefully scoped equip and unequip plan, or add the first activity log foundation before item mechanics. Equipment mechanics, shops, combat, and item rewards should still wait.
+Add a carefully scoped equip and unequip plan. Equipment mechanics, shops, combat, and item rewards should still wait.

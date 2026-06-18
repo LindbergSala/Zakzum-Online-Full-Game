@@ -14,9 +14,9 @@ The protected character detail page now displays a read-only Activity Log sectio
 
 Activity log write routes have not been added yet.
 
-The first automatic log source now exists: creating a character writes a `character_created` activity log.
+Automatic log sources now exist for character creation and starter equipment assignment.
 
-No automatic logs are written yet during starter equipment assignment, rest, travel, combat, quests, or story progress.
+No automatic logs are written yet during rest, travel, combat, quests, or story progress.
 
 ## ActivityLog Model Fields
 
@@ -72,6 +72,8 @@ No `POST`, `PUT`, `PATCH`, or `DELETE` activity log routes exist yet.
 
 ## Automatic Log Sources
 
+### Character Creation
+
 The first deliberate automatic log source is character creation.
 
 When a logged-in user creates a character through:
@@ -96,6 +98,43 @@ The log details store:
 - `currentLocation`
 
 This log is connected to the newly created character. It is created by the server during character creation, not by a public activity log write route.
+
+### Starter Equipment Assignment
+
+The second deliberate automatic log source is starter equipment assignment.
+
+When a logged-in user assigns starter equipment through:
+
+```text
+POST /api/characters/[id]/inventory
+```
+
+with this body:
+
+```json
+{
+  "action": "assignStarterEquipment"
+}
+```
+
+the server creates one `ActivityLog` record for that character.
+
+The log uses:
+
+- `type`: `starter_equipment_assigned`
+- `title`: `Starter Equipment Assigned`
+- `description`: `The first tools of the road were gathered.`
+
+The log details store:
+
+- `characterName`
+- `characterClass`
+- `itemCount`
+- `itemNames`
+
+This log is connected to the same character that receives the starter equipment. It is only created when starter equipment assignment succeeds.
+
+If the character already has items and the inventory API returns `409`, no `starter_equipment_assigned` log is created.
 
 ## Activity Log UI Summary
 
@@ -170,7 +209,7 @@ Future activity logs may record:
 - A protected activity log read API route exists, but no write routes exist yet.
 - A read-only activity log UI exists on `/characters/[id]`.
 - Character creation now writes one automatic `character_created` activity log.
-- Starter equipment assignment does not write activity logs yet.
+- Starter equipment assignment now writes one automatic `starter_equipment_assigned` activity log when assignment succeeds.
 - Resting has not been added.
 - Travel and map systems have not been added.
 - Quests have not been added.
@@ -179,4 +218,4 @@ Future activity logs may record:
 
 ## Next Recommended Step
 
-Add the next deliberate automatic log source, such as starter equipment assignment. Each new log source should stay tied to the server-side system that owns the action.
+Add the next deliberate automatic log source only when its owning server-side system exists. Rest, travel, quests, combat, and story systems have not been added yet.

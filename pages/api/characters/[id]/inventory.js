@@ -1,4 +1,5 @@
 import { getCurrentUser } from "../../../../lib/auth/currentUser";
+import { createActivityLog } from "../../../../lib/game/activityLog";
 import { getStarterEquipmentForClass } from "../../../../lib/game/starterEquipment";
 import prisma from "../../../../lib/prisma";
 
@@ -35,6 +36,7 @@ async function getOwnedCharacter(characterId, userId) {
     },
     select: {
       id: true,
+      name: true,
       characterClass: true,
     },
   });
@@ -78,22 +80,42 @@ async function handlePost(req, res, character) {
     });
   }
 
-  const createdItems = await prisma.$transaction(
-    starterEquipment.map((item) =>
-      prisma.characterItem.create({
-        data: {
-          characterId: character.id,
-          key: item.key,
-          name: item.name,
-          type: item.type,
-          slot: item.slot,
-          description: item.description,
-          quantity: 1,
-          isEquipped: EQUIPPED_STARTER_SLOTS.includes(item.slot),
+  const createdItems = await prisma.$transaction(async (tx) => {
+    const items = await Promise.all(
+      starterEquipment.map((item) =>
+        tx.characterItem.create({
+          data: {
+            characterId: character.id,
+            key: item.key,
+            name: item.name,
+            type: item.type,
+            slot: item.slot,
+            description: item.description,
+            quantity: 1,
+            isEquipped: EQUIPPED_STARTER_SLOTS.includes(item.slot),
+          },
+        }),
+      ),
+    );
+
+    await createActivityLog(
+      {
+        characterId: character.id,
+        type: "starter_equipment_assigned",
+        title: "Starter Equipment Assigned",
+        description: "The first tools of the road were gathered.",
+        details: {
+          characterName: character.name,
+          characterClass: character.characterClass,
+          itemCount: items.length,
+          itemNames: items.map((item) => item.name),
         },
-      }),
-    ),
-  );
+      },
+      tx,
+    );
+
+    return items;
+  });
 
   return res.status(201).json({
     items: createdItems.map(toSafeItem),

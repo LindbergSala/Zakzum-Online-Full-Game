@@ -32,6 +32,8 @@ Each character includes:
 
 The current default location is `Kingstone`.
 
+Static world location data now exists in `lib/game/worldLocations.js`, but `Character.currentLocation` is still a simple string for now. Existing characters have not been migrated to location keys.
+
 Deleting a user deletes that user's characters through the Prisma relation cascade.
 
 ## Character API Summary

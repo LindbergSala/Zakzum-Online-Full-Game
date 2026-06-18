@@ -2,7 +2,7 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, starter equipment preview data, persisted inventory with a Currently Equipped summary and equip/unequip controls, and the activity log model foundation with a protected read API route and read-only UI section.
+The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a character detail page, starter equipment preview data, persisted inventory with a Currently Equipped summary and equip/unequip controls, a simple Travel section, and the activity log model foundation with a protected read API route and read-only UI section.
 
 Character update and delete actions, public activity log write routes, quests, combat, resting, shops, and map systems have not been added yet.
 
@@ -114,6 +114,8 @@ If there is no valid logged-in user, the page redirects to `/login`.
 
 If the requested character does not exist or does not belong to the logged-in user, the page returns `notFound: true`.
 
+The page includes a simple Travel section that calls `POST /api/characters/[id]/travel`, updates the displayed current location after successful travel, and refreshes the Activity Log.
+
 The page shows:
 
 - `name`
@@ -217,12 +219,14 @@ Assigning starter equipment through `POST /api/characters/[id]/inventory` now wr
 
 Equipping or unequipping saved inventory now writes automatic `item_equipped` and `item_unequipped` logs when the item state changes.
 
+Traveling through the character detail page now writes an automatic `travel_completed` log when the protected travel request succeeds.
+
 Public activity log write routes have not been added yet.
 
 ## Current Limitations
 
 - No update or delete character API exists yet.
-- Character detail is read-only.
+- Character detail has read-only character data, with focused controls for inventory equipment and basic travel.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
 - Inventory persistence, protected inventory API routes, a Currently Equipped summary, basic inventory UI, and equip/unequip controls exist.
@@ -231,8 +235,9 @@ Public activity log write routes have not been added yet.
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Activity log persistence, the protected read API route, the read-only UI section, and automatic logs for character creation, starter equipment assignment, equip, and unequip exist, but public write routes have not been added.
+- Map UI, travel costs, stamina costs, stress costs, danger rules, and random encounters have not been added.
+- Activity log persistence, the protected read API route, the read-only UI section, and automatic logs for character creation, starter equipment assignment, equip, unequip, and travel exist, but public write routes have not been added.
 
 ## Next Recommended Step
 
-Add item stats only after the current inventory display and ownership behavior stay stable.
+Add travel cost rules only after the basic travel UI and protected travel API stay stable.

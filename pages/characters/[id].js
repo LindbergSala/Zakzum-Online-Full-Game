@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "../../lib/auth/currentUser";
 import { EQUIPPABLE_SLOTS, isEquippableSlot } from "../../lib/game/equipmentRules";
 import { getStarterEquipmentForClass } from "../../lib/game/starterEquipment";
+import {
+  getAvailableTravelDestinations,
+  getTravelDestinationSummary,
+} from "../../lib/game/travelRules";
 import { getLocationByKey } from "../../lib/game/worldLocations";
 import prisma from "../../lib/prisma";
 
@@ -54,6 +58,9 @@ function getLocationDisplayName(locationKey) {
 
 export default function CharacterDetail({ character }) {
   const starterEquipment = getStarterEquipmentForClass(character.characterClass);
+  const [currentLocationKey, setCurrentLocationKey] = useState(
+    character.currentLocation,
+  );
   const [inventoryItems, setInventoryItems] = useState([]);
   const [inventoryLoading, setInventoryLoading] = useState(true);
   const [inventoryError, setInventoryError] = useState("");
@@ -66,6 +73,23 @@ export default function CharacterDetail({ character }) {
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogLoading, setActivityLogLoading] = useState(true);
   const [activityLogError, setActivityLogError] = useState("");
+  const [selectedDestinationLocationKey, setSelectedDestinationLocationKey] =
+    useState(
+      () =>
+        getAvailableTravelDestinations({
+          currentLocationKey: character.currentLocation,
+        })[0]?.key || "",
+    );
+  const [travelLoading, setTravelLoading] = useState(false);
+  const [travelError, setTravelError] = useState("");
+  const [travelSuccess, setTravelSuccess] = useState("");
+  const currentLocationSummary = getTravelDestinationSummary(currentLocationKey);
+  const travelDestinations = getAvailableTravelDestinations({
+    currentLocationKey,
+  });
+  const selectedDestination = getTravelDestinationSummary(
+    selectedDestinationLocationKey,
+  );
   const equippedSlots = EQUIPPABLE_SLOTS.map((slot) => ({
     slot,
     item: inventoryItems.find((item) => item.slot === slot && item.isEquipped),
@@ -291,6 +315,55 @@ export default function CharacterDetail({ character }) {
     }
   }
 
+  async function handleTravel(event) {
+    event.preventDefault();
+    setTravelLoading(true);
+    setTravelError("");
+    setTravelSuccess("");
+
+    if (!selectedDestinationLocationKey) {
+      setTravelLoading(false);
+      setTravelError("Choose a destination before traveling.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/characters/${character.id}/travel`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          destinationLocationKey: selectedDestinationLocationKey,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTravelError(data.error || "Travel could not be completed.");
+        return;
+      }
+
+      const nextLocationKey =
+        data.character?.currentLocation || selectedDestinationLocationKey;
+      const nextLocationName =
+        data.character?.currentLocationName ||
+        getLocationDisplayName(nextLocationKey);
+
+      setCurrentLocationKey(nextLocationKey);
+      setSelectedDestinationLocationKey(
+        getAvailableTravelDestinations({ currentLocationKey: nextLocationKey })[0]
+          ?.key || "",
+      );
+      setTravelSuccess(`Travel completed to ${nextLocationName}.`);
+      await loadActivityLogs();
+    } catch (error) {
+      setTravelError(error.message || "Travel could not be completed.");
+    } finally {
+      setTravelLoading(false);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -353,13 +426,81 @@ export default function CharacterDetail({ character }) {
               </div>
               <div>
                 <dt>Location</dt>
-                <dd>{getLocationDisplayName(character.currentLocation)}</dd>
+                <dd>{getLocationDisplayName(currentLocationKey)}</dd>
               </div>
               <div>
                 <dt>Created</dt>
                 <dd>{formatDate(character.createdAt)}</dd>
               </div>
             </dl>
+          </section>
+
+          <section className="session-panel" aria-labelledby="travel-title">
+            <h2 id="travel-title">Travel</h2>
+            <p className="supporting-text">
+              Choose the next road carefully. Costs, danger, and encounters will
+              come later.
+            </p>
+            <dl className="sheet-grid">
+              <div>
+                <dt>Current Location</dt>
+                <dd>{getLocationDisplayName(currentLocationKey)}</dd>
+              </div>
+              <div>
+                <dt>Realm</dt>
+                <dd>{currentLocationSummary?.realmName || "Unknown realm"}</dd>
+              </div>
+            </dl>
+            <form className="auth-form" onSubmit={handleTravel}>
+              <label className="field-label" htmlFor="destination-location">
+                Destination
+              </label>
+              <select
+                id="destination-location"
+                name="destinationLocationKey"
+                value={selectedDestinationLocationKey}
+                onChange={(event) =>
+                  setSelectedDestinationLocationKey(event.target.value)
+                }
+                disabled={travelDestinations.length === 0 || travelLoading}
+              >
+                {travelDestinations.map((destination) => (
+                  <option key={destination.key} value={destination.key}>
+                    {destination.name} / {destination.realmName}
+                  </option>
+                ))}
+              </select>
+              {selectedDestination ? (
+                <article className="inventory-item">
+                  <div>
+                    <h3>{selectedDestination.name}</h3>
+                    <p className="item-meta">
+                      {selectedDestination.realmName} / {selectedDestination.type}
+                    </p>
+                  </div>
+                  <p className="supporting-text">
+                    {selectedDestination.shortDescription}
+                  </p>
+                </article>
+              ) : null}
+              <button
+                className="primary-button"
+                type="submit"
+                disabled={
+                  travelLoading ||
+                  !selectedDestinationLocationKey ||
+                  travelDestinations.length === 0
+                }
+              >
+                {travelLoading ? "Traveling..." : "Travel"}
+              </button>
+            </form>
+            {travelError ? (
+              <p className="form-message error">{travelError}</p>
+            ) : null}
+            {travelSuccess ? (
+              <p className="form-message success">{travelSuccess}</p>
+            ) : null}
           </section>
 
           <section className="session-panel" aria-labelledby="activity-log-title">
@@ -547,7 +688,7 @@ export default function CharacterDetail({ character }) {
             <h2 id="actions-title">Actions</h2>
             <ul className="placeholder-list">
               <li>Rest coming soon.</li>
-              <li>Travel coming soon.</li>
+              <li>Travel costs coming soon.</li>
               <li>Quests coming soon.</li>
               <li>Combat coming soon.</li>
             </ul>

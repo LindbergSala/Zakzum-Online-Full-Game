@@ -2,9 +2,9 @@
 
 The travel foundation prepares Zakzum Online for movement between canon locations.
 
-The project now has reusable travel validation helpers and a protected API route that can move a logged-in user's own character between valid location keys.
+The project now has reusable travel validation helpers, a protected API route, and a simple protected character detail UI section that can move a logged-in user's own character between valid location keys.
 
-This foundation does not create a map, charge stamina, raise stress, trigger encounters, or add travel UI.
+This foundation does not create a map, charge stamina, raise stress, trigger encounters, or add travel danger rules.
 
 ## Source File
 
@@ -69,6 +69,29 @@ Safe response shape:
 ```
 
 The response does not include user data, `passwordHash`, raw session tokens, or activity logs.
+
+## Travel UI
+
+The protected character detail page now has a simple Travel section:
+
+```text
+/characters/[id]
+```
+
+The UI shows:
+
+- the current location friendly name
+- the current realm name
+- a destination selector
+- a destination preview
+- a Travel button
+- simple loading, success, and error states
+
+The destination selector uses `getAvailableTravelDestinations(...)`, so the character's current location is not listed as a destination.
+
+When travel succeeds, the UI updates the displayed current location and refreshes the Activity Log so the new `travel_completed` log appears.
+
+The Travel section does not include a map, costs, distance, danger, random encounters, or stamina and stress changes yet.
 
 ## Exported Helpers
 
@@ -153,7 +176,6 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 ## Current Limitations
 
-- No travel UI exists yet.
 - No map UI exists yet.
 - No travel distance exists yet.
 - No travel cost exists yet.
@@ -166,4 +188,4 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 ## Next Recommended Step
 
-Add a small protected travel UI on the character detail page. It should use the existing travel API, show valid destinations, and refresh the character location and Activity Log after successful travel.
+Add travel cost rules only after the basic travel UI and protected travel API stay stable. Stamina, stress, danger, map, and encounter systems should still be added one small step at a time.

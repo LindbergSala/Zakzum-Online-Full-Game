@@ -2,9 +2,9 @@
 
 Characters are the player-owned records that will later carry saved progress through Zakzum.
 
-The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, starter equipment preview data, persisted inventory, and the activity log model foundation with a protected read API route and read-only UI section.
+The current work includes the database model, protected API routes, a simple protected character creation UI on `/dashboard`, a read-only character detail page, starter equipment preview data, persisted inventory with equip and unequip controls, and the activity log model foundation with a protected read API route and read-only UI section.
 
-Character update and delete actions, activity log write routes, quests, combat, resting, shops, and map systems have not been added yet.
+Character update and delete actions, public activity log write routes, quests, combat, resting, shops, and map systems have not been added yet.
 
 ## Character Model Summary
 
@@ -123,11 +123,11 @@ The page shows:
 - `currentLocation`
 - `createdAt`
 
-It also includes sections for Activity Log, Equipment, and future Actions.
+It also includes sections for Activity Log, Equipment, Starter Equipment Preview, and future Actions.
 
-The Equipment section explains that inventory persistence is coming soon.
+The Equipment section shows saved inventory, can assign starter equipment once when inventory is empty, and can equip or unequip saved items.
 
-The Starter Equipment Preview section shows class-based starter equipment from `lib/game/starterEquipment.js`. This is preview-only data and is not saved as character inventory yet.
+The Starter Equipment Preview section shows class-based starter equipment from `lib/game/starterEquipment.js`. This preview is reference-only; saved inventory appears in the Equipment section.
 
 ## Allowed Races
 
@@ -185,7 +185,7 @@ Each starter item currently has:
 - `slot`
 - `description`
 
-The current item data is meant to help future inventory work assign grounded starter gear when a character is created. It does not create saved inventory yet.
+The current item data is used by the starter equipment assignment API. It still does not assign equipment automatically during character creation.
 
 ## Character Items
 
@@ -193,7 +193,7 @@ The `CharacterItem` Prisma model now exists as the persisted inventory foundatio
 
 Each `CharacterItem` belongs to one `Character`, and deleting a character deletes that character's item records through cascade deletion.
 
-Protected inventory API routes now exist for listing character-owned items and assigning starter equipment once. The character detail page now shows saved inventory and can assign starter equipment once when inventory is empty. Automatic starter equipment assignment during character creation has not been added yet.
+Protected inventory API routes now exist for listing character-owned items, assigning starter equipment once, and equipping or unequipping saved items. The character detail page now shows saved inventory, can assign starter equipment once when inventory is empty, and can equip or unequip saved equipment. Automatic starter equipment assignment during character creation has not been added yet.
 
 ## Activity Logs
 
@@ -209,7 +209,9 @@ Creating a character through `POST /api/characters` now writes one automatic `ch
 
 Assigning starter equipment through `POST /api/characters/[id]/inventory` now writes one automatic `starter_equipment_assigned` log connected to the same character when assignment succeeds.
 
-Activity log write routes have not been added yet.
+Equipping or unequipping saved inventory now writes automatic `item_equipped` and `item_unequipped` logs when the item state changes.
+
+Public activity log write routes have not been added yet.
 
 ## Current Limitations
 
@@ -217,15 +219,14 @@ Activity log write routes have not been added yet.
 - Character detail is read-only.
 - Race mechanics have not been added.
 - Class mechanics have not been added.
-- Inventory persistence, protected inventory API routes, and basic inventory UI exist.
-- Equip and unequip actions have not been added.
-- Starter equipment is preview-only.
+- Inventory persistence, protected inventory API routes, basic inventory UI, and equip/unequip controls exist.
+- Starter equipment preview remains reference-only, but starter equipment can be saved from the character detail page.
 - Quests have not been added.
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Activity log persistence, the protected read API route, the read-only UI section, automatic `character_created` logging, and automatic `starter_equipment_assigned` logging exist, but write routes have not been added.
+- Activity log persistence, the protected read API route, the read-only UI section, and automatic logs for character creation, starter equipment assignment, equip, and unequip exist, but public write routes have not been added.
 
 ## Next Recommended Step
 
-Add the next deliberate automatic log source only after its owning system exists. Gameplay systems should still wait until character ownership, inventory display, and activity log ownership are stable.
+Add a small equipment summary section for currently equipped items before adding item stats or gameplay systems.

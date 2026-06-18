@@ -236,7 +236,9 @@ If no logs exist, the page shows:
 No recorded activity yet.
 ```
 
-The UI does not include an activity log form and does not write logs.
+The UI does not include an activity log form and does not directly write logs.
+
+When the character detail page equips or unequips an item through the inventory API, it refreshes this section so `item_equipped` and `item_unequipped` logs appear after successful actions.
 
 ## Relation To Character
 

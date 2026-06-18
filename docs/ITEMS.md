@@ -10,7 +10,7 @@ lib/game/starterEquipment.js
 
 Starter equipment should feel practical, worn, grounded, and useful for survival. Characters should feel like new travelers at the start of a dangerous road, not finished heroes.
 
-The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI. Successful starter equipment assignment, equip, and unequip actions write automatic activity logs.
+The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI with equip and unequip controls. Successful starter equipment assignment, equip, and unequip actions write automatic activity logs.
 
 The equipment rules foundation now exists in:
 
@@ -166,7 +166,13 @@ The character detail page:
 - Calls `POST /api/characters/[id]/inventory` with `action: "assignStarterEquipment"`.
 - Refreshes saved inventory after starter equipment is assigned.
 - Handles duplicate starter assignment safely if the API returns `409`.
-- The Activity Log section shows the starter equipment assignment log after the page is refreshed.
+- Shows `Equip` controls for unequipped `mainHand`, `offHand`, and `body` items.
+- Shows `Unequip` controls for equipped items.
+- Shows carried or non-equippable notes for `pack` and `none` items instead of equip controls.
+- Calls `PATCH /api/characters/[id]/inventory/[itemId]` for equip and unequip actions.
+- Handles same-slot conflict responses without crashing the page.
+- Refreshes saved inventory after equip and unequip actions.
+- Refreshes the Activity Log after equip and unequip actions so `item_equipped` and `item_unequipped` logs appear.
 
 The Starter Equipment Preview section remains reference-only. Saved inventory appears in the Equipment section.
 
@@ -241,16 +247,15 @@ Equip behavior allows only one equipped item per equippable slot.
 
 Equip and unequip API behavior now reuses these rules.
 
-Equip and unequip UI has not been added yet.
+Equip and unequip UI controls now call the protected inventory item action route.
 
 ## Current Limitations
 
 - No global `Item` database model exists yet.
 - Starter equipment is not assigned during character creation yet.
 - Starter equipment is not assigned automatically.
-- Inventory UI is limited to listing saved items and assigning starter equipment once.
+- Inventory UI is limited to listing saved items, assigning starter equipment once, and equipping or unequipping saved items.
 - Update and delete item routes have not been added yet.
-- Equip and unequip UI has not been added yet.
 - Items do not have stats.
 - Items do not have damage values.
 - Items do not have armor values.
@@ -261,4 +266,4 @@ Equip and unequip UI has not been added yet.
 
 ## Next Recommended Step
 
-Add simple equip and unequip controls to the character detail inventory UI. Equipment stats, shops, combat, and item rewards should still wait.
+Add a small equipment summary section for currently equipped items. Equipment stats, shops, combat, and item rewards should still wait.

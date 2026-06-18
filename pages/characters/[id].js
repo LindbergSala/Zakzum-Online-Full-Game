@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../../lib/auth/currentUser";
+import { isEquippableSlot } from "../../lib/game/equipmentRules";
 import { getStarterEquipmentForClass } from "../../lib/game/starterEquipment";
 import prisma from "../../lib/prisma";
 
@@ -46,6 +47,10 @@ export default function CharacterDetail({ character }) {
   const [inventoryError, setInventoryError] = useState("");
   const [inventorySuccess, setInventorySuccess] = useState("");
   const [assigningStarterEquipment, setAssigningStarterEquipment] = useState(false);
+  const [equipmentActionLoadingItemId, setEquipmentActionLoadingItemId] =
+    useState("");
+  const [equipmentActionError, setEquipmentActionError] = useState("");
+  const [equipmentActionSuccess, setEquipmentActionSuccess] = useState("");
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogLoading, setActivityLogLoading] = useState(true);
   const [activityLogError, setActivityLogError] = useState("");
@@ -63,8 +68,32 @@ export default function CharacterDetail({ character }) {
       }
 
       setInventoryItems(data.items || []);
+    } catch (error) {
+      setInventoryError(error.message || "Inventory could not be loaded.");
+      setInventoryItems([]);
     } finally {
       setInventoryLoading(false);
+    }
+  }
+
+  async function loadActivityLogs() {
+    setActivityLogLoading(true);
+    setActivityLogError("");
+
+    try {
+      const response = await fetch(`/api/characters/${character.id}/activity-logs`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Activity log could not be loaded.");
+      }
+
+      setActivityLogs(data.activityLogs || []);
+    } catch (error) {
+      setActivityLogError(error.message || "Activity log could not be loaded.");
+      setActivityLogs([]);
+    } finally {
+      setActivityLogLoading(false);
     }
   }
 
@@ -152,6 +181,8 @@ export default function CharacterDetail({ character }) {
     setAssigningStarterEquipment(true);
     setInventoryError("");
     setInventorySuccess("");
+    setEquipmentActionError("");
+    setEquipmentActionSuccess("");
 
     try {
       const response = await fetch(`/api/characters/${character.id}/inventory`, {
@@ -179,10 +210,68 @@ export default function CharacterDetail({ character }) {
       setInventoryItems(data.items || []);
       setInventorySuccess("Starter equipment has been saved to this character.");
       await loadInventory();
+      await loadActivityLogs();
     } catch (error) {
       setInventoryError(error.message || "Starter equipment could not be assigned.");
     } finally {
       setAssigningStarterEquipment(false);
+    }
+  }
+
+  async function handleEquipmentAction(item, action) {
+    const actionPastTense = action === "equip" ? "equipped" : "unequipped";
+
+    setEquipmentActionLoadingItemId(item.id);
+    setEquipmentActionError("");
+    setEquipmentActionSuccess("");
+    setInventoryError("");
+    setInventorySuccess("");
+
+    try {
+      const response = await fetch(
+        `/api/characters/${character.id}/inventory/${item.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action }),
+        },
+      );
+      const data = await response.json();
+
+      if (response.status === 409) {
+        setEquipmentActionError(
+          data.error || "That equipment slot is already in use.",
+        );
+        await loadInventory();
+        return;
+      }
+
+      if (response.status === 400) {
+        setEquipmentActionError(data.error || "That item cannot be equipped.");
+        await loadInventory();
+        return;
+      }
+
+      if (!response.ok) {
+        setEquipmentActionError(
+          data.error || `The item could not be ${actionPastTense}.`,
+        );
+        return;
+      }
+
+      setEquipmentActionSuccess(
+        data.message || (action === "equip" ? "Item equipped." : "Item unequipped."),
+      );
+      await loadInventory();
+      await loadActivityLogs();
+    } catch (error) {
+      setEquipmentActionError(
+        error.message || `The item could not be ${actionPastTense}.`,
+      );
+    } finally {
+      setEquipmentActionLoadingItemId("");
     }
   }
 
@@ -326,6 +415,37 @@ export default function CharacterDetail({ character }) {
                       </div>
                     </dl>
                     <p className="supporting-text">{item.description}</p>
+                    <div className="inventory-item-actions">
+                      {item.isEquipped ? (
+                        <button
+                          className="secondary-button small-action-button"
+                          type="button"
+                          onClick={() => handleEquipmentAction(item, "unequip")}
+                          disabled={equipmentActionLoadingItemId === item.id}
+                        >
+                          {equipmentActionLoadingItemId === item.id
+                            ? "Unequipping..."
+                            : "Unequip"}
+                        </button>
+                      ) : null}
+                      {!item.isEquipped && isEquippableSlot(item.slot) ? (
+                        <button
+                          className="secondary-button small-action-button"
+                          type="button"
+                          onClick={() => handleEquipmentAction(item, "equip")}
+                          disabled={equipmentActionLoadingItemId === item.id}
+                        >
+                          {equipmentActionLoadingItemId === item.id
+                            ? "Equipping..."
+                            : "Equip"}
+                        </button>
+                      ) : null}
+                      {!item.isEquipped && !isEquippableSlot(item.slot) ? (
+                        <p className="item-action-note">
+                          {item.slot === "pack" ? "Carried item" : "Not equippable"}
+                        </p>
+                      ) : null}
+                    </div>
                   </article>
                 ))}
               </div>
@@ -347,6 +467,12 @@ export default function CharacterDetail({ character }) {
             ) : null}
             {inventorySuccess ? (
               <p className="form-message success">{inventorySuccess}</p>
+            ) : null}
+            {equipmentActionError ? (
+              <p className="form-message error">{equipmentActionError}</p>
+            ) : null}
+            {equipmentActionSuccess ? (
+              <p className="form-message success">{equipmentActionSuccess}</p>
             ) : null}
           </section>
 

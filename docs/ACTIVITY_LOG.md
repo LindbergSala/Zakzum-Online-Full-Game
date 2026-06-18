@@ -16,9 +16,9 @@ Public activity log write routes have not been added yet.
 
 Automatic log sources now exist for character creation and starter equipment assignment.
 
-Automatic log sources also exist for successful item equip and unequip actions.
+Automatic log sources also exist for successful item equip, item unequip, and travel actions.
 
-No automatic logs are written yet during rest, travel, combat, quests, or story progress.
+No automatic logs are written yet during rest, combat, quests, or story progress.
 
 ## ActivityLog Model Fields
 
@@ -208,6 +208,44 @@ The log is only created when the item changes from equipped to unequipped.
 
 No `item_unequipped` log is created for missing items, unauthorized requests, or an item that is already unequipped.
 
+### Travel Completed
+
+When a logged-in user moves one of their own characters through:
+
+```text
+POST /api/characters/[id]/travel
+```
+
+with this body:
+
+```json
+{
+  "destinationLocationKey": "golden-citadel"
+}
+```
+
+the server updates the character's `currentLocation` and creates one `ActivityLog` record for that character.
+
+The log uses:
+
+- `type`: `travel_completed`
+- `title`: `Travel Completed`
+- `description`: `The road carried another step into memory.`
+
+The log details store:
+
+- `characterName`
+- `fromLocationKey`
+- `fromLocationName`
+- `destinationLocationKey`
+- `destinationLocationName`
+- `destinationRealmKey`
+- `destinationRealmName`
+
+The log is only created when travel succeeds.
+
+No `travel_completed` log is created for missing destinations, invalid destinations, same-location travel, missing characters, unauthorized requests, or failed requests.
+
 ## Activity Log UI Summary
 
 The protected character detail page now displays read-only activity logs:
@@ -289,12 +327,14 @@ Future activity logs may record:
 - Item equip now writes one automatic `item_equipped` activity log when equipment changes.
 - Item unequip now writes one automatic `item_unequipped` activity log when equipment changes.
 - No equip or unequip logs are written for no-op, conflict, invalid slot, not found, or unauthorized requests.
+- Travel now writes one automatic `travel_completed` activity log when a protected travel request succeeds.
+- No travel logs are written for invalid, same-location, not found, unauthorized, or failed requests.
 - Resting has not been added.
-- Travel and map systems have not been added.
+- Travel UI and map systems have not been added.
 - Quests have not been added.
 - Combat has not been added.
 - Story systems have not been added.
 
 ## Next Recommended Step
 
-Add the next deliberate automatic log source only when its owning server-side system exists. Rest, travel, quests, combat, and story systems have not been added yet.
+Add the next deliberate automatic log source only when its owning server-side system exists. Rest, quests, combat, and story systems have not been added yet.

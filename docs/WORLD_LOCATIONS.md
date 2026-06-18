@@ -58,9 +58,9 @@ Basic travel validation helpers now exist in:
 lib/game/travelRules.js
 ```
 
-These helpers validate location keys and return safe destination summaries for future travel API and UI work.
+These helpers validate location keys and return safe destination summaries for travel API and UI work.
 
-They do not move characters or create a travel system yet.
+A protected travel API now uses these helpers to move owned characters between valid location keys.
 
 ## Realm Data Shape
 
@@ -101,7 +101,7 @@ Current location types are:
 ## Current Limitations
 
 - No map UI exists yet.
-- Travel rules exist, but no travel API or travel UI exists yet.
+- Travel rules and a protected travel API exist, but no travel UI exists yet.
 - No travel distances exist yet.
 - No coordinates exist yet.
 - No location images exist yet.
@@ -113,4 +113,4 @@ Current location types are:
 
 ## Next Recommended Step
 
-Add a protected travel API only after the travel rules foundation stays stable. Map UI and richer travel behavior should wait until character ownership, location validation, and activity logging remain reliable.
+Add a small protected travel UI only after the travel API stays stable. Map UI and richer travel behavior should wait until character ownership, location validation, and activity logging remain reliable.

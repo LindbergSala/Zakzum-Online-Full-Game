@@ -1,8 +1,10 @@
 # Zakzum Online Travel Foundation
 
-The travel rules foundation prepares Zakzum Online for future movement between canon locations.
+The travel foundation prepares Zakzum Online for movement between canon locations.
 
-This step adds validation helpers only. It does not move characters, create a map, charge stamina, raise stress, trigger encounters, or write activity logs.
+The project now has reusable travel validation helpers and a protected API route that can move a logged-in user's own character between valid location keys.
+
+This foundation does not create a map, charge stamina, raise stress, trigger encounters, or add travel UI.
 
 ## Source File
 
@@ -17,6 +19,56 @@ The rules reuse world location data from:
 ```text
 lib/game/worldLocations.js
 ```
+
+## Travel API
+
+The protected travel route is:
+
+```text
+POST /api/characters/[id]/travel
+```
+
+The route requires a valid logged-in user.
+
+The route checks that the requested character exists and belongs to the logged-in user. If the character does not exist or belongs to another user, the route returns `404`.
+
+Request body:
+
+```json
+{
+  "destinationLocationKey": "golden-citadel"
+}
+```
+
+If `destinationLocationKey` is missing, the route returns `400`.
+
+If the destination is invalid or matches the character's current location, the route returns `400` with a safe validation message.
+
+Successful travel updates `Character.currentLocation` to the destination location key.
+
+Safe response shape:
+
+```json
+{
+  "message": "Travel completed.",
+  "character": {
+    "id": "character_id",
+    "name": "Character Name",
+    "currentLocation": "golden-citadel",
+    "currentLocationName": "Golden Citadel"
+  },
+  "destination": {
+    "key": "golden-citadel",
+    "name": "Golden Citadel",
+    "realmKey": "heartlands",
+    "realmName": "Heartlands",
+    "type": "stronghold",
+    "shortDescription": "A seat of old authority bound to the prophecy of the Empty Throne."
+  }
+}
+```
+
+The response does not include user data, `passwordHash`, raw session tokens, or activity logs.
 
 ## Exported Helpers
 
@@ -49,6 +101,8 @@ Invalid current or destination location keys are rejected.
 
 It returns `null` when travel is valid.
 
+Same-location travel is rejected because a character must move to a different location key.
+
 ## Available Destination Shape
 
 `getAvailableTravelDestinations(...)` returns safe destination summaries with:
@@ -75,12 +129,32 @@ For valid destination keys, it returns:
 - `type`
 - `shortDescription`
 
+## Activity Log Behavior
+
+Successful travel creates one automatic `ActivityLog` record.
+
+The log uses:
+
+- `type`: `travel_completed`
+- `title`: `Travel Completed`
+- `description`: `The road carried another step into memory.`
+
+The log details store:
+
+- `characterName`
+- `fromLocationKey`
+- `fromLocationName`
+- `destinationLocationKey`
+- `destinationLocationName`
+- `destinationRealmKey`
+- `destinationRealmName`
+
+No travel log is created for missing destinations, invalid destinations, same-location travel, missing characters, unauthorized requests, or failed requests.
+
 ## Current Limitations
 
-- No travel API exists yet.
 - No travel UI exists yet.
 - No map UI exists yet.
-- Characters are not moved by gameplay yet.
 - No travel distance exists yet.
 - No travel cost exists yet.
 - No stamina cost exists yet.
@@ -92,4 +166,4 @@ For valid destination keys, it returns:
 
 ## Next Recommended Step
 
-Add a protected travel API only after the rules foundation remains stable. The first travel API should verify character ownership, validate the destination key, update `Character.currentLocation`, and write an activity log.
+Add a small protected travel UI on the character detail page. It should use the existing travel API, show valid destinations, and refresh the character location and Activity Log after successful travel.

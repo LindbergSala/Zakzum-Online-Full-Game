@@ -4,6 +4,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../lib/auth/currentUser";
 import { CLASSES, RACES } from "../lib/game/characterOptions";
+import { getLocationByKey } from "../lib/game/worldLocations";
+
+function getLocationDisplayName(locationKey) {
+  return getLocationByKey(locationKey)?.name || locationKey;
+}
 
 export default function Dashboard({ user }) {
   const router = useRouter();
@@ -174,7 +179,7 @@ export default function Dashboard({ user }) {
                       </div>
                       <div>
                         <dt>Location</dt>
-                        <dd>{character.currentLocation}</dd>
+                        <dd>{getLocationDisplayName(character.currentLocation)}</dd>
                       </div>
                     </dl>
                   </Link>

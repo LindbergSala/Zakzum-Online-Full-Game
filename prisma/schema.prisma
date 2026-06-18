@@ -32,7 +32,7 @@ model Character {
   maxStamina      Int             @default(10)
   stress          Int             @default(0)
   renown          Int             @default(0)
-  currentLocation String          @default("Kingstone")
+  currentLocation String          @default("kingstone")
   items           CharacterItem[]
   activityLogs    ActivityLog[]
   createdAt       DateTime        @default(now())

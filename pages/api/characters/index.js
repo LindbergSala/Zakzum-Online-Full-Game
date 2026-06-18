@@ -2,6 +2,7 @@ import prisma from "../../../lib/prisma";
 import { getCurrentUser } from "../../../lib/auth/currentUser";
 import { createActivityLog } from "../../../lib/game/activityLog";
 import { isValidClass, isValidRace } from "../../../lib/game/characterOptions";
+import { STARTING_LOCATION_KEY } from "../../../lib/game/worldLocations";
 
 function toSafeCharacter(character) {
   return {
@@ -89,6 +90,7 @@ async function handlePost(req, res, user) {
         name: input.name,
         race: input.race,
         characterClass: input.characterClass,
+        currentLocation: STARTING_LOCATION_KEY,
       },
     });
 

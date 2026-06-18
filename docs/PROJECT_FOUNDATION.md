@@ -119,7 +119,7 @@ The `CharacterItem` model foundation now exists and belongs to `Character`. It s
 
 The `ActivityLog` model foundation now exists and belongs to `Character`. It stores type, title, description, optional JSON details, and creation time for future character timeline records.
 
-Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. No map UI, travel system, schema change, or character migration has been added yet.
+Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. No map UI or travel system has been added yet.
 
 Local PostgreSQL development is configured with Docker Compose.
 

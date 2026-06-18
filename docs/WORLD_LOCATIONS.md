@@ -8,7 +8,7 @@ The source file is:
 lib/game/worldLocations.js
 ```
 
-This data is static JavaScript for now. It does not create database records and does not change saved characters.
+This data is static JavaScript for now. It does not create database records.
 
 ## Canon Source
 
@@ -38,7 +38,17 @@ kingstone
 
 This represents Kingstone in the Heartlands.
 
-`Character.currentLocation` is still a simple string for now and still defaults to `Kingstone` in Prisma. The project has not migrated existing characters to location keys yet.
+`Character.currentLocation` is still a simple string field, but it now stores location keys.
+
+Kingstone is stored as:
+
+```text
+kingstone
+```
+
+The UI should use `getLocationByKey(character.currentLocation)` to show friendly location names such as `Kingstone`.
+
+Legacy local rows that stored `Kingstone` were normalized to `kingstone` in the Prisma migration.
 
 ## Realm Data Shape
 
@@ -86,10 +96,9 @@ Current location types are:
 - No shops exist yet.
 - No quest data exists yet.
 - No combat encounter data exists yet.
-- `Character.currentLocation` has not been changed yet.
-- Existing characters have not been migrated to location keys.
-- No database schema changes were made for world locations.
+- `Character.currentLocation` is still a string, not a database relation.
+- No `Location` database table exists yet.
 
 ## Next Recommended Step
 
-Add a small read-only location display helper or use `STARTING_LOCATION_KEY` during future character/location cleanup. Map UI and travel behavior should wait until the static location names stay stable.
+Add travel behavior only after location key storage stays stable. Map UI and travel behavior should wait until character ownership and location display remain reliable.

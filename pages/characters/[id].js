@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "../../lib/auth/currentUser";
 import { EQUIPPABLE_SLOTS, isEquippableSlot } from "../../lib/game/equipmentRules";
 import { getStarterEquipmentForClass } from "../../lib/game/starterEquipment";
+import { getLocationByKey } from "../../lib/game/worldLocations";
 import prisma from "../../lib/prisma";
 
 function toSafeCharacter(character) {
@@ -37,7 +38,18 @@ function formatDetails(details) {
     return details;
   }
 
-  return JSON.stringify(details, null, 2);
+  const displayDetails = {
+    ...details,
+    ...(typeof details.currentLocation === "string"
+      ? { currentLocation: getLocationDisplayName(details.currentLocation) }
+      : {}),
+  };
+
+  return JSON.stringify(displayDetails, null, 2);
+}
+
+function getLocationDisplayName(locationKey) {
+  return getLocationByKey(locationKey)?.name || locationKey;
 }
 
 export default function CharacterDetail({ character }) {
@@ -341,7 +353,7 @@ export default function CharacterDetail({ character }) {
               </div>
               <div>
                 <dt>Location</dt>
-                <dd>{character.currentLocation}</dd>
+                <dd>{getLocationDisplayName(character.currentLocation)}</dd>
               </div>
               <div>
                 <dt>Created</dt>

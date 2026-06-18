@@ -2,9 +2,9 @@
 
 The travel foundation prepares Zakzum Online for movement between canon locations.
 
-The project now has reusable travel validation helpers, a protected API route, and a simple protected character detail UI section that can move a logged-in user's own character between valid location keys.
+The project now has reusable travel validation helpers, reusable travel cost helpers, a protected API route, and a simple protected character detail UI section that can move a logged-in user's own character between valid location keys.
 
-This foundation does not create a map, charge stamina, raise stress, trigger encounters, or add travel danger rules.
+This foundation does not create a map, apply stamina costs, apply stress gain, trigger encounters, or add travel danger rolls.
 
 ## Source File
 
@@ -19,6 +19,71 @@ The rules reuse world location data from:
 ```text
 lib/game/worldLocations.js
 ```
+
+Travel cost rules live in:
+
+```text
+lib/game/travelCostRules.js
+```
+
+## Travel Cost Rules
+
+The travel cost rules foundation defines the first reusable stamina and stress calculations for future travel.
+
+`lib/game/travelCostRules.js` exports:
+
+- `BASE_TRAVEL_STAMINA_COST`
+- `BASE_TRAVEL_STRESS_GAIN`
+- `SAME_REALM_STAMINA_COST`
+- `DIFFERENT_REALM_STAMINA_COST`
+- `DANGEROUS_LOCATION_STRESS_GAIN`
+- `getTravelCost({ currentLocationKey, destinationLocationKey })`
+- `hasEnoughStaminaForTravel({ stamina, travelCost })`
+- `getTravelCostValidationError({ stamina, travelCost })`
+
+Current values:
+
+- `BASE_TRAVEL_STAMINA_COST`: `1`
+- `BASE_TRAVEL_STRESS_GAIN`: `1`
+- `SAME_REALM_STAMINA_COST`: `1`
+- `DIFFERENT_REALM_STAMINA_COST`: `2`
+- `DANGEROUS_LOCATION_STRESS_GAIN`: `2`
+
+Same-realm travel uses `SAME_REALM_STAMINA_COST`.
+
+Different-realm travel uses `DIFFERENT_REALM_STAMINA_COST`.
+
+Normal destinations use `BASE_TRAVEL_STRESS_GAIN`.
+
+Dangerous destination types use `DANGEROUS_LOCATION_STRESS_GAIN`.
+
+Dangerous destination types are currently:
+
+- `dungeon`
+- `wilderness`
+- `realm`
+
+`getTravelCost(...)` returns `null` when either location key is invalid.
+
+For valid location keys, it returns:
+
+- `staminaCost`
+- `stressGain`
+- `isSameRealm`
+- `fromLocationKey`
+- `fromLocationName`
+- `destinationLocationKey`
+- `destinationLocationName`
+- `destinationRealmKey`
+- `destinationRealmName`
+
+`hasEnoughStaminaForTravel(...)` returns `true` only when the character has at least the calculated stamina cost.
+
+`getTravelCostValidationError(...)` returns a safe message for invalid costs or insufficient stamina, and returns `null` when the cost is usable.
+
+These costs are not applied by the travel API yet.
+
+The travel API still does not consume stamina or add stress.
 
 ## Travel API
 
@@ -91,7 +156,7 @@ The destination selector uses `getAvailableTravelDestinations(...)`, so the char
 
 When travel succeeds, the UI updates the displayed current location and refreshes the Activity Log so the new `travel_completed` log appears.
 
-The Travel section does not include a map, costs, distance, danger, random encounters, or stamina and stress changes yet.
+The Travel section does not include a map, displayed costs, distance, danger, random encounters, or stamina and stress changes yet.
 
 ## Exported Helpers
 
@@ -178,9 +243,10 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 - No map UI exists yet.
 - No travel distance exists yet.
-- No travel cost exists yet.
-- No stamina cost exists yet.
-- No stress cost exists yet.
+- Travel cost rules exist, but the travel API does not apply them yet.
+- Travel UI does not display travel costs yet.
+- Character stamina is not reduced by travel yet.
+- Character stress is not increased by travel yet.
 - No random encounters exist yet.
 - No dangerous-road logic exists yet.
 - No coordinates or adjacency graph exists yet.
@@ -188,4 +254,4 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 ## Next Recommended Step
 
-Add travel cost rules only after the basic travel UI and protected travel API stay stable. Stamina, stress, danger, map, and encounter systems should still be added one small step at a time.
+Apply travel costs to the protected travel API only after the rules foundation stays stable. The next step should reduce stamina, increase stress, include costs in the travel response, and keep the UI clear about what changed.

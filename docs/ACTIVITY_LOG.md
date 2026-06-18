@@ -14,7 +14,9 @@ The protected character detail page now displays a read-only Activity Log sectio
 
 Activity log write routes have not been added yet.
 
-No automatic logs are written yet during character creation, starter equipment assignment, rest, travel, combat, quests, or story progress.
+The first automatic log source now exists: creating a character writes a `character_created` activity log.
+
+No automatic logs are written yet during starter equipment assignment, rest, travel, combat, quests, or story progress.
 
 ## ActivityLog Model Fields
 
@@ -67,6 +69,33 @@ Safe response shape:
 The response does not include user data, `passwordHash`, or raw session tokens.
 
 No `POST`, `PUT`, `PATCH`, or `DELETE` activity log routes exist yet.
+
+## Automatic Log Sources
+
+The first deliberate automatic log source is character creation.
+
+When a logged-in user creates a character through:
+
+```text
+POST /api/characters
+```
+
+the server creates one `ActivityLog` record for the new character.
+
+The log uses:
+
+- `type`: `character_created`
+- `title`: `Character Created`
+- `description`: `The road remembers the first step.`
+
+The log details store:
+
+- `characterName`
+- `race`
+- `characterClass`
+- `currentLocation`
+
+This log is connected to the newly created character. It is created by the server during character creation, not by a public activity log write route.
 
 ## Activity Log UI Summary
 
@@ -140,8 +169,7 @@ Future activity logs may record:
 
 - A protected activity log read API route exists, but no write routes exist yet.
 - A read-only activity log UI exists on `/characters/[id]`.
-- No automatic activity logs are written yet.
-- Character creation does not write activity logs yet.
+- Character creation now writes one automatic `character_created` activity log.
 - Starter equipment assignment does not write activity logs yet.
 - Resting has not been added.
 - Travel and map systems have not been added.
@@ -151,4 +179,4 @@ Future activity logs may record:
 
 ## Next Recommended Step
 
-Plan the first deliberate automatic log source, such as character creation or starter equipment assignment. Automatic log creation should wait until each source system is built deliberately.
+Add the next deliberate automatic log source, such as starter equipment assignment. Each new log source should stay tied to the server-side system that owns the action.

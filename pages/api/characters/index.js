@@ -1,5 +1,6 @@
 import prisma from "../../../lib/prisma";
 import { getCurrentUser } from "../../../lib/auth/currentUser";
+import { createActivityLog } from "../../../lib/game/activityLog";
 import { isValidClass, isValidRace } from "../../../lib/game/characterOptions";
 
 function toSafeCharacter(character) {
@@ -81,13 +82,33 @@ async function handlePost(req, res, user) {
     return res.status(400).json({ error: validationError });
   }
 
-  const character = await prisma.character.create({
-    data: {
-      userId: user.id,
-      name: input.name,
-      race: input.race,
-      characterClass: input.characterClass,
-    },
+  const character = await prisma.$transaction(async (tx) => {
+    const createdCharacter = await tx.character.create({
+      data: {
+        userId: user.id,
+        name: input.name,
+        race: input.race,
+        characterClass: input.characterClass,
+      },
+    });
+
+    await createActivityLog(
+      {
+        characterId: createdCharacter.id,
+        type: "character_created",
+        title: "Character Created",
+        description: "The road remembers the first step.",
+        details: {
+          characterName: createdCharacter.name,
+          race: createdCharacter.race,
+          characterClass: createdCharacter.characterClass,
+          currentLocation: createdCharacter.currentLocation,
+        },
+      },
+      tx,
+    );
+
+    return createdCharacter;
   });
 
   return res.status(201).json({

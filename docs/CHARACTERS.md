@@ -205,7 +205,9 @@ The protected read route `GET /api/characters/[id]/activity-logs` now returns lo
 
 The character detail page now shows a read-only Activity Log section. It loads logs from the protected read route and shows `No recorded activity yet.` when the character has no logs.
 
-Activity log write routes and automatic activity logging have not been added yet.
+Creating a character through `POST /api/characters` now writes one automatic `character_created` log connected to the new character.
+
+Activity log write routes have not been added yet.
 
 ## Current Limitations
 
@@ -220,8 +222,8 @@ Activity log write routes and automatic activity logging have not been added yet
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Activity log persistence, the protected read API route, and the read-only UI section exist, but write routes have not been added.
+- Activity log persistence, the protected read API route, the read-only UI section, and automatic `character_created` logging exist, but write routes have not been added.
 
 ## Next Recommended Step
 
-Plan exactly which future systems should write activity logs. Gameplay systems should still wait until character ownership, inventory display, and activity log ownership are stable.
+Add the next deliberate automatic log source, or plan exactly which future systems should write activity logs. Gameplay systems should still wait until character ownership, inventory display, and activity log ownership are stable.

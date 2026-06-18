@@ -50,6 +50,18 @@ The UI should use `getLocationByKey(character.currentLocation)` to show friendly
 
 Legacy local rows that stored `Kingstone` were normalized to `kingstone` in the Prisma migration.
 
+## Travel Rules
+
+Basic travel validation helpers now exist in:
+
+```text
+lib/game/travelRules.js
+```
+
+These helpers validate location keys and return safe destination summaries for future travel API and UI work.
+
+They do not move characters or create a travel system yet.
+
 ## Realm Data Shape
 
 Each realm entry includes:
@@ -89,7 +101,7 @@ Current location types are:
 ## Current Limitations
 
 - No map UI exists yet.
-- No travel system exists yet.
+- Travel rules exist, but no travel API or travel UI exists yet.
 - No travel distances exist yet.
 - No coordinates exist yet.
 - No location images exist yet.
@@ -101,4 +113,4 @@ Current location types are:
 
 ## Next Recommended Step
 
-Add travel behavior only after location key storage stays stable. Map UI and travel behavior should wait until character ownership and location display remain reliable.
+Add a protected travel API only after the travel rules foundation stays stable. Map UI and richer travel behavior should wait until character ownership, location validation, and activity logging remain reliable.

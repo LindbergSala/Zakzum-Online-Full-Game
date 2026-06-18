@@ -31,7 +31,7 @@ The protected dashboard shell now exists at `/dashboard`. It is the future home 
 
 Protected character API routes now exist at `/api/characters`. They let logged-in users list and create their own characters.
 
-The protected dashboard now includes a simple character creation UI and character list. Character cards link to read-only character sheets at `/characters/[id]`. Starter equipment preview data exists, the CharacterItem inventory persistence foundation has been added, protected inventory API routes now exist, and the character detail page can show saved inventory. The ActivityLog persistence foundation, protected read API route, read-only character detail UI section, automatic `character_created` logging, and automatic `starter_equipment_assigned` logging also exist. Gameplay systems have not been added yet.
+The protected dashboard now includes a simple character creation UI and character list. Character cards link to read-only character sheets at `/characters/[id]`. Starter equipment preview data exists, the CharacterItem inventory persistence foundation has been added, protected inventory API routes now exist, and the character detail page can show saved inventory. A small equipment rules helper now defines equippable slots for future equip and unequip behavior. The ActivityLog persistence foundation, protected read API route, read-only character detail UI section, automatic `character_created` logging, and automatic `starter_equipment_assigned` logging also exist. Gameplay systems have not been added yet.
 
 ## Tech Stack
 
@@ -143,7 +143,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation, protected character API routes, dashboard character creation UI, read-only character detail page, starter equipment preview data, CharacterItem inventory persistence foundation, protected inventory API routes, basic inventory UI, ActivityLog persistence foundation, protected activity log read API route, read-only activity log UI section, automatic `character_created` logging, and automatic `starter_equipment_assigned` logging exist. Gameplay systems have not been added yet.
+The Character model foundation, protected character API routes, dashboard character creation UI, read-only character detail page, starter equipment preview data, CharacterItem inventory persistence foundation, protected inventory API routes, basic inventory UI, equipment rules helper, ActivityLog persistence foundation, protected activity log read API route, read-only activity log UI section, automatic `character_created` logging, and automatic `starter_equipment_assigned` logging exist. Gameplay systems have not been added yet.
 
 ## Core Lore Rule
 
@@ -158,7 +158,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 Recommended next steps:
 
 1. Add the next deliberate automatic activity log source only after its owning system exists.
-2. Add a carefully scoped equip and unequip plan.
+2. Add protected equip and unequip API routes that reuse the equipment rules helper.
 3. Add starter journey content only after character ownership is stable.
 4. Add broader gameplay systems after the saved-progress foundation works.
 

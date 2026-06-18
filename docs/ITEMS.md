@@ -12,6 +12,12 @@ Starter equipment should feel practical, worn, grounded, and useful for survival
 
 The protected inventory API foundation now exists. The character detail page now has a simple saved inventory UI. Successful starter equipment assignment now writes one automatic `starter_equipment_assigned` activity log.
 
+The equipment rules foundation now exists in:
+
+```text
+lib/game/equipmentRules.js
+```
+
 ## Starter Equipment Data Summary
 
 Starter equipment is currently class-based.
@@ -159,6 +165,37 @@ Current item slots are intentionally simple:
 - `pack`
 - `none`
 
+## Equipment Rules Foundation
+
+The reusable equipment rules helper defines which item slots can be equipped.
+
+Equippable slots:
+
+- `mainHand`
+- `offHand`
+- `body`
+
+Non-equippable slots:
+
+- `pack`
+- `none`
+
+The helper exports:
+
+- `EQUIPPABLE_SLOTS`
+- `NON_EQUIPPABLE_SLOTS`
+- `isEquippableSlot(slot)`
+- `canEquipItem(item)`
+- `getEquippedSlotConflict(items, item)`
+
+Future equip behavior should allow only one equipped item per equippable slot.
+
+`getEquippedSlotConflict(items, item)` checks an inventory list for an already equipped item in the same slot and returns that item when there is a conflict. It returns `null` when there is no conflict.
+
+Equip and unequip API routes have not been added yet.
+
+Equip and unequip UI has not been added yet.
+
 ## Current Limitations
 
 - No global `Item` database model exists yet.
@@ -167,6 +204,7 @@ Current item slots are intentionally simple:
 - Inventory UI is limited to listing saved items and assigning starter equipment once.
 - Update, delete, equip, and unequip item routes have not been added yet.
 - Equip and unequip UI has not been added yet.
+- Equipment rules exist, but they are not wired into API behavior yet.
 - Items do not have stats.
 - Items do not have damage values.
 - Items do not have armor values.
@@ -178,4 +216,4 @@ Current item slots are intentionally simple:
 
 ## Next Recommended Step
 
-Add a carefully scoped equip and unequip plan. Equipment mechanics, shops, combat, and item rewards should still wait.
+Add protected equip and unequip API routes that reuse `lib/game/equipmentRules.js`. Equipment mechanics, shops, combat, and item rewards should still wait.

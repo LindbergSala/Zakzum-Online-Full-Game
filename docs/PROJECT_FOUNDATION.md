@@ -121,7 +121,7 @@ The `ActivityLog` model foundation now exists and belongs to `Character`. It sto
 
 Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. Basic travel validation and cost rules, a protected travel API, and a simple Travel UI now exist. Travel consumes stamina and increases stress. Basic rest recovery rules, a protected rest API, and a simple Rest UI now exist. No map UI or random encounter system has been added yet.
 
-Static quest definitions now exist in `lib/game/questData.js`. A protected read-only character quest API returns the static duties available at an owned character's current location. Quest UI, database models, acceptance, completion, rewards, combat, and story progression have not been added.
+Static quest definitions now exist in `lib/game/questData.js`. A protected read-only character quest API and read-only Quest section return the static duties available at an owned character's current location. Quest database models, acceptance, completion, rewards, combat, and story progression have not been added.
 
 Local PostgreSQL development is configured with Docker Compose.
 
@@ -161,7 +161,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add a simple read-only Quest section to the protected character detail page.
+1. Add a quest persistence model foundation before quest acceptance or completion behavior.
 2. Add the next deliberate automatic activity log source only after its owning system exists.
 3. Add starter journey content only after character ownership is stable.
 4. Add broader gameplay systems after the saved-progress foundation works.

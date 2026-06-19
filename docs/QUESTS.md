@@ -134,10 +134,40 @@ The route does not return user data, `passwordHash`, raw session tokens, Activit
 
 Only `GET` is supported. No public quest write behavior exists.
 
+## Quest UI Summary
+
+The protected character detail page now includes a read-only Quest section:
+
+```text
+/characters/[id]
+```
+
+The UI calls:
+
+```text
+GET /api/characters/[id]/quests
+```
+
+It displays the character's friendly current location and realm names, then lists the static quests available for `Character.currentLocation`.
+
+Each quest displays:
+
+- title
+- type
+- suggested level
+- short description
+- briefing
+- text-only objectives
+- a starter quest label when applicable
+
+The Quest section refreshes after successful travel so the list follows the character's new current location.
+
+The UI includes safe loading, error, and empty states. It does not include accept or complete controls.
+
 ## Current Limitations
 
 - The quest API is read-only and returns static definitions only.
-- No quest UI exists yet.
+- The Quest UI is read-only.
 - No quest database models exist yet.
 - No player quest status is persisted yet.
 - No objective completion logic exists yet.
@@ -148,4 +178,4 @@ Only `GET` is supported. No public quest write behavior exists.
 
 ## Next Recommended Step
 
-Add a simple read-only Quest section to `/characters/[id]` that displays the current location's static quests. Keep acceptance, progress, completion, rewards, and combat for separate later steps.
+Add a quest persistence model foundation before introducing acceptance or completion behavior. Keep rewards and combat for separate later steps.

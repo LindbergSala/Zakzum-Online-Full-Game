@@ -66,6 +66,17 @@ function getLocationDisplayName(locationKey) {
   return getLocationByKey(locationKey)?.name || locationKey;
 }
 
+async function fetchQuestData(characterId) {
+  const response = await fetch(`/api/characters/${characterId}/quests`);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Quests could not be loaded.");
+  }
+
+  return data;
+}
+
 export default function CharacterDetail({ character }) {
   const starterEquipment = getStarterEquipmentForClass(character.characterClass);
   const [currentLocationKey, setCurrentLocationKey] = useState(
@@ -89,6 +100,16 @@ export default function CharacterDetail({ character }) {
   const [activityLogs, setActivityLogs] = useState([]);
   const [activityLogLoading, setActivityLogLoading] = useState(true);
   const [activityLogError, setActivityLogError] = useState("");
+  const [quests, setQuests] = useState([]);
+  const [questsLoading, setQuestsLoading] = useState(true);
+  const [questsError, setQuestsError] = useState("");
+  const [questLocationName, setQuestLocationName] = useState(
+    getLocationDisplayName(character.currentLocation),
+  );
+  const [questRealmName, setQuestRealmName] = useState(
+    getTravelDestinationSummary(character.currentLocation)?.realmName ||
+      "Unknown realm",
+  );
   const [selectedDestinationLocationKey, setSelectedDestinationLocationKey] =
     useState(
       () =>
@@ -140,6 +161,32 @@ export default function CharacterDetail({ character }) {
     slot,
     item: inventoryItems.find((item) => item.slot === slot && item.isEquipped),
   }));
+
+  async function loadQuests() {
+    setQuestsLoading(true);
+    setQuestsError("");
+
+    try {
+      const data = await fetchQuestData(character.id);
+
+      setQuests(data.quests || []);
+      setQuestLocationName(
+        data.character?.currentLocationName ||
+          data.character?.currentLocation ||
+          "Unknown location",
+      );
+      setQuestRealmName(
+        data.character?.currentRealmName ||
+          data.character?.currentRealmKey ||
+          "Unknown realm",
+      );
+    } catch (error) {
+      setQuestsError(error.message || "Quests could not be loaded.");
+      setQuests([]);
+    } finally {
+      setQuestsLoading(false);
+    }
+  }
 
   async function loadInventory() {
     setInventoryLoading(true);
@@ -217,6 +264,50 @@ export default function CharacterDetail({ character }) {
     }
 
     loadInitialInventory();
+
+    return () => {
+      isActive = false;
+    };
+  }, [character.id]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadInitialQuests() {
+      setQuestsLoading(true);
+      setQuestsError("");
+
+      try {
+        const data = await fetchQuestData(character.id);
+
+        if (!isActive) {
+          return;
+        }
+
+        setQuests(data.quests || []);
+        setQuestLocationName(
+          data.character?.currentLocationName ||
+            data.character?.currentLocation ||
+            "Unknown location",
+        );
+        setQuestRealmName(
+          data.character?.currentRealmName ||
+            data.character?.currentRealmKey ||
+            "Unknown realm",
+        );
+      } catch (error) {
+        if (isActive) {
+          setQuestsError(error.message || "Quests could not be loaded.");
+          setQuests([]);
+        }
+      } finally {
+        if (isActive) {
+          setQuestsLoading(false);
+        }
+      }
+    }
+
+    loadInitialQuests();
 
     return () => {
       isActive = false;
@@ -417,6 +508,7 @@ export default function CharacterDetail({ character }) {
       );
       setTravelSuccess(`Travel completed to ${nextLocationName}.`);
       await loadActivityLogs();
+      await loadQuests();
     } catch (error) {
       setTravelError(error.message || "Travel could not be completed.");
     } finally {
@@ -636,6 +728,64 @@ export default function CharacterDetail({ character }) {
             ) : null}
             {travelSuccess ? (
               <p className="form-message success">{travelSuccess}</p>
+            ) : null}
+          </section>
+
+          <section className="session-panel" aria-labelledby="quests-title">
+            <h2 id="quests-title">Quests</h2>
+            <p className="supporting-text">
+              Local duties wait where the road leaves unfinished work behind.
+            </p>
+            <dl className="sheet-grid">
+              <div>
+                <dt>Current Quest Location</dt>
+                <dd>{questLocationName}</dd>
+              </div>
+              <div>
+                <dt>Realm</dt>
+                <dd>{questRealmName}</dd>
+              </div>
+            </dl>
+            {questsLoading ? (
+              <p className="supporting-text">Reading the local notices...</p>
+            ) : null}
+            {questsError ? (
+              <p className="form-message error">{questsError}</p>
+            ) : null}
+            {!questsLoading && !questsError && quests.length === 0 ? (
+              <p className="empty-state">No local quests are available here yet.</p>
+            ) : null}
+            {!questsLoading && !questsError && quests.length > 0 ? (
+              <div className="inventory-list">
+                {quests.map((quest) => (
+                  <article className="inventory-item" key={quest.key}>
+                    <div>
+                      <h3>{quest.title}</h3>
+                      <p className="item-meta">
+                        {quest.type} / Suggested level {quest.suggestedLevel}
+                      </p>
+                    </div>
+                    {quest.isStarterQuest ? (
+                      <p className="item-action-note">Starter Quest</p>
+                    ) : null}
+                    <p className="supporting-text">{quest.shortDescription}</p>
+                    <div>
+                      <p className="item-meta">Briefing</p>
+                      <p className="supporting-text">{quest.briefing}</p>
+                    </div>
+                    {quest.objectives.length > 0 ? (
+                      <div>
+                        <p className="item-meta">Objectives</p>
+                        <ul className="placeholder-list">
+                          {quest.objectives.map((objective) => (
+                            <li key={objective}>{objective}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
             ) : null}
           </section>
 
@@ -891,7 +1041,6 @@ export default function CharacterDetail({ character }) {
             <h2 id="actions-title">Actions</h2>
             <ul className="placeholder-list">
               <li>Travel danger coming soon.</li>
-              <li>Quests coming soon.</li>
               <li>Combat coming soon.</li>
             </ul>
           </section>

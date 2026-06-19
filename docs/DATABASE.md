@@ -8,28 +8,27 @@ The intended database is PostgreSQL.
 
 Do not use SQLite as the deployed database. The project is being built with Vercel deployment in mind, so production should use a hosted PostgreSQL database.
 
-## Environment Variable
+## Environment Variables
 
-`DATABASE_URL` and `DATABASE_URL_UNPOOLED` must be set for local development and on Vercel.
+`DATABASE_URL` must be set for local development and on Vercel.
 
 The placeholder format is documented in `.env.example`:
 
 ```text
 DATABASE_URL="postgresql://zakzum:zakzum_dev_password@localhost:55432/zakzum_online_dev?schema=public"
-DATABASE_URL_UNPOOLED="postgresql://zakzum:zakzum_dev_password@localhost:55432/zakzum_online_dev?schema=public"
 ```
 
 Do not commit real database passwords, tokens, or connection strings.
 
 `DATABASE_URL` is the runtime connection string used by the application.
 
-`DATABASE_URL_UNPOOLED` is the direct connection string Prisma uses for operations that should not go through PgBouncer or another connection pooler, such as migrations. For local Docker development, it can be the same value as `DATABASE_URL`.
-
 When using the Vercel Postgres/Neon integration:
 
-- Use the pooled runtime URL for `DATABASE_URL`. Depending on the values Vercel exposes, this may be `DATABASE_URL`, `POSTGRES_PRISMA_URL`, or another pooled Neon URL.
-- Use the direct/non-pooling URL for `DATABASE_URL_UNPOOLED`. Depending on the values Vercel exposes, this may be `DATABASE_URL_UNPOOLED` or `POSTGRES_URL_NON_POOLING`.
+- Set `DATABASE_URL` in Vercel Project Settings, under Environment Variables.
+- Enable it for Production, and usually also Preview and Development.
+- Use the PostgreSQL connection string from the Vercel Storage/Neon integration.
 - Keep `AUTH_SESSION_SECRET` set to a long random value.
+- Keep real database URLs and session secrets in Vercel, not in GitHub.
 
 This project uses Prisma, so do not add the `comments` example table or the `@neondatabase/serverless` sample form from the generic Vercel guide unless a feature specifically needs raw SQL access.
 
@@ -43,26 +42,25 @@ To start local database work:
 
 1. Copy `.env.example` to `.env` on your machine.
 2. Keep the local Docker `DATABASE_URL` unless you use a different local PostgreSQL database.
-3. Keep local `DATABASE_URL_UNPOOLED` set to the same connection string unless you use a different direct PostgreSQL URL.
-4. Start PostgreSQL:
+3. Start PostgreSQL:
 
 ```bash
 npm run db:up
 ```
 
-5. Apply pending migrations locally:
+4. Apply pending migrations locally:
 
 ```bash
 npm run db:migrate
 ```
 
-6. Validate the Prisma schema:
+5. Validate the Prisma schema:
 
 ```bash
 npm run db:validate
 ```
 
-7. Stop the local database when finished:
+6. Stop the local database when finished:
 
 ```bash
 npm run db:down
@@ -86,6 +84,16 @@ The project includes simple package scripts for local database work:
 - `npm run db:studio` opens Prisma Studio.
 
 Use `npm run db:reset` carefully. It deletes local database data.
+
+`npm run db:migrate` uses `prisma migrate dev` and is only for local development.
+
+For Vercel and production, the `build` script runs:
+
+```bash
+prisma migrate deploy && prisma generate && next build
+```
+
+`prisma migrate deploy` applies existing migration files in production. Do not use `prisma migrate dev` in Vercel builds.
 
 ## Migrations
 
@@ -144,7 +152,7 @@ This migration creates:
 
 The current migrations have been applied to the local Docker PostgreSQL database.
 
-For deployment, use the normal Prisma and Vercel migration flow with real production `DATABASE_URL` and `DATABASE_URL_UNPOOLED` values. Do not use the local Docker database for production.
+For deployment, use the Prisma and Vercel migration flow with a real production `DATABASE_URL` value. Do not use the local Docker database for production.
 
 ## Current Models
 

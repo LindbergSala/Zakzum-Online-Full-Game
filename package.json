@@ -5,7 +5,7 @@
   "description": "A DnD-inspired text-based RPG web game set in the world of Zakzum.",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma migrate deploy && prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "db:up": "docker compose up -d",

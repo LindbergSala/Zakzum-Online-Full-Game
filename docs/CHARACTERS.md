@@ -236,9 +236,10 @@ Public activity log write routes have not been added yet.
 - Resting has not been added.
 - Shops have not been added.
 - Travel now consumes stamina and increases stress through the protected travel API, and the Travel UI previews those costs before travel.
-- Map UI, danger rules, random encounters, and rest recovery have not been added.
+- Rest recovery rules exist, but no rest API or rest UI has been added.
+- Map UI, danger rules, random encounters, and live rest recovery have not been added.
 - Activity log persistence, the protected read API route, the read-only UI section, and automatic logs for character creation, starter equipment assignment, equip, unequip, and travel exist, but public write routes have not been added.
 
 ## Next Recommended Step
 
-Add a small rest foundation so characters can recover from travel pressure.
+Add a protected rest API route that reuses the rest rules helper.

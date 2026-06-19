@@ -26,6 +26,12 @@ Travel cost rules live in:
 lib/game/travelCostRules.js
 ```
 
+Rest recovery rules live in:
+
+```text
+lib/game/restRules.js
+```
+
 ## Travel Cost Rules
 
 The travel cost rules foundation defines the first reusable stamina and stress calculations for future travel.
@@ -84,6 +90,8 @@ For valid location keys, it returns:
 The protected travel API now applies these costs when travel succeeds.
 
 The Travel UI now displays these costs for the selected destination before the player confirms travel.
+
+Rest recovery rules now exist separately, but travel does not call them.
 
 ## Travel API
 
@@ -271,8 +279,9 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 - No map UI exists yet.
 - No travel distance exists yet.
-- Travel now consumes stamina and increases stress, but no rest system exists yet.
-- Travel UI displays cost previews, but no rest system exists yet.
+- Travel now consumes stamina and increases stress.
+- Travel UI displays cost previews.
+- Rest rules exist, but no rest API or rest UI exists yet.
 - No random encounters exist yet.
 - No dangerous-road logic exists yet.
 - No coordinates or adjacency graph exists yet.
@@ -280,4 +289,4 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 ## Next Recommended Step
 
-Add a small rest foundation so characters can recover from travel pressure before deeper road danger or random encounter systems are introduced.
+Add a protected rest API route so characters can recover from travel pressure before deeper road danger or random encounter systems are introduced.

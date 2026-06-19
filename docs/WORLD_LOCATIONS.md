@@ -101,16 +101,16 @@ Current location types are:
 ## Current Limitations
 
 - No map UI exists yet.
-- Travel rules and a protected travel API exist, but no travel UI exists yet.
+- Travel rules, a protected travel API, and a simple Travel UI exist.
 - No travel distances exist yet.
 - No coordinates exist yet.
 - No location images exist yet.
 - No shops exist yet.
-- No quest data exists yet.
+- Static quest data now references location keys, but no quest API, UI, or database models exist yet.
 - No combat encounter data exists yet.
 - `Character.currentLocation` is still a string, not a database relation.
 - No `Location` database table exists yet.
 
 ## Next Recommended Step
 
-Add a small protected travel UI only after the travel API stays stable. Map UI and richer travel behavior should wait until character ownership, location validation, and activity logging remain reliable.
+Keep location keys stable as future quest APIs and persistence are added. Map UI and richer travel behavior should continue to wait until character ownership, location validation, and activity logging remain reliable.

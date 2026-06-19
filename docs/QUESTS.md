@@ -88,9 +88,55 @@ The tasks focus on roads, warnings, graves, messages, and unfinished local dutie
 
 `isValidQuestKey(...)` and `isValidQuestStatus(...)` provide safe validation for future APIs.
 
+## Quest API Summary
+
+The protected read-only quest route is:
+
+```text
+GET /api/characters/[id]/quests
+```
+
+The route requires a valid logged-in user and verifies that the requested character belongs to that user. Missing characters and characters owned by another user return `404`.
+
+The route reads `Character.currentLocation`, resolves friendly location and realm names through `lib/game/worldLocations.js`, and returns static quests from `getAvailableQuestsForLocation(...)`.
+
+Safe response shape:
+
+```json
+{
+  "character": {
+    "id": "character_id",
+    "name": "Mara",
+    "currentLocation": "kingstone",
+    "currentLocationName": "Kingstone",
+    "currentRealmKey": "heartlands",
+    "currentRealmName": "Heartlands"
+  },
+  "quests": [
+    {
+      "key": "warnings-on-the-old-road",
+      "title": "Warnings on the Old Road",
+      "type": "notice",
+      "startLocationKey": "kingstone",
+      "shortDescription": "Check the weathered warning posts along the first road beyond Kingstone.",
+      "briefing": "Three warning posts have gone unread since the last hard rain.",
+      "suggestedLevel": 1,
+      "isStarterQuest": true,
+      "objectives": [
+        "Read the road notice posted in Kingstone."
+      ]
+    }
+  ]
+}
+```
+
+The route does not return user data, `passwordHash`, raw session tokens, ActivityLog records, rewards, or mutable quest progress.
+
+Only `GET` is supported. No public quest write behavior exists.
+
 ## Current Limitations
 
-- No quest API exists yet.
+- The quest API is read-only and returns static definitions only.
 - No quest UI exists yet.
 - No quest database models exist yet.
 - No player quest status is persisted yet.
@@ -102,4 +148,4 @@ The tasks focus on roads, warnings, graves, messages, and unfinished local dutie
 
 ## Next Recommended Step
 
-Add a protected read-only quest API that lists static quests for the logged-in character's current location. Keep acceptance, progress, completion, rewards, and combat for separate later steps.
+Add a simple read-only Quest section to `/characters/[id]` that displays the current location's static quests. Keep acceptance, progress, completion, rewards, and combat for separate later steps.

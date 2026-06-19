@@ -2,7 +2,7 @@
 
 The rest foundation prepares Zakzum Online for future recovery after travel pressure.
 
-Rest is not a live gameplay action yet. This step only defines reusable rules for how stamina recovery and stress reduction should be calculated later.
+Rest is now available as a protected server-side action. It reuses the rest rules foundation to recover stamina, reduce stress, and record the recovery in the character's Activity Log.
 
 ## Source File
 
@@ -76,13 +76,82 @@ The result includes:
 - a safe message when there is nothing to recover
 - `null` when rest is valid
 
+## Rest API Summary
+
+The protected rest route is:
+
+```text
+POST /api/characters/[id]/rest
+```
+
+The route requires a valid logged-in user.
+
+The route checks that the requested character exists and belongs to the logged-in user. If the character does not exist or belongs to another user, the route returns `404`.
+
+Successful rest:
+
+- increases `Character.stamina`
+- caps stamina at `maxStamina`
+- reduces `Character.stress`
+- floors stress at `0`
+- creates one `rest_completed` ActivityLog record
+
+Rest is rejected when the character is already at full stamina and `0` stress.
+
+Safe response shape:
+
+```json
+{
+  "message": "Rest completed.",
+  "character": {
+    "id": "character_id",
+    "name": "Mara",
+    "currentLocation": "kingstone",
+    "stamina": 8,
+    "maxStamina": 10,
+    "stress": 1
+  },
+  "restResult": {
+    "staminaBefore": 5,
+    "staminaAfter": 8,
+    "maxStamina": 10,
+    "stressBefore": 3,
+    "stressAfter": 1,
+    "staminaRecovered": 3,
+    "stressReduced": 2
+  }
+}
+```
+
+The response does not include user data, `passwordHash`, raw session tokens, or ActivityLog records.
+
+## Activity Log Behavior
+
+Successful rest creates one automatic ActivityLog record.
+
+The log uses:
+
+- `type`: `rest_completed`
+- `title`: `Rest Completed`
+- `description`: `A pause from the road steadied body and mind.`
+
+The log details store:
+
+- `characterName`
+- `locationKey`
+- `staminaBefore`
+- `staminaAfter`
+- `maxStamina`
+- `stressBefore`
+- `stressAfter`
+- `staminaRecovered`
+- `stressReduced`
+
+No `rest_completed` log is created when rest is rejected or the request fails.
+
 ## Current Limitations
 
-- No rest API route exists yet.
 - No rest UI exists yet.
-- Rest does not update `Character.stamina` yet.
-- Rest does not update `Character.stress` yet.
-- Rest does not create ActivityLog records yet.
 - No random encounters exist yet.
 - No dangerous-rest logic exists yet.
 - No inn, camp, or shop logic exists yet.
@@ -90,4 +159,4 @@ The result includes:
 
 ## Next Recommended Step
 
-Add a protected rest API route that reuses these rules, updates the logged-in user's own character, and creates one automatic rest activity log only when rest succeeds.
+Add a simple protected Rest UI on `/characters/[id]` that calls the rest API, updates stamina and stress, and refreshes the Activity Log after successful rest.

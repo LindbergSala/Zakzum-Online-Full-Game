@@ -16,9 +16,9 @@ Public activity log write routes have not been added yet.
 
 Automatic log sources now exist for character creation and starter equipment assignment.
 
-Automatic log sources also exist for successful item equip, item unequip, and travel actions.
+Automatic log sources also exist for successful item equip, item unequip, travel, and rest actions.
 
-No automatic logs are written yet during rest, combat, quests, or story progress.
+No automatic logs are written yet during combat, quests, or story progress.
 
 ## ActivityLog Model Fields
 
@@ -252,6 +252,38 @@ The log is only created when travel succeeds.
 
 No `travel_completed` log is created for missing destinations, invalid destinations, same-location travel, insufficient stamina, missing characters, unauthorized requests, or failed requests.
 
+### Rest Completed
+
+When a logged-in user rests one of their own characters through:
+
+```text
+POST /api/characters/[id]/rest
+```
+
+the server updates the character's stamina and stress, then creates one `ActivityLog` record for that character.
+
+The log uses:
+
+- `type`: `rest_completed`
+- `title`: `Rest Completed`
+- `description`: `A pause from the road steadied body and mind.`
+
+The log details store:
+
+- `characterName`
+- `locationKey`
+- `staminaBefore`
+- `staminaAfter`
+- `maxStamina`
+- `stressBefore`
+- `stressAfter`
+- `staminaRecovered`
+- `stressReduced`
+
+The log is only created when rest succeeds.
+
+No `rest_completed` log is created when the character is already at full stamina and `0` stress, when rest values are invalid, when the character is missing, when the request is unauthorized, or when the request fails.
+
 ## Activity Log UI Summary
 
 The protected character detail page now displays read-only activity logs:
@@ -335,7 +367,8 @@ Future activity logs may record:
 - No equip or unequip logs are written for no-op, conflict, invalid slot, not found, or unauthorized requests.
 - Travel now writes one automatic `travel_completed` activity log with stamina and stress cost details when a protected travel request succeeds.
 - No travel logs are written for invalid, same-location, insufficient stamina, not found, unauthorized, or failed requests.
-- Resting has not been added.
+- Rest now writes one automatic `rest_completed` activity log with stamina and stress recovery details when a protected rest request succeeds.
+- No rest logs are written for full-recovery, invalid, not found, unauthorized, or failed requests.
 - Travel UI and map systems have not been added.
 - Quests have not been added.
 - Combat has not been added.
@@ -343,4 +376,4 @@ Future activity logs may record:
 
 ## Next Recommended Step
 
-Add the next deliberate automatic log source only when its owning server-side system exists. Rest, quests, combat, and story systems have not been added yet.
+Add the next deliberate automatic log source only when its owning server-side system exists. Quests, combat, and story systems have not been added yet.

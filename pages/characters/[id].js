@@ -8,6 +8,11 @@ import {
   getAvailableTravelDestinations,
   getTravelDestinationSummary,
 } from "../../lib/game/travelRules";
+import {
+  getTravelCost,
+  getTravelCostValidationError,
+  hasEnoughStaminaForTravel,
+} from "../../lib/game/travelCostRules";
 import { getLocationByKey } from "../../lib/game/worldLocations";
 import prisma from "../../lib/prisma";
 
@@ -61,6 +66,12 @@ export default function CharacterDetail({ character }) {
   const [currentLocationKey, setCurrentLocationKey] = useState(
     character.currentLocation,
   );
+  const [currentLocationName, setCurrentLocationName] = useState(
+    getLocationDisplayName(character.currentLocation),
+  );
+  const [stamina, setStamina] = useState(character.stamina);
+  const [maxStamina, setMaxStamina] = useState(character.maxStamina);
+  const [stress, setStress] = useState(character.stress);
   const [inventoryItems, setInventoryItems] = useState([]);
   const [inventoryLoading, setInventoryLoading] = useState(true);
   const [inventoryError, setInventoryError] = useState("");
@@ -90,6 +101,22 @@ export default function CharacterDetail({ character }) {
   const selectedDestination = getTravelDestinationSummary(
     selectedDestinationLocationKey,
   );
+  const selectedTravelCost = selectedDestinationLocationKey
+    ? getTravelCost({
+        currentLocationKey,
+        destinationLocationKey: selectedDestinationLocationKey,
+      })
+    : null;
+  const travelCostValidationError = selectedDestinationLocationKey
+    ? getTravelCostValidationError({
+        stamina,
+        travelCost: selectedTravelCost,
+      })
+    : "";
+  const hasEnoughStamina = hasEnoughStaminaForTravel({
+    stamina,
+    travelCost: selectedTravelCost,
+  });
   const equippedSlots = EQUIPPABLE_SLOTS.map((slot) => ({
     slot,
     item: inventoryItems.find((item) => item.slot === slot && item.isEquipped),
@@ -351,6 +378,20 @@ export default function CharacterDetail({ character }) {
         getLocationDisplayName(nextLocationKey);
 
       setCurrentLocationKey(nextLocationKey);
+      setCurrentLocationName(nextLocationName);
+      setStamina(
+        typeof data.character?.stamina === "number"
+          ? data.character.stamina
+          : stamina,
+      );
+      setMaxStamina(
+        typeof data.character?.maxStamina === "number"
+          ? data.character.maxStamina
+          : maxStamina,
+      );
+      setStress(
+        typeof data.character?.stress === "number" ? data.character.stress : stress,
+      );
       setSelectedDestinationLocationKey(
         getAvailableTravelDestinations({ currentLocationKey: nextLocationKey })[0]
           ?.key || "",
@@ -413,12 +454,12 @@ export default function CharacterDetail({ character }) {
               <div>
                 <dt>Stamina</dt>
                 <dd>
-                  {character.stamina} / {character.maxStamina}
+                  {stamina} / {maxStamina}
                 </dd>
               </div>
               <div>
                 <dt>Stress</dt>
-                <dd>{character.stress}</dd>
+                <dd>{stress}</dd>
               </div>
               <div>
                 <dt>Renown</dt>
@@ -426,7 +467,7 @@ export default function CharacterDetail({ character }) {
               </div>
               <div>
                 <dt>Location</dt>
-                <dd>{getLocationDisplayName(currentLocationKey)}</dd>
+                <dd>{currentLocationName}</dd>
               </div>
               <div>
                 <dt>Created</dt>
@@ -438,13 +479,13 @@ export default function CharacterDetail({ character }) {
           <section className="session-panel" aria-labelledby="travel-title">
             <h2 id="travel-title">Travel</h2>
             <p className="supporting-text">
-              Choose the next road carefully. Costs, danger, and encounters will
+              Choose the next road carefully. Danger, encounters, and rest will
               come later.
             </p>
             <dl className="sheet-grid">
               <div>
                 <dt>Current Location</dt>
-                <dd>{getLocationDisplayName(currentLocationKey)}</dd>
+                <dd>{currentLocationName}</dd>
               </div>
               <div>
                 <dt>Realm</dt>
@@ -483,12 +524,44 @@ export default function CharacterDetail({ character }) {
                   </p>
                 </article>
               ) : null}
+              {selectedTravelCost ? (
+                <article className="inventory-item">
+                  <div>
+                    <h3>Travel Cost</h3>
+                    <p className="item-meta">
+                      {selectedTravelCost.isSameRealm
+                        ? "Same realm road"
+                        : "Cross-realm road"}
+                    </p>
+                  </div>
+                  <dl className="inventory-details">
+                    <div>
+                      <dt>Stamina Cost</dt>
+                      <dd>{selectedTravelCost.staminaCost}</dd>
+                    </div>
+                    <div>
+                      <dt>Stress Gain</dt>
+                      <dd>{selectedTravelCost.stressGain}</dd>
+                    </div>
+                  </dl>
+                  <p className="supporting-text">
+                    {hasEnoughStamina
+                      ? "This road can be taken with your current stamina."
+                      : "Too little stamina remains for this road."}
+                  </p>
+                </article>
+              ) : null}
+              {travelCostValidationError ? (
+                <p className="form-message error">{travelCostValidationError}</p>
+              ) : null}
               <button
                 className="primary-button"
                 type="submit"
                 disabled={
                   travelLoading ||
                   !selectedDestinationLocationKey ||
+                  !selectedTravelCost ||
+                  Boolean(travelCostValidationError) ||
                   travelDestinations.length === 0
                 }
               >
@@ -688,7 +761,7 @@ export default function CharacterDetail({ character }) {
             <h2 id="actions-title">Actions</h2>
             <ul className="placeholder-list">
               <li>Rest coming soon.</li>
-              <li>Travel costs coming soon.</li>
+              <li>Travel danger coming soon.</li>
               <li>Quests coming soon.</li>
               <li>Combat coming soon.</li>
             </ul>

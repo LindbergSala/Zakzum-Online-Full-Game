@@ -83,7 +83,7 @@ For valid location keys, it returns:
 
 The protected travel API now applies these costs when travel succeeds.
 
-The Travel UI does not display these costs yet.
+The Travel UI now displays these costs for the selected destination before the player confirms travel.
 
 ## Travel API
 
@@ -167,14 +167,18 @@ The UI shows:
 - the current realm name
 - a destination selector
 - a destination preview
+- stamina cost and stress gain for the selected destination
+- a warning when the character does not have enough stamina
 - a Travel button
 - simple loading, success, and error states
 
 The destination selector uses `getAvailableTravelDestinations(...)`, so the character's current location is not listed as a destination.
 
-When travel succeeds, the UI updates the displayed current location and refreshes the Activity Log so the new `travel_completed` log appears.
+The Travel button is disabled when no destination is selected, cost cannot be calculated, stamina is too low, or travel is already loading.
 
-The Travel section does not include a map, displayed costs, distance, danger, random encounters, or rest controls yet.
+When travel succeeds, the UI updates the displayed current location, stamina, and stress. It also refreshes the Activity Log so the new `travel_completed` log appears.
+
+The Travel section does not include a map, distance, danger, random encounters, or rest controls yet.
 
 ## Exported Helpers
 
@@ -267,8 +271,8 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 - No map UI exists yet.
 - No travel distance exists yet.
-- Travel UI does not display travel costs yet.
 - Travel now consumes stamina and increases stress, but no rest system exists yet.
+- Travel UI displays cost previews, but no rest system exists yet.
 - No random encounters exist yet.
 - No dangerous-road logic exists yet.
 - No coordinates or adjacency graph exists yet.
@@ -276,4 +280,4 @@ No travel log is created for missing destinations, invalid destinations, same-lo
 
 ## Next Recommended Step
 
-Update the Travel UI to show stamina cost and stress gain before travel. After that, add a small rest foundation so characters can recover from travel pressure.
+Add a small rest foundation so characters can recover from travel pressure before deeper road danger or random encounter systems are introduced.

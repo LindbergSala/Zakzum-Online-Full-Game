@@ -114,7 +114,7 @@ If there is no valid logged-in user, the page redirects to `/login`.
 
 If the requested character does not exist or does not belong to the logged-in user, the page returns `notFound: true`.
 
-The page includes a simple Travel section that calls `POST /api/characters/[id]/travel`, updates the displayed current location after successful travel, and refreshes the Activity Log.
+The page includes a simple Travel section that previews stamina cost and stress gain, calls `POST /api/characters/[id]/travel`, updates the displayed current location, stamina, and stress after successful travel, and refreshes the Activity Log.
 
 The page shows:
 
@@ -235,10 +235,10 @@ Public activity log write routes have not been added yet.
 - Combat has not been added.
 - Resting has not been added.
 - Shops have not been added.
-- Travel now consumes stamina and increases stress through the protected travel API, but the Travel UI does not display costs yet.
+- Travel now consumes stamina and increases stress through the protected travel API, and the Travel UI previews those costs before travel.
 - Map UI, danger rules, random encounters, and rest recovery have not been added.
 - Activity log persistence, the protected read API route, the read-only UI section, and automatic logs for character creation, starter equipment assignment, equip, unequip, and travel exist, but public write routes have not been added.
 
 ## Next Recommended Step
 
-Update the Travel UI to display stamina cost and stress gain before travel.
+Add a small rest foundation so characters can recover from travel pressure.

@@ -119,7 +119,7 @@ The `CharacterItem` model foundation now exists and belongs to `Character`. It s
 
 The `ActivityLog` model foundation now exists and belongs to `Character`. It stores type, title, description, optional JSON details, and creation time for future character timeline records.
 
-Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. Basic travel validation rules now exist in `lib/game/travelRules.js`, basic travel cost rules now exist in `lib/game/travelCostRules.js`, a protected travel API can update a character's current location, and the character detail page has a simple Travel section. Travel now consumes stamina and increases stress, but no map UI or rest system has been added yet.
+Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. Basic travel validation rules now exist in `lib/game/travelRules.js`, basic travel cost rules now exist in `lib/game/travelCostRules.js`, a protected travel API can update a character's current location, and the character detail page has a simple Travel section with stamina cost and stress gain previews. Travel now consumes stamina and increases stress, but no map UI or rest system has been added yet.
 
 Local PostgreSQL development is configured with Docker Compose.
 
@@ -145,7 +145,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation, protected character API routes, dashboard character creation UI, character detail page, starter equipment preview data, CharacterItem inventory persistence foundation, protected inventory API routes, basic inventory UI, equipment rules helper, ActivityLog persistence foundation, protected activity log read API route, read-only activity log UI section, automatic `character_created` logging, automatic `starter_equipment_assigned` logging, static world location data, travel validation rules, travel cost rules, protected travel API, and simple Travel UI exist. Gameplay systems have not been added yet.
+The Character model foundation, protected character API routes, dashboard character creation UI, character detail page, starter equipment preview data, CharacterItem inventory persistence foundation, protected inventory API routes, basic inventory UI, equipment rules helper, ActivityLog persistence foundation, protected activity log read API route, read-only activity log UI section, automatic `character_created` logging, automatic `starter_equipment_assigned` logging, static world location data, travel validation rules, travel cost rules, protected travel API, and simple Travel UI with cost preview exist. Gameplay systems have not been added yet.
 
 ## Core Lore Rule
 

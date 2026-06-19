@@ -98,16 +98,19 @@ export default function CharacterDetail({ character }) {
   const travelDestinations = getAvailableTravelDestinations({
     currentLocationKey,
   });
+  const firstTravelDestinationKey = travelDestinations[0]?.key || "";
+  const activeDestinationLocationKey =
+    selectedDestinationLocationKey || firstTravelDestinationKey;
   const selectedDestination = getTravelDestinationSummary(
-    selectedDestinationLocationKey,
+    activeDestinationLocationKey,
   );
-  const selectedTravelCost = selectedDestinationLocationKey
+  const selectedTravelCost = activeDestinationLocationKey
     ? getTravelCost({
         currentLocationKey,
-        destinationLocationKey: selectedDestinationLocationKey,
+        destinationLocationKey: activeDestinationLocationKey,
       })
     : null;
-  const travelCostValidationError = selectedDestinationLocationKey
+  const travelCostValidationError = activeDestinationLocationKey
     ? getTravelCostValidationError({
         stamina,
         travelCost: selectedTravelCost,
@@ -348,7 +351,7 @@ export default function CharacterDetail({ character }) {
     setTravelError("");
     setTravelSuccess("");
 
-    if (!selectedDestinationLocationKey) {
+    if (!activeDestinationLocationKey) {
       setTravelLoading(false);
       setTravelError("Choose a destination before traveling.");
       return;
@@ -361,7 +364,7 @@ export default function CharacterDetail({ character }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          destinationLocationKey: selectedDestinationLocationKey,
+          destinationLocationKey: activeDestinationLocationKey,
         }),
       });
       const data = await response.json();
@@ -372,7 +375,7 @@ export default function CharacterDetail({ character }) {
       }
 
       const nextLocationKey =
-        data.character?.currentLocation || selectedDestinationLocationKey;
+        data.character?.currentLocation || activeDestinationLocationKey;
       const nextLocationName =
         data.character?.currentLocationName ||
         getLocationDisplayName(nextLocationKey);
@@ -499,7 +502,7 @@ export default function CharacterDetail({ character }) {
               <select
                 id="destination-location"
                 name="destinationLocationKey"
-                value={selectedDestinationLocationKey}
+                value={activeDestinationLocationKey}
                 onChange={(event) =>
                   setSelectedDestinationLocationKey(event.target.value)
                 }
@@ -559,7 +562,7 @@ export default function CharacterDetail({ character }) {
                 type="submit"
                 disabled={
                   travelLoading ||
-                  !selectedDestinationLocationKey ||
+                  !activeDestinationLocationKey ||
                   !selectedTravelCost ||
                   Boolean(travelCostValidationError) ||
                   travelDestinations.length === 0

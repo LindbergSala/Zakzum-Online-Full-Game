@@ -149,9 +149,35 @@ The log details store:
 
 No `rest_completed` log is created when rest is rejected or the request fails.
 
+## Rest UI Summary
+
+The protected character detail page now includes a simple Rest section:
+
+```text
+/characters/[id]
+```
+
+The UI reuses `getRestResult(...)`, `canRest(...)`, and `getRestValidationError(...)` to preview:
+
+- stamina after rest
+- stress after rest
+- stamina recovered
+- stress reduced
+
+The Rest button calls:
+
+```text
+POST /api/characters/[id]/rest
+```
+
+The button is disabled when the rest values are invalid, the result cannot be calculated, a request is loading, or the character is already at full stamina and `0` stress.
+
+After successful rest, the page updates its displayed stamina and stress from the safe API response and refreshes the Activity Log so the new `rest_completed` entry appears.
+
+Safe API errors are shown without crashing the page.
+
 ## Current Limitations
 
-- No rest UI exists yet.
 - No random encounters exist yet.
 - No dangerous-rest logic exists yet.
 - No inn, camp, or shop logic exists yet.
@@ -159,4 +185,4 @@ No `rest_completed` log is created when rest is rejected or the request fails.
 
 ## Next Recommended Step
 
-Add a simple protected Rest UI on `/characters/[id]` that calls the rest API, updates stamina and stress, and refreshes the Activity Log after successful rest.
+Verify the protected Rest UI in the browser, then define dangerous-rest or location-aware recovery rules in a separate step before adding random encounters.

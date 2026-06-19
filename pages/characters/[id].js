@@ -13,6 +13,11 @@ import {
   getTravelCostValidationError,
   hasEnoughStaminaForTravel,
 } from "../../lib/game/travelCostRules";
+import {
+  canRest,
+  getRestResult,
+  getRestValidationError,
+} from "../../lib/game/restRules";
 import { getLocationByKey } from "../../lib/game/worldLocations";
 import prisma from "../../lib/prisma";
 
@@ -94,6 +99,9 @@ export default function CharacterDetail({ character }) {
   const [travelLoading, setTravelLoading] = useState(false);
   const [travelError, setTravelError] = useState("");
   const [travelSuccess, setTravelSuccess] = useState("");
+  const [restLoading, setRestLoading] = useState(false);
+  const [restError, setRestError] = useState("");
+  const [restSuccess, setRestSuccess] = useState("");
   const currentLocationSummary = getTravelDestinationSummary(currentLocationKey);
   const travelDestinations = getAvailableTravelDestinations({
     currentLocationKey,
@@ -120,6 +128,14 @@ export default function CharacterDetail({ character }) {
     stamina,
     travelCost: selectedTravelCost,
   });
+  const restValues = { stamina, maxStamina, stress };
+  const restResult = getRestResult(restValues);
+  const restAllowed = canRest(restValues);
+  const restValidationError = getRestValidationError(restValues);
+  const restValidationMessage =
+    restValidationError === "There is nothing to recover."
+      ? "There is nothing to recover right now."
+      : restValidationError;
   const equippedSlots = EQUIPPABLE_SLOTS.map((slot) => ({
     slot,
     item: inventoryItems.find((item) => item.slot === slot && item.isEquipped),
@@ -408,6 +424,50 @@ export default function CharacterDetail({ character }) {
     }
   }
 
+  async function handleRest() {
+    setRestLoading(true);
+    setRestError("");
+    setRestSuccess("");
+
+    if (!restAllowed || !restResult || restValidationError) {
+      setRestLoading(false);
+      setRestError(restValidationMessage || "Rest could not be prepared.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/characters/${character.id}/rest`, {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRestError(data.error || "Rest could not be completed.");
+        return;
+      }
+
+      setStamina(
+        typeof data.character?.stamina === "number"
+          ? data.character.stamina
+          : stamina,
+      );
+      setMaxStamina(
+        typeof data.character?.maxStamina === "number"
+          ? data.character.maxStamina
+          : maxStamina,
+      );
+      setStress(
+        typeof data.character?.stress === "number" ? data.character.stress : stress,
+      );
+      setRestSuccess(data.message || "Rest completed.");
+      await loadActivityLogs();
+    } catch (error) {
+      setRestError(error.message || "Rest could not be completed.");
+    } finally {
+      setRestLoading(false);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -576,6 +636,73 @@ export default function CharacterDetail({ character }) {
             ) : null}
             {travelSuccess ? (
               <p className="form-message success">{travelSuccess}</p>
+            ) : null}
+          </section>
+
+          <section className="session-panel" aria-labelledby="rest-title">
+            <h2 id="rest-title">Rest</h2>
+            <p className="supporting-text">
+              Step away from the road long enough to steady body and mind.
+            </p>
+            <dl className="sheet-grid">
+              <div>
+                <dt>Current Stamina</dt>
+                <dd>{stamina}</dd>
+              </div>
+              <div>
+                <dt>Maximum Stamina</dt>
+                <dd>{maxStamina}</dd>
+              </div>
+              <div>
+                <dt>Current Stress</dt>
+                <dd>{stress}</dd>
+              </div>
+            </dl>
+            {restAllowed && restResult ? (
+              <article className="inventory-item">
+                <div>
+                  <h3>Recovery Preview</h3>
+                  <p className="item-meta">Before the road resumes</p>
+                </div>
+                <dl className="inventory-details">
+                  <div>
+                    <dt>Stamina After</dt>
+                    <dd>{restResult.staminaAfter}</dd>
+                  </div>
+                  <div>
+                    <dt>Stress After</dt>
+                    <dd>{restResult.stressAfter}</dd>
+                  </div>
+                  <div>
+                    <dt>Stamina Recovered</dt>
+                    <dd>{restResult.staminaRecovered}</dd>
+                  </div>
+                  <div>
+                    <dt>Stress Reduced</dt>
+                    <dd>{restResult.stressReduced}</dd>
+                  </div>
+                </dl>
+              </article>
+            ) : null}
+            {!restAllowed && restValidationMessage ? (
+              <p className="empty-state">{restValidationMessage}</p>
+            ) : null}
+            <button
+              className="primary-button"
+              type="button"
+              onClick={handleRest}
+              disabled={
+                restLoading ||
+                !restAllowed ||
+                !restResult ||
+                Boolean(restValidationError)
+              }
+            >
+              {restLoading ? "Resting..." : "Rest"}
+            </button>
+            {restError ? <p className="form-message error">{restError}</p> : null}
+            {restSuccess ? (
+              <p className="form-message success">{restSuccess}</p>
             ) : null}
           </section>
 
@@ -763,7 +890,6 @@ export default function CharacterDetail({ character }) {
           <section className="session-panel" aria-labelledby="actions-title">
             <h2 id="actions-title">Actions</h2>
             <ul className="placeholder-list">
-              <li>Rest coming soon.</li>
               <li>Travel danger coming soon.</li>
               <li>Quests coming soon.</li>
               <li>Combat coming soon.</li>

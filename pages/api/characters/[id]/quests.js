@@ -30,6 +30,24 @@ function toSafeQuest(quest) {
   };
 }
 
+function toSafeQuestProgress(progress) {
+  if (!progress) {
+    return {
+      status: "AVAILABLE",
+      acceptedAt: null,
+      completedAt: null,
+      failedAt: null,
+    };
+  }
+
+  return {
+    status: progress.status,
+    acceptedAt: progress.acceptedAt.toISOString(),
+    completedAt: progress.completedAt?.toISOString() || null,
+    failedAt: progress.failedAt?.toISOString() || null,
+  };
+}
+
 function getCharacterId(req) {
   return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
 }
@@ -60,6 +78,25 @@ async function handleGet(res, character) {
   const location = getLocationByKey(character.currentLocation);
   const realm = location ? getRealmByKey(location.realmKey) : null;
   const quests = getAvailableQuestsForLocation(character.currentLocation);
+  const questKeys = quests.map((quest) => quest.key);
+  const progressRows = questKeys.length
+    ? await prisma.characterQuest.findMany({
+        where: {
+          characterId: character.id,
+          questKey: { in: questKeys },
+        },
+        select: {
+          questKey: true,
+          status: true,
+          acceptedAt: true,
+          completedAt: true,
+          failedAt: true,
+        },
+      })
+    : [];
+  const progressByQuestKey = new Map(
+    progressRows.map((progress) => [progress.questKey, progress]),
+  );
 
   return res.status(200).json({
     character: {
@@ -70,7 +107,10 @@ async function handleGet(res, character) {
       currentRealmKey: location?.realmKey || null,
       currentRealmName: realm?.name || location?.realmKey || null,
     },
-    quests: quests.map(toSafeQuest),
+    quests: quests.map((quest) => ({
+      ...toSafeQuest(quest),
+      progress: toSafeQuestProgress(progressByQuestKey.get(quest.key)),
+    })),
   });
 }
 

@@ -125,11 +125,21 @@ Safe response shape:
       "isStarterQuest": true,
       "objectives": [
         "Read the road notice posted in Kingstone."
-      ]
+      ],
+      "progress": {
+        "status": "AVAILABLE",
+        "acceptedAt": null,
+        "completedAt": null,
+        "failedAt": null
+      }
     }
   ]
 }
 ```
+
+Each quest returned by `GET` includes a safe `progress` object. Quests without a `CharacterQuest` row use the virtual status `AVAILABLE` with null timestamps. Quests with persisted progress expose their `ACCEPTED`, `COMPLETED`, or `FAILED` status and the relevant acceptance, completion, and failure timestamps.
+
+The route only reads progress rows whose `questKey` appears in the static quest list for the character's current location. Raw `CharacterQuest` rows and internal relation data are not returned.
 
 The `POST` request accepts:
 
@@ -194,6 +204,8 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 ## Current Limitations
 
 - The quest API lists static definitions and accepts available quests.
+- Quest reads merge current-location static definitions with safe per-character progress.
+- `AVAILABLE` is a virtual read status and is not stored in `QuestProgressStatus`.
 - The Quest UI is read-only.
 - The `CharacterQuest` persistence model stores accepted quest rows.
 - A quest key references static quest data by convention rather than a database relation.

@@ -18,7 +18,7 @@ Automatic log sources now exist for character creation and starter equipment ass
 
 Automatic log sources also exist for successful item equip, item unequip, travel, and rest actions.
 
-Quest acceptance now writes an automatic activity log. No automatic logs are written yet during quest completion, combat, or story progress.
+Quest acceptance and completion now write automatic activity logs. No automatic logs are written yet during combat or story progress.
 
 ## ActivityLog Model Fields
 
@@ -339,8 +339,18 @@ The log details store:
 - `status`
 - `acceptedAt`
 - `completedAt`
+- `rewards`
+- `goldAwarded`
+- `experienceAwarded`
+- `renownAwarded`
+- `characterGoldBefore`
+- `characterGoldAfter`
+- `characterExperienceBefore`
+- `characterExperienceAfter`
+- `characterRenownBefore`
+- `characterRenownAfter`
 
-No `quest_completed` log is created for invalid, unaccepted, completed, failed, missing, unauthorized, conflicting, or failed requests.
+The reward details are written in the same transaction as quest completion and character progression updates. No `quest_completed` log or reward is created for invalid, unaccepted, completed, failed, missing, unauthorized, conflicting, or failed requests.
 
 ## Activity Log UI Summary
 

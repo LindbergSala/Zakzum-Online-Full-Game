@@ -2,6 +2,10 @@ import { getCurrentUser } from "../../../../../../lib/auth/currentUser";
 import { createActivityLog } from "../../../../../../lib/game/activityLog";
 import { getQuestCompletionValidationError } from "../../../../../../lib/game/questCompletionRules";
 import { getQuestByKey } from "../../../../../../lib/game/questData";
+import {
+  getQuestRewards,
+  getQuestRewardValidationError,
+} from "../../../../../../lib/game/questRewardRules";
 import prisma from "../../../../../../lib/prisma";
 
 function getQueryValue(value) {
@@ -65,6 +69,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Quest key is invalid." });
     }
 
+    const rewardValidationError = getQuestRewardValidationError(quest);
+
+    if (rewardValidationError) {
+      return res.status(400).json({ error: rewardValidationError });
+    }
+
+    const rewards = getQuestRewards(quest);
+
     const characterQuest = await prisma.characterQuest.findUnique({
       where: {
         characterId_questKey: {
@@ -101,7 +113,7 @@ export default async function handler(req, res) {
     const completedAt = new Date();
 
     try {
-      const completedQuest = await prisma.$transaction(async (tx) => {
+      const completionResult = await prisma.$transaction(async (tx) => {
         const updateResult = await tx.characterQuest.updateMany({
           where: {
             id: characterQuest.id,
@@ -118,6 +130,20 @@ export default async function handler(req, res) {
           completionConflict.code = "QUEST_COMPLETION_CONFLICT";
           throw completionConflict;
         }
+
+        const updatedCharacter = await tx.character.update({
+          where: { id: character.id },
+          data: {
+            gold: { increment: rewards.gold },
+            experience: { increment: rewards.experience },
+            renown: { increment: rewards.renown },
+          },
+          select: {
+            gold: true,
+            experience: true,
+            renown: true,
+          },
+        });
 
         const updatedQuest = await tx.characterQuest.findUnique({
           where: { id: characterQuest.id },
@@ -146,12 +172,27 @@ export default async function handler(req, res) {
               status: updatedQuest.status,
               acceptedAt: characterQuest.acceptedAt.toISOString(),
               completedAt: updatedQuest.completedAt.toISOString(),
+              rewards,
+              goldAwarded: rewards.gold,
+              experienceAwarded: rewards.experience,
+              renownAwarded: rewards.renown,
+              characterGoldBefore: updatedCharacter.gold - rewards.gold,
+              characterGoldAfter: updatedCharacter.gold,
+              characterExperienceBefore:
+                updatedCharacter.experience - rewards.experience,
+              characterExperienceAfter: updatedCharacter.experience,
+              characterRenownBefore:
+                updatedCharacter.renown - rewards.renown,
+              characterRenownAfter: updatedCharacter.renown,
             },
           },
           tx,
         );
 
-        return updatedQuest;
+        return {
+          completedQuest: updatedQuest,
+          characterProgress: updatedCharacter,
+        };
       });
 
       return res.status(200).json({
@@ -160,13 +201,17 @@ export default async function handler(req, res) {
           name: character.name,
         },
         completedQuest: {
-          id: completedQuest.id,
-          questKey: completedQuest.questKey,
-          status: completedQuest.status,
-          acceptedAt: completedQuest.acceptedAt.toISOString(),
-          completedAt: completedQuest.completedAt.toISOString(),
+          id: completionResult.completedQuest.id,
+          questKey: completionResult.completedQuest.questKey,
+          status: completionResult.completedQuest.status,
+          acceptedAt:
+            completionResult.completedQuest.acceptedAt.toISOString(),
+          completedAt:
+            completionResult.completedQuest.completedAt.toISOString(),
           ...toSafeQuestDetails(quest),
         },
+        rewards,
+        characterProgress: completionResult.characterProgress,
       });
     } catch (error) {
       if (error?.code === "QUEST_COMPLETION_CONFLICT") {

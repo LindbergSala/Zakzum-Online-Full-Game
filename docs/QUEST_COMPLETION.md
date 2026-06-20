@@ -22,9 +22,9 @@ POST /api/characters/[id]/quests/[questKey]/complete
 
 The route requires a valid session and verifies that the character belongs to the logged-in user. It validates the static quest key, loads the matching `CharacterQuest` row, and reuses the completion rules.
 
-Only `ACCEPTED` progress can be completed. Successful completion updates the existing row to `COMPLETED`, sets `completedAt`, and creates one `quest_completed` ActivityLog in the same transaction. The conditional database update prevents concurrent or repeated requests from creating duplicate completion logs.
+Only `ACCEPTED` progress can be completed. Successful completion updates the existing row to `COMPLETED`, sets `completedAt`, increments the character's validated gold, experience, and renown rewards, and creates one `quest_completed` ActivityLog in the same transaction. The conditional database update prevents concurrent or repeated requests from creating duplicate completion logs or applying rewards twice.
 
-The response contains safe character identity, safe quest progress, and static quest details. It does not return user data or ActivityLog records.
+The response contains safe character identity, safe quest progress, static quest details, normalized rewards, and the character's updated gold, experience, and renown. It does not return user data or ActivityLog records.
 
 ## Completion UI
 
@@ -38,7 +38,7 @@ The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/
 
 Completed quests show their persisted status and `completedAt` date instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
 
-Static quests now define modest gold, experience, and renown rewards, but completion does not apply them yet. The completion response, transaction, ActivityLog details, and character progression values remain unchanged.
+Static quests define modest gold, experience, and renown rewards. Completion validates and applies them atomically. Character level remains unchanged because level-up logic has not been added.
 
 ### Activity Log
 
@@ -48,7 +48,7 @@ Successful completion writes:
 - `title`: `Quest Completed`
 - `description`: `A duty was fulfilled and written into memory.`
 
-The details store `characterName`, `questKey`, `questTitle`, `questType`, `startLocationKey`, `previousStatus`, `status`, `acceptedAt`, and `completedAt`.
+The details store `characterName`, `questKey`, `questTitle`, `questType`, `startLocationKey`, `previousStatus`, `status`, `acceptedAt`, `completedAt`, normalized rewards, awarded values, and before/after gold, experience, and renown values.
 
 ## Current Rule
 
@@ -74,7 +74,8 @@ validationError
 
 - Objective completion is not checked yet.
 - Character location is not checked yet.
-- Static gold, experience, and renown reward definitions exist but are not applied.
+- Static gold, experience, and renown rewards are applied during completion.
+- No level-up logic exists and completion does not modify character level.
 - No item rewards are defined or calculated.
 - A protected quest completion API exists.
 - Quest completion controls exist for accepted quests.
@@ -83,4 +84,4 @@ validationError
 
 ## Next Recommended Step
 
-Add a quest reward rules foundation without changing completion safety. Keep objective tracking and reward persistence for separate later steps.
+Add a read-only reward result to the Quest UI without adding item rewards or level-up behavior.

@@ -1,6 +1,6 @@
 # Zakzum Online Quest Reward Rules
 
-The quest reward rules foundation gives static quests a shared, validated reward shape for future completion rewards. Early rewards remain modest and grounded.
+The quest reward rules foundation gives static quests a shared, validated reward shape. Early rewards remain modest and grounded.
 
 ## Supported Rewards
 
@@ -51,16 +51,16 @@ validationError
 
 ## Current Limitations
 
-- Rewards are static definitions only and are not applied yet.
-- The quest completion API does not change character rewards yet.
-- Character gold, experience, renown, and level are unchanged by completion.
+- Validated rewards are applied by `POST /api/characters/[id]/quests/[questKey]/complete`.
+- Gold, experience, and renown are incremented in the same transaction that completes the quest and writes its ActivityLog.
+- A guarded `ACCEPTED` to `COMPLETED` update must succeed before rewards are applied. Repeated or concurrent completion attempts therefore cannot award the same quest twice.
+- Character level remains unchanged because no level-up logic exists yet.
 - No reward UI exists yet.
 - No item or equipment rewards exist.
 - No random reward tables exist.
-- No level-up logic exists.
 - No database writes or ActivityLog records are created by these helpers.
 - Combat, shops, map UI, and story progression are not connected.
 
 ## Next Recommended Step
 
-Apply validated gold, experience, and renown rewards atomically during quest completion. Keep item rewards and level-up behavior for separate later steps.
+Add a read-only reward result to the Quest UI without adding item rewards or level-up behavior.

@@ -205,6 +205,12 @@ Each row records acceptance time and optional completion or failure time. A uniq
 
 Quest titles, briefings, objectives, and rewards remain in static data and are not stored in `CharacterQuest`.
 
+## Quest Completion Rules
+
+Reusable completion validation now exists in `lib/game/questCompletionRules.js`. Only quests with `ACCEPTED` progress can pass the current rule. `AVAILABLE`, `COMPLETED`, `FAILED`, missing, and unknown progress states fail safely.
+
+The rules are not connected to an API or UI yet. They do not check objectives or location, calculate rewards, write database records, or create ActivityLog entries.
+
 ## Current Limitations
 
 - The quest API lists static definitions and accepts available quests.
@@ -215,6 +221,7 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 - A quest key references static quest data by convention rather than a database relation.
 - No quest completion or failure API exists yet.
 - No quest completion or failure controls exist in the UI.
+- Completion rules exist but are not wired to API or UI behavior.
 - No objective completion logic exists yet.
 - No objective progress fields exist yet.
 - No quest rewards exist yet.
@@ -224,4 +231,4 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 
 ## Next Recommended Step
 
-Add a protected quest completion rules foundation before introducing completion controls or rewards. Keep rewards and combat for separate later steps.
+Add a protected quest completion API that reuses the completion rules. Keep objective tracking, rewards, and combat for separate later steps.

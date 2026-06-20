@@ -36,6 +36,7 @@ shortDescription
 briefing
 suggestedLevel
 isStarterQuest
+rewards
 objectives
 ```
 
@@ -44,6 +45,8 @@ Quest and location keys use stable lowercase kebab-case values.
 `startLocationKey` must match a location in `lib/game/worldLocations.js`.
 
 `objectives` contains text-only guidance. Objective completion logic does not exist yet.
+
+`rewards` contains modest static `gold`, `experience`, and `renown` values. Reward application does not exist yet.
 
 ## Quest Types
 
@@ -189,7 +192,7 @@ The UI includes safe loading, error, empty, and acceptance feedback states. Ques
 
 Persisted quests show `Accepted`, `Completed`, or `Failed` instead of an acceptance button. Accepted quests also show `acceptedAt` when available. This prevents duplicate acceptance through the UI, while the API unique constraint remains the final server-side protection.
 
-The UI does not include completion or failure controls.
+The UI includes completion controls for accepted quests but does not include failure controls or reward display.
 
 ## Quest Persistence
 
@@ -204,6 +207,8 @@ Persisted statuses use the `QuestProgressStatus` enum:
 Each row records acceptance time and optional completion or failure time. A unique constraint on `characterId` and `questKey` allows only one progress row for a given quest and character. Deleting a character cascades to its quest progress rows.
 
 Quest titles, briefings, objectives, and rewards remain in static data and are not stored in `CharacterQuest`.
+
+All current static quests include modest gold, experience, and renown definitions. `lib/game/questRewardRules.js` normalizes and validates this data, but no API or UI applies rewards yet.
 
 ## Quest Completion Rules
 
@@ -228,8 +233,8 @@ Completion does not check objectives or location and does not calculate rewards.
 - Completion rules are wired to both API and UI behavior.
 - No objective completion logic exists yet.
 - No objective progress fields exist yet.
-- No quest rewards exist yet.
-- No item, gold, experience, or renown rewards exist yet.
+- Static gold, experience, and renown reward definitions exist but are not applied.
+- No item rewards exist yet.
 - No quest combat exists yet.
 - No story progression is connected to quests yet.
 

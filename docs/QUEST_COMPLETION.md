@@ -38,6 +38,8 @@ The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/
 
 Completed quests show their persisted status and `completedAt` date instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
 
+Static quests now define modest gold, experience, and renown rewards, but completion does not apply them yet. The completion response, transaction, ActivityLog details, and character progression values remain unchanged.
+
 ### Activity Log
 
 Successful completion writes:
@@ -72,8 +74,8 @@ validationError
 
 - Objective completion is not checked yet.
 - Character location is not checked yet.
-- Quest rewards do not exist yet.
-- No gold, experience, renown, or item rewards are calculated.
+- Static gold, experience, and renown reward definitions exist but are not applied.
+- No item rewards are defined or calculated.
 - A protected quest completion API exists.
 - Quest completion controls exist for accepted quests.
 - No database writes or ActivityLog records are created by these helpers.

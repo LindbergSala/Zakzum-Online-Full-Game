@@ -6,6 +6,8 @@ import {
 } from "../../../lib/game/characterPageHelpers";
 import {
   acceptCharacterQuest,
+  completeCharacterQuest,
+  fetchCharacterActivityLogs,
   fetchCharacterQuests,
 } from "../../../lib/game/characterPageRequests";
 import { getCharacterPageServerSideProps } from "../../../lib/game/characterPageServer";
@@ -17,6 +19,9 @@ export default function CharacterQuestsPage({ character }) {
   const [acceptingQuestKey, setAcceptingQuestKey] = useState("");
   const [questAcceptError, setQuestAcceptError] = useState("");
   const [questAcceptSuccess, setQuestAcceptSuccess] = useState("");
+  const [completingQuestKey, setCompletingQuestKey] = useState("");
+  const [questCompleteError, setQuestCompleteError] = useState("");
+  const [questCompleteSuccess, setQuestCompleteSuccess] = useState("");
   const [questLocationName, setQuestLocationName] = useState("");
   const [questRealmName, setQuestRealmName] = useState("");
 
@@ -94,6 +99,8 @@ export default function CharacterQuestsPage({ character }) {
     setAcceptingQuestKey(quest.key);
     setQuestAcceptError("");
     setQuestAcceptSuccess("");
+    setQuestCompleteError("");
+    setQuestCompleteSuccess("");
 
     try {
       await acceptCharacterQuest(character.id, quest.key);
@@ -103,6 +110,30 @@ export default function CharacterQuestsPage({ character }) {
       setQuestAcceptError(error.message || "The quest could not be accepted.");
     } finally {
       setAcceptingQuestKey("");
+    }
+  }
+
+  async function handleCompleteQuest(quest) {
+    setCompletingQuestKey(quest.key);
+    setQuestCompleteError("");
+    setQuestCompleteSuccess("");
+    setQuestAcceptError("");
+    setQuestAcceptSuccess("");
+
+    try {
+      await completeCharacterQuest(character.id, quest.key);
+      setQuestCompleteSuccess(`${quest.title} has been completed.`);
+      await loadQuests();
+
+      try {
+        await fetchCharacterActivityLogs(character.id);
+      } catch {
+        // The dedicated Activity page retries the log request when opened.
+      }
+    } catch (error) {
+      setQuestCompleteError(error.message || "The quest could not be completed.");
+    } finally {
+      setCompletingQuestKey("");
     }
   }
 
@@ -137,6 +168,12 @@ export default function CharacterQuestsPage({ character }) {
         ) : null}
         {questAcceptSuccess ? (
           <p className="form-message success">{questAcceptSuccess}</p>
+        ) : null}
+        {questCompleteError ? (
+          <p className="form-message error">{questCompleteError}</p>
+        ) : null}
+        {questCompleteSuccess ? (
+          <p className="form-message success">{questCompleteSuccess}</p>
         ) : null}
 
         {!questsLoading && !questsError && quests.length === 0 ? (
@@ -188,15 +225,42 @@ export default function CharacterQuestsPage({ character }) {
                         ? "Accepting..."
                         : "Accept Quest"}
                     </button>
+                  ) : quest.progress.status === "ACCEPTED" ? (
+                    <div>
+                      <p className="item-action-note">
+                        {getQuestStatusLabel(quest.progress.status)}
+                      </p>
+                      {quest.progress.acceptedAt ? (
+                        <p className="item-meta">
+                          Accepted {formatDate(quest.progress.acceptedAt)}
+                        </p>
+                      ) : null}
+                      <button
+                        className="secondary-button small-action-button"
+                        disabled={completingQuestKey === quest.key}
+                        onClick={() => handleCompleteQuest(quest)}
+                        type="button"
+                      >
+                        {completingQuestKey === quest.key
+                          ? "Completing..."
+                          : "Complete Quest"}
+                      </button>
+                    </div>
                   ) : (
                     <div>
                       <p className="item-action-note">
                         {getQuestStatusLabel(quest.progress.status)}
                       </p>
-                      {quest.progress.status === "ACCEPTED" &&
-                      quest.progress.acceptedAt ? (
+                      {quest.progress.status === "COMPLETED" &&
+                      quest.progress.completedAt ? (
                         <p className="item-meta">
-                          Accepted {formatDate(quest.progress.acceptedAt)}
+                          Completed {formatDate(quest.progress.completedAt)}
+                        </p>
+                      ) : null}
+                      {quest.progress.status === "FAILED" &&
+                      quest.progress.failedAt ? (
+                        <p className="item-meta">
+                          Failed {formatDate(quest.progress.failedAt)}
                         </p>
                       ) : null}
                     </div>

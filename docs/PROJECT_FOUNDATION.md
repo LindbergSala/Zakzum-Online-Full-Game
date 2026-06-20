@@ -121,7 +121,7 @@ The `ActivityLog` model foundation now exists and belongs to `Character`. It sto
 
 Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. Basic travel validation and cost rules, a protected travel API, and a simple Travel UI now exist. Travel consumes stamina and increases stress. Basic rest recovery rules, a protected rest API, and a simple Rest UI now exist. No map UI or random encounter system has been added yet.
 
-Static quest definitions now exist in `lib/game/questData.js`. Protected character quest APIs list duties, merge progress, accept available quests, and complete accepted quests. The Quest section can accept available quests and display persisted status, but completion controls are not added yet. `CharacterQuest` provides per-character status persistence for static quest keys. Rewards, combat, and story progression have not been added.
+Static quest definitions now exist in `lib/game/questData.js`. Protected character quest APIs list duties, merge progress, accept available quests, and complete accepted quests. The Quest page can accept available quests, complete accepted quests, and display persisted status. `CharacterQuest` provides per-character status persistence for static quest keys. Rewards, combat, and story progression have not been added.
 
 Local PostgreSQL development is configured with Docker Compose.
 
@@ -147,7 +147,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation, protected character API routes, dashboard character creation UI, split character pages, inventory and equipment foundations, ActivityLog persistence and automatic logs, static world location data, protected travel and rest flows, static quest data, CharacterQuest persistence, quest acceptance API and UI, completion rules, and protected quest completion API now exist. Completion UI, rewards, combat, shops, map UI, and story progression have not been added yet.
+The Character model foundation, protected character API routes, dashboard character creation UI, split character pages, inventory and equipment foundations, ActivityLog persistence and automatic logs, static world location data, protected travel and rest flows, static quest data, CharacterQuest persistence, quest acceptance API and UI, completion rules, and protected quest completion API and UI now exist. Rewards, combat, shops, map UI, and story progression have not been added yet.
 
 ## Core Lore Rule
 
@@ -161,7 +161,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Add safe quest completion controls before rewards.
+1. Add a quest reward rules foundation without changing completion safety.
 2. Add the next deliberate automatic activity log source only after its owning system exists.
 3. Add starter journey content only after character ownership is stable.
 4. Add broader gameplay systems after the saved-progress foundation works.

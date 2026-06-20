@@ -26,6 +26,18 @@ Only `ACCEPTED` progress can be completed. Successful completion updates the exi
 
 The response contains safe character identity, safe quest progress, and static quest details. It does not return user data or ActivityLog records.
 
+## Completion UI
+
+Accepted quests can now be completed from the protected Quest page:
+
+```text
+/characters/[id]/quests
+```
+
+The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. After success, the page reloads quest progress and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
+
+Completed quests show their persisted status and `completedAt` date instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
+
 ### Activity Log
 
 Successful completion writes:
@@ -63,10 +75,10 @@ validationError
 - Quest rewards do not exist yet.
 - No gold, experience, renown, or item rewards are calculated.
 - A protected quest completion API exists.
-- No quest completion UI exists yet.
+- Quest completion controls exist for accepted quests.
 - No database writes or ActivityLog records are created by these helpers.
 - Combat, shops, map UI, and story progression are not connected.
 
 ## Next Recommended Step
 
-Add safe quest completion controls to the Quest UI. Keep rewards and objective tracking for separate later steps.
+Add a quest reward rules foundation without changing completion safety. Keep objective tracking and reward persistence for separate later steps.

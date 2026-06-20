@@ -376,6 +376,8 @@ When the character detail page equips or unequips an item through the inventory 
 
 When the Quest section accepts a quest, it refreshes this section so the new `quest_accepted` log appears without a full page reload.
 
+When the Quest page completes a quest, it checks the Activity Log endpoint after refreshing progress. The dedicated Activity page shows the new `quest_completed` entry when opened or refreshed.
+
 ## Relation To Character
 
 Each `ActivityLog` belongs to one `Character`.

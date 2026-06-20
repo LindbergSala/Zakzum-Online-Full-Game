@@ -211,7 +211,9 @@ Reusable completion validation now exists in `lib/game/questCompletionRules.js`.
 
 The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion updates `CharacterQuest` and creates a `quest_completed` ActivityLog atomically.
 
-No completion UI exists yet. Completion does not check objectives or location and does not calculate rewards.
+The Quest UI now shows `Complete Quest` for accepted quests. Successful completion refreshes quest progress and checks the Activity Log endpoint. Completed quests show `Completed` and their completion date instead of action buttons.
+
+Completion does not check objectives or location and does not calculate rewards.
 
 ## Current Limitations
 
@@ -222,8 +224,8 @@ No completion UI exists yet. Completion does not check objectives or location an
 - The `CharacterQuest` persistence model stores accepted quest rows.
 - A quest key references static quest data by convention rather than a database relation.
 - A protected quest completion API exists; no quest failure API exists yet.
-- No quest completion or failure controls exist in the UI.
-- Completion rules are wired to the API but not to UI behavior.
+- Quest completion controls exist for accepted quests; no quest failure controls exist.
+- Completion rules are wired to both API and UI behavior.
 - No objective completion logic exists yet.
 - No objective progress fields exist yet.
 - No quest rewards exist yet.
@@ -233,4 +235,4 @@ No completion UI exists yet. Completion does not check objectives or location an
 
 ## Next Recommended Step
 
-Add safe quest completion controls to the Quest UI. Keep objective tracking, rewards, and combat for separate later steps.
+Add a quest reward rules foundation. Keep objective tracking and combat for separate later steps.

@@ -90,10 +90,11 @@ The tasks focus on roads, warnings, graves, messages, and unfinished local dutie
 
 ## Quest API Summary
 
-The protected read-only quest route is:
+The protected quest route is:
 
 ```text
 GET /api/characters/[id]/quests
+POST /api/characters/[id]/quests
 ```
 
 The route requires a valid logged-in user and verifies that the requested character belongs to that user. Missing characters and characters owned by another user return `404`.
@@ -130,9 +131,21 @@ Safe response shape:
 }
 ```
 
-The route does not return user data, `passwordHash`, raw session tokens, ActivityLog records, rewards, or mutable quest progress.
+The `POST` request accepts:
 
-Only `GET` is supported. No public quest write behavior exists.
+```json
+{
+  "questKey": "warnings-on-the-old-road"
+}
+```
+
+Acceptance requires a valid static quest key, an owned character, and a quest available at the character's current location. A successful request creates one `CharacterQuest` row with status `ACCEPTED` and returns `201` with safe character identity, persisted progress identity, and static quest details.
+
+Accepting the same quest more than once returns `409`. Invalid keys and quests from another location return `400`. The progress row and its `quest_accepted` activity log are created in one transaction.
+
+The route does not return user data, `passwordHash`, raw session tokens, ActivityLog records, or rewards.
+
+No completion or failure behavior exists yet.
 
 ## Quest UI Summary
 
@@ -180,11 +193,12 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 
 ## Current Limitations
 
-- The quest API is read-only and returns static definitions only.
+- The quest API lists static definitions and accepts available quests.
 - The Quest UI is read-only.
-- The `CharacterQuest` persistence model exists, but no API writes progress yet.
+- The `CharacterQuest` persistence model stores accepted quest rows.
 - A quest key references static quest data by convention rather than a database relation.
-- No quest acceptance, completion, or failure API exists yet.
+- No quest completion or failure API exists yet.
+- No quest accept button exists in the UI yet.
 - No objective completion logic exists yet.
 - No objective progress fields exist yet.
 - No quest rewards exist yet.
@@ -194,4 +208,4 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 
 ## Next Recommended Step
 
-Add a protected quest acceptance API that validates static quest keys, character ownership, and current location. Keep completion, rewards, and combat for separate later steps.
+Add protected quest acceptance controls to the character Quest UI. Keep completion, rewards, and combat for separate later steps.

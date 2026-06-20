@@ -18,7 +18,7 @@ Automatic log sources now exist for character creation and starter equipment ass
 
 Automatic log sources also exist for successful item equip, item unequip, travel, and rest actions.
 
-No automatic logs are written yet during combat, quests, or story progress.
+Quest acceptance now writes an automatic activity log. No automatic logs are written yet during quest completion, combat, or story progress.
 
 ## ActivityLog Model Fields
 
@@ -284,6 +284,34 @@ The log is only created when rest succeeds.
 
 No `rest_completed` log is created when the character is already at full stamina and `0` stress, when rest values are invalid, when the character is missing, when the request is unauthorized, or when the request fails.
 
+### Quest Accepted
+
+When a logged-in user accepts an available static quest for an owned character through:
+
+```text
+POST /api/characters/[id]/quests
+```
+
+the server creates one `CharacterQuest` row and one `ActivityLog` record in the same transaction.
+
+The log uses:
+
+- `type`: `quest_accepted`
+- `title`: `Quest Accepted`
+- `description`: `A new duty was written into the road ahead.`
+
+The log details store:
+
+- `characterName`
+- `questKey`
+- `questTitle`
+- `questType`
+- `startLocationKey`
+- `currentLocationKey`
+- `status`
+
+No `quest_accepted` log is created for invalid keys, unavailable locations, duplicate acceptance, missing characters, unauthorized requests, or failed transactions.
+
 ## Activity Log UI Summary
 
 The protected character detail page now displays read-only activity logs:
@@ -369,8 +397,10 @@ Future activity logs may record:
 - No travel logs are written for invalid, same-location, insufficient stamina, not found, unauthorized, or failed requests.
 - Rest now writes one automatic `rest_completed` activity log with stamina and stress recovery details when a protected rest request succeeds.
 - No rest logs are written for full-recovery, invalid, not found, unauthorized, or failed requests.
+- Quest acceptance writes one automatic `quest_accepted` log when acceptance succeeds.
+- No quest acceptance logs are written for invalid, unavailable, duplicate, not found, unauthorized, or failed requests.
 - Travel UI and map systems have not been added.
-- Quests have not been added.
+- Quest completion and failure logs have not been added.
 - Combat has not been added.
 - Story systems have not been added.
 

@@ -19,24 +19,25 @@ model User {
 }
 
 model Character {
-  id              String          @id @default(cuid())
+  id              String           @id @default(cuid())
   userId          String
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   name            String
   race            String
   characterClass  String
-  level           Int             @default(1)
-  experience      Int             @default(0)
-  gold            Int             @default(0)
-  stamina         Int             @default(10)
-  maxStamina      Int             @default(10)
-  stress          Int             @default(0)
-  renown          Int             @default(0)
-  currentLocation String          @default("kingstone")
+  level           Int              @default(1)
+  experience      Int              @default(0)
+  gold            Int              @default(0)
+  stamina         Int              @default(10)
+  maxStamina      Int              @default(10)
+  stress          Int              @default(0)
+  renown          Int              @default(0)
+  currentLocation String           @default("kingstone")
   items           CharacterItem[]
   activityLogs    ActivityLog[]
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  quests          CharacterQuest[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([userId])
 }
@@ -72,7 +73,31 @@ model ActivityLog {
   @@index([characterId, createdAt])
 }
 
+model CharacterQuest {
+  id          String              @id @default(cuid())
+  characterId String
+  character   Character           @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  questKey    String
+  status      QuestProgressStatus @default(ACCEPTED)
+  acceptedAt  DateTime            @default(now())
+  completedAt DateTime?
+  failedAt    DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([characterId, questKey])
+  @@index([characterId])
+  @@index([questKey])
+  @@index([status])
+}
+
 enum UserRole {
   PLAYER
   ADMIN
+}
+
+enum QuestProgressStatus {
+  ACCEPTED
+  COMPLETED
+  FAILED
 }

@@ -8,7 +8,7 @@ The source file is:
 lib/game/questData.js
 ```
 
-This foundation is static JavaScript. It does not create database records or player quest progress.
+Quest content remains static JavaScript. Per-character quest status now has a separate persistence foundation.
 
 ## Exports
 
@@ -164,13 +164,29 @@ The Quest section refreshes after successful travel so the list follows the char
 
 The UI includes safe loading, error, and empty states. It does not include accept or complete controls.
 
+## Quest Persistence
+
+The `CharacterQuest` model stores quest progress for a character without duplicating static quest content. Its `questKey` refers by convention to a quest key in `lib/game/questData.js`; there is no database foreign key because static quest definitions are not database rows.
+
+Persisted statuses use the `QuestProgressStatus` enum:
+
+- `ACCEPTED`
+- `COMPLETED`
+- `FAILED`
+
+Each row records acceptance time and optional completion or failure time. A unique constraint on `characterId` and `questKey` allows only one progress row for a given quest and character. Deleting a character cascades to its quest progress rows.
+
+Quest titles, briefings, objectives, and rewards remain in static data and are not stored in `CharacterQuest`.
+
 ## Current Limitations
 
 - The quest API is read-only and returns static definitions only.
 - The Quest UI is read-only.
-- No quest database models exist yet.
-- No player quest status is persisted yet.
+- The `CharacterQuest` persistence model exists, but no API writes progress yet.
+- A quest key references static quest data by convention rather than a database relation.
+- No quest acceptance, completion, or failure API exists yet.
 - No objective completion logic exists yet.
+- No objective progress fields exist yet.
 - No quest rewards exist yet.
 - No item, gold, experience, or renown rewards exist yet.
 - No quest combat exists yet.
@@ -178,4 +194,4 @@ The UI includes safe loading, error, and empty states. It does not include accep
 
 ## Next Recommended Step
 
-Add a quest persistence model foundation before introducing acceptance or completion behavior. Keep rewards and combat for separate later steps.
+Add a protected quest acceptance API that validates static quest keys, character ownership, and current location. Keep completion, rewards, and combat for separate later steps.

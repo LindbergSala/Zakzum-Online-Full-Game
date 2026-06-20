@@ -159,7 +159,7 @@ No completion or failure behavior exists yet.
 
 ## Quest UI Summary
 
-The protected character detail page now includes a read-only Quest section:
+The protected character detail page now includes a Quest section:
 
 ```text
 /characters/[id]
@@ -185,7 +185,11 @@ Each quest displays:
 
 The Quest section refreshes after successful travel so the list follows the character's new current location.
 
-The UI includes safe loading, error, and empty states. It does not include accept or complete controls.
+The UI includes safe loading, error, empty, and acceptance feedback states. Quests with virtual `AVAILABLE` progress show an `Accept Quest` button that calls `POST /api/characters/[id]/quests`. After successful acceptance, the Quest section and Activity Log refresh.
+
+Persisted quests show `Accepted`, `Completed`, or `Failed` instead of an acceptance button. Accepted quests also show `acceptedAt` when available. This prevents duplicate acceptance through the UI, while the API unique constraint remains the final server-side protection.
+
+The UI does not include completion or failure controls.
 
 ## Quest Persistence
 
@@ -206,11 +210,11 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 - The quest API lists static definitions and accepts available quests.
 - Quest reads merge current-location static definitions with safe per-character progress.
 - `AVAILABLE` is a virtual read status and is not stored in `QuestProgressStatus`.
-- The Quest UI is read-only.
+- The Quest UI can accept available quests and display persisted status.
 - The `CharacterQuest` persistence model stores accepted quest rows.
 - A quest key references static quest data by convention rather than a database relation.
 - No quest completion or failure API exists yet.
-- No quest accept button exists in the UI yet.
+- No quest completion or failure controls exist in the UI.
 - No objective completion logic exists yet.
 - No objective progress fields exist yet.
 - No quest rewards exist yet.
@@ -220,4 +224,4 @@ Quest titles, briefings, objectives, and rewards remain in static data and are n
 
 ## Next Recommended Step
 
-Add protected quest acceptance controls to the character Quest UI. Keep completion, rewards, and combat for separate later steps.
+Add a protected quest completion rules foundation before introducing completion controls or rewards. Keep rewards and combat for separate later steps.

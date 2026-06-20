@@ -344,6 +344,8 @@ The UI does not include an activity log form and does not directly write logs.
 
 When the character detail page equips or unequips an item through the inventory API, it refreshes this section so `item_equipped` and `item_unequipped` logs appear after successful actions.
 
+When the Quest section accepts a quest, it refreshes this section so the new `quest_accepted` log appears without a full page reload.
+
 ## Relation To Character
 
 Each `ActivityLog` belongs to one `Character`.

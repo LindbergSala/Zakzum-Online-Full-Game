@@ -43,6 +43,19 @@ function formatDate(dateValue) {
   return dateValue.split("T")[0];
 }
 
+function getQuestStatusLabel(status) {
+  switch (status) {
+    case "ACCEPTED":
+      return "Accepted";
+    case "COMPLETED":
+      return "Completed";
+    case "FAILED":
+      return "Failed";
+    default:
+      return "Available";
+  }
+}
+
 function formatDetails(details) {
   if (!details) {
     return "";
@@ -103,6 +116,9 @@ export default function CharacterDetail({ character }) {
   const [quests, setQuests] = useState([]);
   const [questsLoading, setQuestsLoading] = useState(true);
   const [questsError, setQuestsError] = useState("");
+  const [acceptingQuestKey, setAcceptingQuestKey] = useState("");
+  const [questAcceptError, setQuestAcceptError] = useState("");
+  const [questAcceptSuccess, setQuestAcceptSuccess] = useState("");
   const [questLocationName, setQuestLocationName] = useState(
     getLocationDisplayName(character.currentLocation),
   );
@@ -560,6 +576,37 @@ export default function CharacterDetail({ character }) {
     }
   }
 
+  async function handleAcceptQuest(quest) {
+    setAcceptingQuestKey(quest.key);
+    setQuestAcceptError("");
+    setQuestAcceptSuccess("");
+
+    try {
+      const response = await fetch(`/api/characters/${character.id}/quests`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ questKey: quest.key }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setQuestAcceptError(data.error || "The quest could not be accepted.");
+        return;
+      }
+
+      setQuestAcceptSuccess(
+        data.message || `${quest.title} has been accepted.`,
+      );
+      await Promise.all([loadQuests(), loadActivityLogs()]);
+    } catch (error) {
+      setQuestAcceptError(error.message || "The quest could not be accepted.");
+    } finally {
+      setAcceptingQuestKey("");
+    }
+  }
+
   return (
     <>
       <Head>
@@ -752,6 +799,12 @@ export default function CharacterDetail({ character }) {
             {questsError ? (
               <p className="form-message error">{questsError}</p>
             ) : null}
+            {questAcceptError ? (
+              <p className="form-message error">{questAcceptError}</p>
+            ) : null}
+            {questAcceptSuccess ? (
+              <p className="form-message success">{questAcceptSuccess}</p>
+            ) : null}
             {!questsLoading && !questsError && quests.length === 0 ? (
               <p className="empty-state">No local quests are available here yet.</p>
             ) : null}
@@ -783,6 +836,32 @@ export default function CharacterDetail({ character }) {
                         </ul>
                       </div>
                     ) : null}
+                    <div className="inventory-item-actions">
+                      {(quest.progress?.status || "AVAILABLE") === "AVAILABLE" ? (
+                        <button
+                          className="secondary-button small-action-button"
+                          type="button"
+                          onClick={() => handleAcceptQuest(quest)}
+                          disabled={acceptingQuestKey === quest.key}
+                        >
+                          {acceptingQuestKey === quest.key
+                            ? "Accepting..."
+                            : "Accept Quest"}
+                        </button>
+                      ) : (
+                        <div>
+                          <p className="item-action-note">
+                            {getQuestStatusLabel(quest.progress.status)}
+                          </p>
+                          {quest.progress.status === "ACCEPTED" &&
+                          quest.progress.acceptedAt ? (
+                            <p className="item-meta">
+                              Accepted {formatDate(quest.progress.acceptedAt)}
+                            </p>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
                   </article>
                 ))}
               </div>

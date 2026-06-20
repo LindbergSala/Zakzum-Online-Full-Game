@@ -534,12 +534,139 @@ select:focus {
   white-space: pre-wrap;
 }
 
+.game-page {
+  display: flex;
+  min-height: 100vh;
+  padding: 1.5rem 1rem;
+}
+
+.game-shell {
+  display: grid;
+  width: 100%;
+  max-width: 72rem;
+  margin: auto;
+  gap: 1rem;
+}
+
+.game-shell-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.game-shell-heading {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.game-shell-heading h1 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.game-shell-nav-toggle {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  padding: 0.85rem 1rem;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.game-shell-nav {
+  display: none;
+  border: 1px solid var(--line);
+  background: rgba(25, 27, 23, 0.9);
+  padding: 0.75rem;
+}
+
+.game-shell-nav.is-open {
+  display: block;
+}
+
+.game-shell-nav-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.game-shell-nav-link {
+  display: inline-flex;
+  min-height: 2.85rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: rgba(16, 17, 15, 0.64);
+  color: var(--muted);
+  padding: 0.7rem 0.85rem;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.game-shell-nav-link.is-active {
+  border-color: var(--gold);
+  background: rgba(196, 164, 93, 0.16);
+  color: var(--gold);
+}
+
+.game-shell-content {
+  display: grid;
+  gap: 1rem;
+}
+
+.character-section-links {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.character-section-link {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid var(--line);
+  background: rgba(16, 17, 15, 0.64);
+  color: inherit;
+  padding: 1rem;
+  text-decoration: none;
+}
+
+.character-section-link h3 {
+  margin: 0;
+  color: var(--gold);
+  font-size: 1.05rem;
+}
+
+.game-shell-nav-toggle:focus-visible,
+.game-shell-nav-link:focus-visible,
+.character-section-link:focus-visible {
+  outline: 2px solid rgba(196, 164, 93, 0.25);
+  outline-offset: 2px;
+}
+
 @media (min-width: 48rem) {
   .home-page {
     padding: 4rem 2rem;
   }
 
   .auth-page {
+    padding: 4rem 2rem;
+  }
+
+  .game-page {
     padding: 4rem 2rem;
   }
 
@@ -565,6 +692,25 @@ select:focus {
   .account-actions .primary-button,
   .account-actions .secondary-button {
     flex: 1;
+  }
+
+  .game-shell-nav-toggle {
+    display: none;
+  }
+
+  .game-shell-nav {
+    display: block;
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .game-shell-nav-list {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .character-section-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .account-actions {

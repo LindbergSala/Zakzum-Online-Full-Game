@@ -312,6 +312,36 @@ The log details store:
 
 No `quest_accepted` log is created for invalid keys, unavailable locations, duplicate acceptance, missing characters, unauthorized requests, or failed transactions.
 
+### Quest Completed
+
+When a logged-in user completes an accepted quest for an owned character through:
+
+```text
+POST /api/characters/[id]/quests/[questKey]/complete
+```
+
+the server updates `CharacterQuest` and creates one ActivityLog record in the same transaction.
+
+The log uses:
+
+- `type`: `quest_completed`
+- `title`: `Quest Completed`
+- `description`: `A duty was fulfilled and written into memory.`
+
+The log details store:
+
+- `characterName`
+- `questKey`
+- `questTitle`
+- `questType`
+- `startLocationKey`
+- `previousStatus`
+- `status`
+- `acceptedAt`
+- `completedAt`
+
+No `quest_completed` log is created for invalid, unaccepted, completed, failed, missing, unauthorized, conflicting, or failed requests.
+
 ## Activity Log UI Summary
 
 The protected character detail page now displays read-only activity logs:
@@ -401,8 +431,10 @@ Future activity logs may record:
 - No rest logs are written for full-recovery, invalid, not found, unauthorized, or failed requests.
 - Quest acceptance writes one automatic `quest_accepted` log when acceptance succeeds.
 - No quest acceptance logs are written for invalid, unavailable, duplicate, not found, unauthorized, or failed requests.
+- Quest completion writes one automatic `quest_completed` log when an accepted quest becomes completed.
+- No quest completion logs are written for invalid, unaccepted, completed, failed, not found, unauthorized, conflicting, or failed requests.
 - Travel UI and map systems have not been added.
-- Quest completion and failure logs have not been added.
+- Quest failure logs have not been added.
 - Combat has not been added.
 - Story systems have not been added.
 

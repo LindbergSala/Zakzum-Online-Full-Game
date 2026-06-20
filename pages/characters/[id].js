@@ -610,7 +610,7 @@ export default function CharacterDetail({ character }) {
   return (
     <>
       <Head>
-        <title>{character.name} | Zakzum Online</title>
+        <title>{`${character.name} | Zakzum Online`}</title>
         <meta
           name="description"
           content="A read-only Zakzum Online character sheet foundation."

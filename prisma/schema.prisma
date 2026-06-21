@@ -74,21 +74,38 @@ model ActivityLog {
 }
 
 model CharacterQuest {
-  id          String              @id @default(cuid())
+  id          String                    @id @default(cuid())
   characterId String
-  character   Character           @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character   Character                 @relation(fields: [characterId], references: [id], onDelete: Cascade)
   questKey    String
-  status      QuestProgressStatus @default(ACCEPTED)
-  acceptedAt  DateTime            @default(now())
+  status      QuestProgressStatus       @default(ACCEPTED)
+  acceptedAt  DateTime                  @default(now())
   completedAt DateTime?
   failedAt    DateTime?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  objectives  CharacterQuestObjective[]
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
 
   @@unique([characterId, questKey])
   @@index([characterId])
   @@index([questKey])
   @@index([status])
+}
+
+model CharacterQuestObjective {
+  id               String         @id @default(cuid())
+  characterQuestId String
+  characterQuest   CharacterQuest @relation(fields: [characterQuestId], references: [id], onDelete: Cascade)
+  objectiveKey     String
+  isCompleted      Boolean        @default(false)
+  completedAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([characterQuestId, objectiveKey])
+  @@index([characterQuestId])
+  @@index([objectiveKey])
+  @@index([isCompleted])
 }
 
 enum UserRole {

@@ -121,7 +121,7 @@ The `ActivityLog` model foundation now exists and belongs to `Character`. It sto
 
 Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. Basic travel validation and cost rules, a protected travel API, and a simple Travel UI now exist. Travel consumes stamina and increases stress. Basic rest recovery rules, a protected rest API, and a simple Rest UI now exist. No map UI or random encounter system has been added yet.
 
-Static quest definitions now exist in `lib/game/questData.js`. Protected character quest APIs list duties, merge progress, accept available quests, and complete accepted quests. The Quest page can accept available quests, complete accepted quests, display persisted status, preview rewards, and show completion reward feedback. `CharacterQuest` provides per-character status persistence for static quest keys. Validated gold, experience, and renown rewards are applied atomically during quest completion. Static objectives now use explicit stable keys, and objective normalization, validation, and completion-check helpers exist, but objective progress is not persisted or enforced. Level-up logic, item rewards, combat, and story progression have not been added.
+Static quest definitions now exist in `lib/game/questData.js`. Protected character quest APIs list duties, merge progress, accept available quests, and complete accepted quests. The Quest page can accept available quests, complete accepted quests, display persisted status, preview rewards, and show completion reward feedback. `CharacterQuest` provides per-character status persistence for static quest keys, and `CharacterQuestObjective` provides the database foundation for per-objective progress keyed to static objective definitions. Validated gold, experience, and renown rewards are applied atomically during quest completion. Static objectives use explicit stable keys, and objective normalization, validation, and completion-check helpers exist, but no objective API, UI, or completion enforcement exists. Level-up logic, item rewards, combat, and story progression have not been added.
 
 Local PostgreSQL development is configured with Docker Compose.
 
@@ -147,7 +147,7 @@ Authentication foundations now exist:
 - Protected `/dashboard` shell
 - Protected `/api/characters` routes
 
-The Character model foundation, protected character API routes, dashboard character creation UI, split character pages, inventory and equipment foundations, ActivityLog persistence and automatic logs, static world location data, protected travel and rest flows, static quest data, CharacterQuest persistence, quest acceptance API and UI, completion and objective rules, protected quest completion API and UI, atomic quest reward application, and read-only reward feedback now exist. Objective persistence, level-up logic, item rewards, combat, shops, map UI, and story progression have not been added yet.
+The Character model foundation, protected character API routes, dashboard character creation UI, split character pages, inventory and equipment foundations, ActivityLog persistence and automatic logs, static world location data, protected travel and rest flows, static quest data, CharacterQuest and CharacterQuestObjective persistence, quest acceptance API and UI, completion and objective rules, protected quest completion API and UI, atomic quest reward application, and read-only reward feedback now exist. Objective API/UI and completion enforcement, level-up logic, item rewards, combat, shops, map UI, and story progression have not been added yet.
 
 ## Core Lore Rule
 
@@ -161,7 +161,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Persist objective progress before enforcing objective completion.
+1. Add a protected objective progress API before enforcing objective completion.
 2. Add the next deliberate automatic activity log source only after its owning system exists.
 3. Add starter journey content only after character ownership is stable.
 4. Add broader gameplay systems after the saved-progress foundation works.

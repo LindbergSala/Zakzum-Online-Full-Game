@@ -4,7 +4,11 @@ import {
   getAvailableQuestsForLocation,
   getQuestByKey,
 } from "../../../../lib/game/questData";
-import { getQuestObjectives } from "../../../../lib/game/questObjectiveRules";
+import {
+  areQuestObjectivesComplete,
+  getQuestObjectiveSummary,
+  getQuestObjectives,
+} from "../../../../lib/game/questObjectiveRules";
 import { getQuestRewards } from "../../../../lib/game/questRewardRules";
 import {
   getLocationByKey,
@@ -51,6 +55,49 @@ function toSafeQuestProgress(progress) {
   };
 }
 
+function toSafeObjectiveProgress(quest, persistedObjectives = []) {
+  const persistedByObjectiveKey = new Map(
+    persistedObjectives.map((objective) => [objective.objectiveKey, objective]),
+  );
+
+  return getQuestObjectives(quest).map((objective) => {
+    const persistedObjective = persistedByObjectiveKey.get(objective.key);
+    const isCompleted = persistedObjective?.isCompleted === true;
+
+    return {
+      key: objective.key,
+      text: objective.text,
+      isRequired: objective.isRequired,
+      isCompleted,
+      completedAt: isCompleted
+        ? persistedObjective.completedAt?.toISOString() || null
+        : null,
+    };
+  });
+}
+
+function toSafeObjectiveSummary(quest, objectiveProgress) {
+  const staticSummary = getQuestObjectiveSummary(quest);
+  const completedObjectiveKeys = objectiveProgress
+    .filter((objective) => objective.isCompleted)
+    .map((objective) => objective.key);
+
+  return {
+    objectiveCount: staticSummary.objectiveCount,
+    requiredObjectiveCount: staticSummary.requiredObjectiveCount,
+    completedObjectiveCount: objectiveProgress.filter(
+      (objective) => objective.isCompleted,
+    ).length,
+    completedRequiredObjectiveCount: objectiveProgress.filter(
+      (objective) => objective.isRequired && objective.isCompleted,
+    ).length,
+    areRequiredObjectivesComplete: areQuestObjectivesComplete({
+      quest,
+      completedObjectiveKeys,
+    }),
+  };
+}
+
 function getCharacterId(req) {
   return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
 }
@@ -89,11 +136,19 @@ async function handleGet(res, character) {
           questKey: { in: questKeys },
         },
         select: {
+          id: true,
           questKey: true,
           status: true,
           acceptedAt: true,
           completedAt: true,
           failedAt: true,
+          objectives: {
+            select: {
+              objectiveKey: true,
+              isCompleted: true,
+              completedAt: true,
+            },
+          },
         },
       })
     : [];
@@ -110,10 +165,20 @@ async function handleGet(res, character) {
       currentRealmKey: location?.realmKey || null,
       currentRealmName: realm?.name || location?.realmKey || null,
     },
-    quests: quests.map((quest) => ({
-      ...toSafeQuest(quest),
-      progress: toSafeQuestProgress(progressByQuestKey.get(quest.key)),
-    })),
+    quests: quests.map((quest) => {
+      const progress = progressByQuestKey.get(quest.key);
+      const objectiveProgress = toSafeObjectiveProgress(
+        quest,
+        progress?.objectives,
+      );
+
+      return {
+        ...toSafeQuest(quest),
+        progress: toSafeQuestProgress(progress),
+        objectiveProgress,
+        objectiveSummary: toSafeObjectiveSummary(quest, objectiveProgress),
+      };
+    }),
   });
 }
 

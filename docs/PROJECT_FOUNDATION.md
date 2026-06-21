@@ -121,7 +121,7 @@ The `ActivityLog` model foundation now exists and belongs to `Character`. It sto
 
 Static world location data now exists in `lib/game/worldLocations.js`. It is based on `core-lore.md` and gives future map, travel, quest, shop, and story systems shared realm and location keys. `Character.currentLocation` now stores the starting location key `kingstone`, while UI surfaces display the friendly name `Kingstone`. Basic travel validation and cost rules, a protected travel API, and a simple Travel UI now exist. Travel consumes stamina and increases stress. Basic rest recovery rules, a protected rest API, and a simple Rest UI now exist. No map UI or random encounter system has been added yet.
 
-Static quest definitions now exist in `lib/game/questData.js`. Protected character quest APIs list duties, merge progress, accept available quests, complete valid objectives, and complete accepted quests. The Quest page can accept available quests, complete accepted quests, display persisted status, preview rewards, and show completion reward feedback. `CharacterQuest` provides per-character status persistence for static quest keys, and `CharacterQuestObjective` stores per-objective progress keyed to static objective definitions. Validated gold, experience, and renown rewards are applied atomically during quest completion. Static objectives use explicit stable keys, and objective normalization, validation, and completion-check helpers exist. No objective UI or quest-completion enforcement exists. Level-up logic, item rewards, combat, and story progression have not been added.
+Static quest definitions now exist in `lib/game/questData.js`. Protected character quest APIs list duties, merge quest and objective progress, accept available quests, complete valid objectives, and complete accepted quests. The Quest page can accept available quests, complete accepted quests, display persisted status, preview rewards, and show completion reward feedback. `CharacterQuest` provides per-character status persistence for static quest keys, and `CharacterQuestObjective` stores per-objective progress keyed to static objective definitions. Protected quest reads safely merge that progress with static objective text. Validated gold, experience, and renown rewards are applied atomically during quest completion. Static objectives use explicit stable keys, and objective normalization, validation, and completion-check helpers exist. No objective UI or quest-completion enforcement exists. Level-up logic, item rewards, combat, and story progression have not been added.
 
 Local PostgreSQL development is configured with Docker Compose.
 
@@ -161,7 +161,7 @@ If `core-lore.md` is missing in the future, do not invent lore. Add only a short
 
 Recommended next steps:
 
-1. Merge objective progress into protected quest reads before adding objective UI or completion enforcement.
+1. Add objective progress controls to the Quest UI before enforcing objectives during quest completion.
 2. Add the next deliberate automatic activity log source only after its owning system exists.
 3. Add starter journey content only after character ownership is stable.
 4. Add broader gameplay systems after the saved-progress foundation works.

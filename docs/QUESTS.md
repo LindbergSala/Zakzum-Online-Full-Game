@@ -139,6 +139,22 @@ Safe response shape:
         "acceptedAt": null,
         "completedAt": null,
         "failedAt": null
+      },
+      "objectiveProgress": [
+        {
+          "key": "read-kingstone-road-notice",
+          "text": "Read the road notice posted in Kingstone.",
+          "isRequired": true,
+          "isCompleted": false,
+          "completedAt": null
+        }
+      ],
+      "objectiveSummary": {
+        "objectiveCount": 3,
+        "requiredObjectiveCount": 3,
+        "completedObjectiveCount": 0,
+        "completedRequiredObjectiveCount": 0,
+        "areRequiredObjectivesComplete": false
       }
     }
   ]
@@ -146,6 +162,8 @@ Safe response shape:
 ```
 
 Each quest returned by `GET` includes a safe `progress` object. Quests without a `CharacterQuest` row use the virtual status `AVAILABLE` with null timestamps. Quests with persisted progress expose their `ACCEPTED`, `COMPLETED`, or `FAILED` status and the relevant acceptance, completion, and failure timestamps.
+
+Each quest also includes `objectiveProgress`, which merges normalized static objective identity and text with persisted `CharacterQuestObjective` completion state. Unaccepted quests expose all objectives as incomplete. The safe `objectiveSummary` reports objective totals and required-completion state without returning raw persistence rows. The existing text-only `objectives` array remains unchanged for UI compatibility.
 
 The route only reads progress rows whose `questKey` appears in the static quest list for the character's current location. Raw `CharacterQuest` rows and internal relation data are not returned.
 
@@ -204,7 +222,7 @@ The UI includes completion controls for accepted quests but does not include fai
 
 The `CharacterQuest` model stores quest progress for a character without duplicating static quest content. Its `questKey` refers by convention to a quest key in `lib/game/questData.js`; there is no database foreign key because static quest definitions are not database rows.
 
-`CharacterQuestObjective` now persists objective completion state. Its `objectiveKey` refers to explicit static objective keys by convention, while objective text and order remain in `lib/game/questData.js`. The protected completion API writes these rows, but quest reads and the UI do not expose persisted objective progress yet.
+`CharacterQuestObjective` now persists objective completion state. Its `objectiveKey` refers to explicit static objective keys by convention, while objective text and order remain in `lib/game/questData.js`. The protected completion API writes these rows, and protected quest reads expose safe merged objective progress. The UI does not display objective progress yet.
 
 The protected objective completion API can create or update one valid objective progress row for an accepted quest. It validates ownership and static keys, writes one automatic log only for a new completion, and does not yet affect quest completion eligibility.
 
@@ -243,8 +261,8 @@ Completion does not check objectives or location. It validates and applies stati
 - A protected quest completion API exists; no quest failure API exists yet.
 - Quest completion controls exist for accepted quests; no quest failure controls exist.
 - Completion rules are wired to both API and UI behavior.
-- No objective completion logic exists yet.
-- No objective progress fields exist yet.
+- Objective completion can be persisted and read safely, but no objective UI exists yet.
+- Quest completion does not enforce required objective completion yet.
 - Static gold, experience, and renown rewards are applied during completion and shown read-only in the Quest UI.
 - No item rewards exist yet.
 - No separate reward claim flow or level-up logic exists.
@@ -253,4 +271,4 @@ Completion does not check objectives or location. It validates and applies stati
 
 ## Next Recommended Step
 
-Merge objective progress into the protected quest read API before adding objective UI or completion enforcement. Keep item rewards, level-up logic, and combat for separate later steps.
+Add objective progress controls to the Quest UI before enforcing required objectives during quest completion. Keep item rewards, level-up logic, and combat for separate later steps.

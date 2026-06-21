@@ -44,7 +44,7 @@ Quest and location keys use stable lowercase kebab-case values.
 
 `startLocationKey` must match a location in `lib/game/worldLocations.js`.
 
-`objectives` contains text-only guidance. Objective completion logic does not exist yet.
+`objectives` contains text-only guidance. `lib/game/questObjectiveRules.js` now normalizes these strings into safe objects with stable keys and required-state metadata. Objective progress is not persisted or enforced yet.
 
 `rewards` contains modest static `gold`, `experience`, and `renown` values. The completion API validates and applies these values atomically.
 
@@ -220,6 +220,8 @@ All current static quests include modest gold, experience, and renown definition
 
 Reusable completion validation now exists in `lib/game/questCompletionRules.js`. Only quests with `ACCEPTED` progress can pass the current rule. `AVAILABLE`, `COMPLETED`, `FAILED`, missing, and unknown progress states fail safely.
 
+Reusable objective normalization and validation now exist in `lib/game/questObjectiveRules.js`. These helpers can compare required objectives with a temporary `completedObjectiveKeys` array, but the completion API and UI do not use that concept yet.
+
 The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion updates `CharacterQuest`, applies rewards, and creates a `quest_completed` ActivityLog atomically.
 
 The Quest UI now shows `Complete Quest` for accepted quests. Successful completion refreshes quest progress and checks the Activity Log endpoint. Completed quests show `Completed` and their completion date instead of action buttons.
@@ -247,4 +249,4 @@ Completion does not check objectives or location. It validates and applies stati
 
 ## Next Recommended Step
 
-Add objective completion rules without changing reward safety. Keep item rewards, level-up logic, and combat for separate later steps.
+Persist objective progress before enforcing objective completion. Keep item rewards, level-up logic, and combat for separate later steps.

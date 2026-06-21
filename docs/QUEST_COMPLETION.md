@@ -40,6 +40,8 @@ Completed quests show their persisted status, `completedAt` date, and read-only 
 
 Static quests define modest gold, experience, and renown rewards. Completion validates and applies them atomically. Character level remains unchanged because level-up logic has not been added.
 
+Objective normalization and completion-check helpers now exist in `lib/game/questObjectiveRules.js`. The protected completion API does not yet read objective progress or require objectives to be complete.
+
 ### Activity Log
 
 Successful completion writes:
@@ -84,4 +86,4 @@ validationError
 
 ## Next Recommended Step
 
-Add objective completion rules without changing reward safety. Keep item rewards and level-up behavior for separate later steps.
+Persist objective progress before enforcing objective completion. Keep item rewards and level-up behavior for separate later steps.

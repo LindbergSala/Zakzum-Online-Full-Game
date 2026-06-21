@@ -4,16 +4,21 @@ The quest objective rules foundation gives static quest objectives one safe, reu
 
 ## Current Objective Data
 
-Current quests store objectives as strings:
+Current quests store objectives as explicit objects:
 
 ```js
 objectives: [
-  "Read the road notice posted in Kingstone.",
-  "Inspect the marked warning posts beyond the city.",
+  {
+    key: "read-kingstone-road-notice",
+    text: "Read the road notice posted in Kingstone.",
+    isRequired: true,
+  },
 ]
 ```
 
-The rules also accept future object entries with `key`, `text`, and `isRequired` fields.
+Every current objective has a readable kebab-case key tied to its meaning. These keys prepare future persisted progress and should not be renamed casually once persistence exists.
+
+The rules continue to support legacy string objectives, but static quest data no longer relies on generated index keys.
 
 ## Normalized Shape
 
@@ -25,7 +30,7 @@ text
 isRequired
 ```
 
-String objectives receive stable index-based keys such as `objective-1`. Object objectives retain a non-empty explicit key. Missing keys fall back to the same index-based form, and missing `isRequired` values default to `true`.
+Object objectives retain their non-empty explicit key. Missing object keys and legacy string objectives fall back to index-based keys for compatibility, and missing `isRequired` values default to `true`.
 
 ## Exports
 
@@ -47,9 +52,12 @@ Validation rejects a missing quest, an objectives value that is present but is n
 
 Completed objective keys are not persisted yet. The quest completion API does not read them or require objective completion, and no objective UI exists.
 
+Existing quest API responses continue to expose objectives as text-only arrays for UI compatibility. Explicit keys remain part of static quest data and the objective rules foundation until persisted progress is introduced.
+
 ## Current Limitations
 
 - Objectives are static quest data only.
+- Current static objectives use explicit stable keys, but the rules retain index-key fallback compatibility.
 - Objective progress is not stored in PostgreSQL.
 - The completion API still permits an accepted quest to complete without objective checks.
 - No objective checkboxes, buttons, or progress controls exist.
@@ -59,4 +67,4 @@ Completed objective keys are not persisted yet. The quest completion API does no
 
 ## Next Recommended Step
 
-Add a small objective persistence model or an equally explicit persisted progress shape before enforcing objective completion in the API.
+Add a small objective persistence model keyed by the explicit objective keys before enforcing objective completion in the API.

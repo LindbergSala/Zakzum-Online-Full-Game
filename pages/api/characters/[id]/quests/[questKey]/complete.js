@@ -2,6 +2,7 @@ import { getCurrentUser } from "../../../../../../lib/auth/currentUser";
 import { createActivityLog } from "../../../../../../lib/game/activityLog";
 import { getQuestCompletionValidationError } from "../../../../../../lib/game/questCompletionRules";
 import { getQuestByKey } from "../../../../../../lib/game/questData";
+import { getQuestObjectives } from "../../../../../../lib/game/questObjectiveRules";
 import {
   getQuestRewards,
   getQuestRewardValidationError,
@@ -21,7 +22,7 @@ function toSafeQuestDetails(quest) {
     briefing: quest.briefing,
     suggestedLevel: quest.suggestedLevel,
     isStarterQuest: quest.isStarterQuest,
-    objectives: [...quest.objectives],
+    objectives: getQuestObjectives(quest).map((objective) => objective.text),
   };
 }
 

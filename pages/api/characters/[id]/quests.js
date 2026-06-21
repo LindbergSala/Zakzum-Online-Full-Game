@@ -4,6 +4,7 @@ import {
   getAvailableQuestsForLocation,
   getQuestByKey,
 } from "../../../../lib/game/questData";
+import { getQuestObjectives } from "../../../../lib/game/questObjectiveRules";
 import { getQuestRewards } from "../../../../lib/game/questRewardRules";
 import {
   getLocationByKey,
@@ -21,7 +22,7 @@ function toSafeQuestDetails(quest) {
     suggestedLevel: quest.suggestedLevel,
     isStarterQuest: quest.isStarterQuest,
     rewards: getQuestRewards(quest),
-    objectives: [...quest.objectives],
+    objectives: getQuestObjectives(quest).map((objective) => objective.text),
   };
 }
 

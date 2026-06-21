@@ -46,7 +46,7 @@ Quest and location keys use stable lowercase kebab-case values.
 
 `objectives` contains text-only guidance. Objective completion logic does not exist yet.
 
-`rewards` contains modest static `gold`, `experience`, and `renown` values. Reward application does not exist yet.
+`rewards` contains modest static `gold`, `experience`, and `renown` values. The completion API validates and applies these values atomically.
 
 ## Quest Types
 
@@ -126,6 +126,11 @@ Safe response shape:
       "briefing": "Three warning posts have gone unread since the last hard rain.",
       "suggestedLevel": 1,
       "isStarterQuest": true,
+      "rewards": {
+        "gold": 5,
+        "experience": 10,
+        "renown": 1
+      },
       "objectives": [
         "Read the road notice posted in Kingstone."
       ],
@@ -156,16 +161,16 @@ Acceptance requires a valid static quest key, an owned character, and a quest av
 
 Accepting the same quest more than once returns `409`. Invalid keys and quests from another location return `400`. The progress row and its `quest_accepted` activity log are created in one transaction.
 
-The route does not return user data, `passwordHash`, raw session tokens, ActivityLog records, or rewards.
+The route does not return user data, `passwordHash`, raw session tokens, or ActivityLog records. Static reward data is normalized to the safe `gold`, `experience`, and `renown` fields before it is returned.
 
-No completion or failure behavior exists yet.
+Quest completion uses the separate protected completion route. Quest failure behavior does not exist yet.
 
 ## Quest UI Summary
 
 The protected character detail page now includes a Quest section:
 
 ```text
-/characters/[id]
+/characters/[id]/quests
 ```
 
 The UI calls:
@@ -184,6 +189,7 @@ Each quest displays:
 - short description
 - briefing
 - text-only objectives
+- gold, experience, and renown reward preview
 - a starter quest label when applicable
 
 The Quest section refreshes after successful travel so the list follows the character's new current location.
@@ -192,7 +198,7 @@ The UI includes safe loading, error, empty, and acceptance feedback states. Ques
 
 Persisted quests show `Accepted`, `Completed`, or `Failed` instead of an acceptance button. Accepted quests also show `acceptedAt` when available. This prevents duplicate acceptance through the UI, while the API unique constraint remains the final server-side protection.
 
-The UI includes completion controls for accepted quests but does not include failure controls or reward display.
+The UI includes completion controls for accepted quests but does not include failure controls. Quest cards display read-only reward previews, successful completion displays awarded values and updated progression totals, and completed quests retain their reward summary after refresh.
 
 ## Quest Persistence
 
@@ -208,17 +214,17 @@ Each row records acceptance time and optional completion or failure time. A uniq
 
 Quest titles, briefings, objectives, and rewards remain in static data and are not stored in `CharacterQuest`.
 
-All current static quests include modest gold, experience, and renown definitions. `lib/game/questRewardRules.js` normalizes and validates this data, but no API or UI applies rewards yet.
+All current static quests include modest gold, experience, and renown definitions. `lib/game/questRewardRules.js` normalizes and validates this data. The completion API applies rewards atomically, and the Quest UI displays only the safe normalized values.
 
 ## Quest Completion Rules
 
 Reusable completion validation now exists in `lib/game/questCompletionRules.js`. Only quests with `ACCEPTED` progress can pass the current rule. `AVAILABLE`, `COMPLETED`, `FAILED`, missing, and unknown progress states fail safely.
 
-The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion updates `CharacterQuest` and creates a `quest_completed` ActivityLog atomically.
+The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion updates `CharacterQuest`, applies rewards, and creates a `quest_completed` ActivityLog atomically.
 
 The Quest UI now shows `Complete Quest` for accepted quests. Successful completion refreshes quest progress and checks the Activity Log endpoint. Completed quests show `Completed` and their completion date instead of action buttons.
 
-Completion does not check objectives or location and does not calculate rewards.
+Completion does not check objectives or location. It validates and applies static gold, experience, and renown rewards but does not perform level-up calculations.
 
 ## Current Limitations
 
@@ -233,11 +239,12 @@ Completion does not check objectives or location and does not calculate rewards.
 - Completion rules are wired to both API and UI behavior.
 - No objective completion logic exists yet.
 - No objective progress fields exist yet.
-- Static gold, experience, and renown reward definitions exist but are not applied.
+- Static gold, experience, and renown rewards are applied during completion and shown read-only in the Quest UI.
 - No item rewards exist yet.
+- No separate reward claim flow or level-up logic exists.
 - No quest combat exists yet.
 - No story progression is connected to quests yet.
 
 ## Next Recommended Step
 
-Add a quest reward rules foundation. Keep objective tracking and combat for separate later steps.
+Add objective completion rules without changing reward safety. Keep item rewards, level-up logic, and combat for separate later steps.

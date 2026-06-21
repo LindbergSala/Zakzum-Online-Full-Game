@@ -4,6 +4,7 @@ import {
   getAvailableQuestsForLocation,
   getQuestByKey,
 } from "../../../../lib/game/questData";
+import { getQuestRewards } from "../../../../lib/game/questRewardRules";
 import {
   getLocationByKey,
   getRealmByKey,
@@ -19,6 +20,7 @@ function toSafeQuestDetails(quest) {
     briefing: quest.briefing,
     suggestedLevel: quest.suggestedLevel,
     isStarterQuest: quest.isStarterQuest,
+    rewards: getQuestRewards(quest),
     objectives: [...quest.objectives],
   };
 }

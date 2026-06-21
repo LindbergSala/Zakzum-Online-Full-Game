@@ -34,9 +34,9 @@ Accepted quests can now be completed from the protected Quest page:
 /characters/[id]/quests
 ```
 
-The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. After success, the page reloads quest progress and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
+The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. After success, the page shows the awarded gold, experience, and renown with updated progression totals, reloads quest progress, and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
 
-Completed quests show their persisted status and `completedAt` date instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
+Completed quests show their persisted status, `completedAt` date, and read-only reward summary instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
 
 Static quests define modest gold, experience, and renown rewards. Completion validates and applies them atomically. Character level remains unchanged because level-up logic has not been added.
 
@@ -84,4 +84,4 @@ validationError
 
 ## Next Recommended Step
 
-Add a read-only reward result to the Quest UI without adding item rewards or level-up behavior.
+Add objective completion rules without changing reward safety. Keep item rewards and level-up behavior for separate later steps.

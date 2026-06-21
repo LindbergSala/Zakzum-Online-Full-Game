@@ -11,6 +11,45 @@ import {
   fetchCharacterQuests,
 } from "../../../lib/game/characterPageRequests";
 import { getCharacterPageServerSideProps } from "../../../lib/game/characterPageServer";
+import {
+  getQuestRewards,
+  getQuestRewardSummary,
+} from "../../../lib/game/questRewardRules";
+
+function formatRewards(rewards) {
+  return `${rewards.gold} gold, ${rewards.experience} experience, and ${rewards.renown} renown`;
+}
+
+function QuestRewardPreview({ quest }) {
+  const rewardSummary = getQuestRewardSummary(quest);
+  const isCompleted = quest.progress?.status === "COMPLETED";
+
+  return (
+    <div className="quest-reward-summary">
+      <p className="item-meta">
+        {isCompleted ? "Rewards Earned" : "Rewards"}
+      </p>
+      {rewardSummary.hasRewards ? (
+        <dl className="quest-reward-grid">
+          <div>
+            <dt>Gold</dt>
+            <dd>{rewardSummary.gold}</dd>
+          </div>
+          <div>
+            <dt>Experience</dt>
+            <dd>{rewardSummary.experience}</dd>
+          </div>
+          <div>
+            <dt>Renown</dt>
+            <dd>{rewardSummary.renown}</dd>
+          </div>
+        </dl>
+      ) : (
+        <p className="supporting-text">No progression rewards are listed.</p>
+      )}
+    </div>
+  );
+}
 
 export default function CharacterQuestsPage({ character }) {
   const [quests, setQuests] = useState([]);
@@ -121,8 +160,18 @@ export default function CharacterQuestsPage({ character }) {
     setQuestAcceptSuccess("");
 
     try {
-      await completeCharacterQuest(character.id, quest.key);
-      setQuestCompleteSuccess(`${quest.title} has been completed.`);
+      const data = await completeCharacterQuest(character.id, quest.key);
+      const rewards = getQuestRewards({
+        rewards: data.rewards || quest.rewards,
+      });
+      const progress = data.characterProgress;
+      const progressMessage = progress
+        ? ` Current totals: ${formatRewards(progress)}.`
+        : "";
+
+      setQuestCompleteSuccess(
+        `${quest.title} has been completed. Awarded ${formatRewards(rewards)}.${progressMessage}`,
+      );
       await loadQuests();
 
       try {
@@ -212,6 +261,8 @@ export default function CharacterQuestsPage({ character }) {
                     </ul>
                   </div>
                 ) : null}
+
+                <QuestRewardPreview quest={quest} />
 
                 <div className="inventory-item-actions">
                   {(quest.progress?.status || "AVAILABLE") === "AVAILABLE" ? (

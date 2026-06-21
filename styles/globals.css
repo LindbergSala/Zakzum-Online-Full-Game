@@ -524,6 +524,41 @@ select:focus {
   text-transform: uppercase;
 }
 
+.quest-reward-summary {
+  display: grid;
+  gap: 0.55rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+
+.quest-reward-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.quest-reward-grid div {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.quest-reward-grid dt {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.quest-reward-grid dd {
+  margin: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
 .activity-log-details {
   margin: 0;
   border: 1px solid var(--line);

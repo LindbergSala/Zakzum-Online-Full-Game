@@ -18,7 +18,7 @@ Automatic log sources now exist for character creation and starter equipment ass
 
 Automatic log sources also exist for successful item equip, item unequip, travel, and rest actions.
 
-Quest acceptance and completion now write automatic activity logs. No automatic logs are written yet during combat or story progress.
+Quest acceptance, objective completion, and quest completion now write automatic activity logs. No automatic logs are written yet during combat or story progress.
 
 ## ActivityLog Model Fields
 
@@ -352,6 +352,36 @@ The log details store:
 
 The reward details are written in the same transaction as quest completion and character progression updates. No `quest_completed` log or reward is created for invalid, unaccepted, completed, failed, missing, unauthorized, conflicting, or failed requests.
 
+### Objective Completed
+
+When a logged-in user completes a valid objective for an accepted quest belonging to an owned character through:
+
+```text
+POST /api/characters/[id]/quests/[questKey]/objectives/[objectiveKey]/complete
+```
+
+the server creates or updates one `CharacterQuestObjective` and creates one ActivityLog in the same transaction.
+
+The log uses:
+
+- `type`: `objective_completed`
+- `title`: `Objective Completed`
+- `description`: `A step of the duty was marked as fulfilled.`
+
+The log details store:
+
+- `characterName`
+- `questKey`
+- `questTitle`
+- `questType`
+- `objectiveKey`
+- `objectiveText`
+- `isRequired`
+- `status`
+- `completedAt`
+
+The log is created only when the objective newly becomes completed. Repeated or concurrent duplicate completion returns the existing progress without creating another `objective_completed` log.
+
 ## Activity Log UI Summary
 
 The protected character detail page now displays read-only activity logs:
@@ -445,6 +475,8 @@ Future activity logs may record:
 - No quest acceptance logs are written for invalid, unavailable, duplicate, not found, unauthorized, or failed requests.
 - Quest completion writes one automatic `quest_completed` log when an accepted quest becomes completed.
 - No quest completion logs are written for invalid, unaccepted, completed, failed, not found, unauthorized, conflicting, or failed requests.
+- Objective completion writes one automatic `objective_completed` log when a valid objective for an accepted quest newly becomes completed.
+- No duplicate objective logs are written for repeated or concurrent completion requests.
 - Travel UI and map systems have not been added.
 - Quest failure logs have not been added.
 - Combat has not been added.

@@ -204,7 +204,9 @@ The UI includes completion controls for accepted quests but does not include fai
 
 The `CharacterQuest` model stores quest progress for a character without duplicating static quest content. Its `questKey` refers by convention to a quest key in `lib/game/questData.js`; there is no database foreign key because static quest definitions are not database rows.
 
-`CharacterQuestObjective` now provides a persistence foundation for objective completion state. Its `objectiveKey` refers to explicit static objective keys by convention, while objective text and order remain in `lib/game/questData.js`. No objective API or UI uses these rows yet.
+`CharacterQuestObjective` now persists objective completion state. Its `objectiveKey` refers to explicit static objective keys by convention, while objective text and order remain in `lib/game/questData.js`. The protected completion API writes these rows, but quest reads and the UI do not expose persisted objective progress yet.
+
+The protected objective completion API can create or update one valid objective progress row for an accepted quest. It validates ownership and static keys, writes one automatic log only for a new completion, and does not yet affect quest completion eligibility.
 
 Persisted statuses use the `QuestProgressStatus` enum:
 
@@ -251,4 +253,4 @@ Completion does not check objectives or location. It validates and applies stati
 
 ## Next Recommended Step
 
-Add a protected objective progress API before enforcing objective completion. Keep objective UI, item rewards, level-up logic, and combat for separate later steps.
+Merge objective progress into the protected quest read API before adding objective UI or completion enforcement. Keep item rewards, level-up logic, and combat for separate later steps.

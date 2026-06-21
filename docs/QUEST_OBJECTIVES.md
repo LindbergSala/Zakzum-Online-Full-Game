@@ -62,13 +62,27 @@ The `CharacterQuestObjective` Prisma model stores per-objective progress for a `
 
 Each `CharacterQuest` has an `objectives` relation. The unique `characterQuestId` and `objectiveKey` constraint allows only one progress row per objective for that accepted quest. Deleting a `CharacterQuest` cascades to its objective rows; deleting a character cascades through `CharacterQuest` as well.
 
-The persistence model is a foundation only. No objective API creates or updates these rows yet, no objective UI exists, and quest completion does not enforce objective completion.
+## Objective Progress API
+
+The protected objective completion route is:
+
+```text
+POST /api/characters/[id]/quests/[questKey]/objectives/[objectiveKey]/complete
+```
+
+The route requires a valid session and verifies character ownership. Both `questKey` and `objectiveKey` are validated against static quest data. Only objectives belonging to an accepted `CharacterQuest` can be completed; completed and failed quests return `409`.
+
+The route creates a completed `CharacterQuestObjective` when no row exists or updates an incomplete row. Repeating a completed objective returns safe current data without creating another row or log. The unique constraint and guarded transaction protect concurrent duplicate requests.
+
+When an objective newly becomes complete, the same transaction creates one `objective_completed` ActivityLog. The log stores character and quest identity, objective key and text, required state, completed status, and completion time.
+
+No objective UI exists, and quest completion does not enforce objective completion.
 
 ## Current Limitations
 
 - Objective definitions remain static quest data, while a database model now exists for future per-character progress.
 - Current static objectives use explicit stable keys, but the rules retain index-key fallback compatibility.
-- No current API writes objective progress to PostgreSQL.
+- A protected API can mark valid objectives complete, but no general objective read or reset API exists.
 - The completion API still permits an accepted quest to complete without objective checks.
 - No objective checkboxes, buttons, or progress controls exist.
 - No ActivityLog records are written by these helpers.
@@ -77,4 +91,4 @@ The persistence model is a foundation only. No objective API creates or updates 
 
 ## Next Recommended Step
 
-Add a protected objective progress API that validates objective keys against static quest data. Keep completion enforcement and objective UI for separate later steps.
+Merge persisted objective progress into the protected quest read API before adding objective controls or completion enforcement.

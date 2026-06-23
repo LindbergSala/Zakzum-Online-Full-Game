@@ -50,7 +50,7 @@ Validation rejects a missing quest, an objectives value that is present but is n
 
 `completedObjectiveKeys` is currently a simple array of normalized objective keys. `areQuestObjectivesComplete(...)` returns `true` only when every required objective key is present. Optional objectives do not block completion.
 
-Completed objective keys are persisted through the model foundation and included in protected quest reads. The Quest UI can mark objectives complete for accepted quests. The quest completion API still does not require objective completion.
+Completed objective keys are persisted through the model foundation and included in protected quest reads. The Quest UI can mark objectives complete for accepted quests. The quest completion API now requires all required objectives to be complete before a quest can be completed.
 
 Existing quest API responses continue to expose `objectives` as text-only arrays for UI compatibility. Explicit keys also appear in the separate safe `objectiveProgress` field.
 
@@ -112,17 +112,25 @@ After a successful objective completion, the Quest page refreshes quest data so 
 
 No objective rewards exist, and no schema changes are required for the UI.
 
+## Objective Enforcement
+
+Quest completion now checks completed `CharacterQuestObjective` rows for the accepted quest. The completion API builds `completedObjectiveKeys` from rows where `isCompleted` is `true`, then uses `areQuestObjectivesComplete(...)` to verify every required static objective key is complete.
+
+If required objectives are incomplete, quest completion is rejected safely. The quest remains accepted, `completedAt` remains unset, rewards are not applied, and no `quest_completed` ActivityLog is written.
+
+Optional objectives do not block quest completion.
+
 ## Current Limitations
 
 - Objective definitions remain static quest data, while a database model now exists for future per-character progress.
 - Current static objectives use explicit stable keys, but the rules retain index-key fallback compatibility.
 - A protected API can mark valid objectives complete, and protected quest reads expose safe merged progress. No reset API exists.
-- The completion API still permits an accepted quest to complete without objective checks.
-- The Quest UI can complete objectives for accepted quests, but it does not enforce objectives before `Complete Quest`.
+- The completion API enforces required objective completion before completing accepted quests.
+- The Quest UI can complete objectives for accepted quests, but `Complete Quest` is not disabled client-side yet.
 - No ActivityLog records are written by these helpers.
 - Reward application and quest completion behavior are unchanged.
 - Combat, shops, map UI, and story progression are not connected.
 
 ## Next Recommended Step
 
-Verify objective progress controls in the browser, then enforce required objective completion in a separate quest completion API change once that flow is proven.
+Update the Quest UI to disable or guide `Complete Quest` until required objectives are complete.

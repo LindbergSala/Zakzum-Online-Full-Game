@@ -22,9 +22,13 @@ POST /api/characters/[id]/quests/[questKey]/complete
 
 The route requires a valid session and verifies that the character belongs to the logged-in user. It validates the static quest key, loads the matching `CharacterQuest` row, and reuses the completion rules.
 
-Only `ACCEPTED` progress can be completed. Successful completion updates the existing row to `COMPLETED`, sets `completedAt`, increments the character's validated gold, experience, and renown rewards, and creates one `quest_completed` ActivityLog in the same transaction. The conditional database update prevents concurrent or repeated requests from creating duplicate completion logs or applying rewards twice.
+Only `ACCEPTED` progress can be completed, and every required objective for the quest must already be completed through objective progress. Optional objectives do not block completion.
 
-The response contains safe character identity, safe quest progress, static quest details, normalized rewards, and the character's updated gold, experience, and renown. It does not return user data or ActivityLog records.
+If required objectives are incomplete, the route returns a safe rejection and does not update `CharacterQuest`, set `completedAt`, apply rewards, or create a `quest_completed` ActivityLog.
+
+Successful completion updates the existing row to `COMPLETED`, sets `completedAt`, increments the character's validated gold, experience, and renown rewards, and creates one `quest_completed` ActivityLog in the same transaction. The conditional database update prevents concurrent or repeated requests from creating duplicate completion logs or applying rewards twice.
+
+The response contains safe character identity, safe quest progress, static quest details, normalized rewards, objective summary, and the character's updated gold, experience, and renown. It does not return user data, raw quest rows, raw objective rows, or ActivityLog records.
 
 ## Completion UI
 
@@ -34,13 +38,13 @@ Accepted quests can now be completed from the protected Quest page:
 /characters/[id]/quests
 ```
 
-The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. After success, the page shows the awarded gold, experience, and renown with updated progression totals, reloads quest progress, and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
+The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. The API now rejects completion until required objectives are complete. After success, the page shows the awarded gold, experience, and renown with updated progression totals, reloads quest progress, and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
 
 Completed quests show their persisted status, `completedAt` date, and read-only reward summary instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
 
 Static quests define modest gold, experience, and renown rewards. Completion validates and applies them atomically. Character level remains unchanged because level-up logic has not been added.
 
-Objective normalization and completion-check helpers now exist in `lib/game/questObjectiveRules.js`. The protected completion API does not yet read objective progress or require objectives to be complete.
+Objective normalization and completion-check helpers now exist in `lib/game/questObjectiveRules.js`. The protected completion API reads completed `CharacterQuestObjective` rows and requires every required objective key to be complete before completion.
 
 ### Activity Log
 
@@ -50,15 +54,17 @@ Successful completion writes:
 - `title`: `Quest Completed`
 - `description`: `A duty was fulfilled and written into memory.`
 
-The details store `characterName`, `questKey`, `questTitle`, `questType`, `startLocationKey`, `previousStatus`, `status`, `acceptedAt`, `completedAt`, normalized rewards, awarded values, and before/after gold, experience, and renown values.
+The details store `characterName`, `questKey`, `questTitle`, `questType`, `startLocationKey`, `previousStatus`, `status`, `acceptedAt`, `completedAt`, normalized rewards, awarded values, before/after gold, experience, and renown values, completed objective keys, required-objective completion state, and objective summary.
 
 ## Current Rule
 
-Only a quest with persisted `ACCEPTED` progress can be completed.
+Only a quest with persisted `ACCEPTED` progress and complete required objectives can be completed.
 
 - `AVAILABLE` quests must be accepted first.
 - `COMPLETED` quests cannot be completed again.
 - `FAILED` quests cannot be completed.
+- Required static objectives must have completed `CharacterQuestObjective` rows.
+- Optional objectives do not block completion.
 - Missing quest or progress data fails safely.
 - Unknown progress statuses fail safely.
 
@@ -74,9 +80,11 @@ validationError
 
 ## Current Limitations
 
-- Objective completion is not checked yet.
+- Required objective completion is enforced by the completion API.
+- The current Quest UI still allows clicking `Complete Quest`; the API returns a safe error when required objectives are incomplete.
 - Character location is not checked yet.
 - Static gold, experience, and renown rewards are applied during completion.
+- Rejected objective-gated completion attempts do not apply rewards or create `quest_completed` logs.
 - No level-up logic exists and completion does not modify character level.
 - No item rewards are defined or calculated.
 - A protected quest completion API exists.
@@ -86,4 +94,4 @@ validationError
 
 ## Next Recommended Step
 
-Persist objective progress before enforcing objective completion. Keep item rewards and level-up behavior for separate later steps.
+Update the Quest UI so `Complete Quest` is disabled or clearly guided until required objectives are complete. Keep item rewards and level-up behavior for separate later steps.

@@ -320,7 +320,9 @@ When a logged-in user completes an accepted quest for an owned character through
 POST /api/characters/[id]/quests/[questKey]/complete
 ```
 
-the server updates `CharacterQuest` and creates one ActivityLog record in the same transaction.
+the server first verifies that all required objectives are complete. If any required objective is incomplete, no quest update, reward, or `quest_completed` log is created.
+
+After required objectives are complete, the server updates `CharacterQuest` and creates one ActivityLog record in the same transaction.
 
 The log uses:
 
@@ -349,6 +351,9 @@ The log details store:
 - `characterExperienceAfter`
 - `characterRenownBefore`
 - `characterRenownAfter`
+- `objectiveSummary`
+- `completedObjectiveKeys`
+- `requiredObjectivesComplete`
 
 The reward details are written in the same transaction as quest completion and character progression updates. No `quest_completed` log or reward is created for invalid, unaccepted, completed, failed, missing, unauthorized, conflicting, or failed requests.
 
@@ -473,8 +478,8 @@ Future activity logs may record:
 - No rest logs are written for full-recovery, invalid, not found, unauthorized, or failed requests.
 - Quest acceptance writes one automatic `quest_accepted` log when acceptance succeeds.
 - No quest acceptance logs are written for invalid, unavailable, duplicate, not found, unauthorized, or failed requests.
-- Quest completion writes one automatic `quest_completed` log when an accepted quest becomes completed.
-- No quest completion logs are written for invalid, unaccepted, completed, failed, not found, unauthorized, conflicting, or failed requests.
+- Quest completion writes one automatic `quest_completed` log when an accepted quest with complete required objectives becomes completed.
+- No quest completion logs are written for incomplete required objectives, invalid, unaccepted, completed, failed, not found, unauthorized, conflicting, or failed requests.
 - Objective completion writes one automatic `objective_completed` log when a valid objective for an accepted quest newly becomes completed.
 - No duplicate objective logs are written for repeated or concurrent completion requests.
 - Travel UI and map systems have not been added.

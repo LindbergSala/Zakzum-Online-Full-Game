@@ -2,7 +2,11 @@ import { getCurrentUser } from "../../../../../../lib/auth/currentUser";
 import { createActivityLog } from "../../../../../../lib/game/activityLog";
 import { getQuestCompletionValidationError } from "../../../../../../lib/game/questCompletionRules";
 import { getQuestByKey } from "../../../../../../lib/game/questData";
-import { getQuestObjectives } from "../../../../../../lib/game/questObjectiveRules";
+import {
+  areQuestObjectivesComplete,
+  getQuestObjectiveSummary,
+  getQuestObjectives,
+} from "../../../../../../lib/game/questObjectiveRules";
 import {
   getQuestRewards,
   getQuestRewardValidationError,
@@ -23,6 +27,29 @@ function toSafeQuestDetails(quest) {
     suggestedLevel: quest.suggestedLevel,
     isStarterQuest: quest.isStarterQuest,
     objectives: getQuestObjectives(quest).map((objective) => objective.text),
+  };
+}
+
+function getObjectiveCompletionSummary(quest, completedObjectiveKeys) {
+  const staticSummary = getQuestObjectiveSummary(quest);
+  const completedKeys = new Set(completedObjectiveKeys);
+  const completedObjectiveCount = staticSummary.objectives.filter(
+    (objective) => completedKeys.has(objective.key),
+  ).length;
+  const completedRequiredObjectiveCount = staticSummary.objectives.filter(
+    (objective) => objective.isRequired && completedKeys.has(objective.key),
+  ).length;
+  const requiredObjectivesComplete = areQuestObjectivesComplete({
+    quest,
+    completedObjectiveKeys,
+  });
+
+  return {
+    objectiveCount: staticSummary.objectiveCount,
+    requiredObjectiveCount: staticSummary.requiredObjectiveCount,
+    completedObjectiveCount,
+    completedRequiredObjectiveCount,
+    requiredObjectivesComplete,
   };
 }
 
@@ -111,6 +138,30 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: validationError });
     }
 
+    const completedObjectives =
+      await prisma.characterQuestObjective.findMany({
+        where: {
+          characterQuestId: characterQuest.id,
+          isCompleted: true,
+        },
+        select: {
+          objectiveKey: true,
+        },
+      });
+    const completedObjectiveKeys = completedObjectives.map(
+      (objective) => objective.objectiveKey,
+    );
+    const objectiveSummary = getObjectiveCompletionSummary(
+      quest,
+      completedObjectiveKeys,
+    );
+
+    if (!objectiveSummary.requiredObjectivesComplete) {
+      return res.status(409).json({
+        error: "Required quest objectives are not complete yet.",
+      });
+    }
+
     const completedAt = new Date();
 
     try {
@@ -185,6 +236,10 @@ export default async function handler(req, res) {
               characterRenownBefore:
                 updatedCharacter.renown - rewards.renown,
               characterRenownAfter: updatedCharacter.renown,
+              objectiveSummary,
+              completedObjectiveKeys,
+              requiredObjectivesComplete:
+                objectiveSummary.requiredObjectivesComplete,
             },
           },
           tx,
@@ -212,6 +267,7 @@ export default async function handler(req, res) {
           ...toSafeQuestDetails(quest),
         },
         rewards,
+        objectiveSummary,
         characterProgress: completionResult.characterProgress,
       });
     } catch (error) {

@@ -246,11 +246,11 @@ Reusable completion validation now exists in `lib/game/questCompletionRules.js`.
 
 Reusable objective normalization and validation now exist in `lib/game/questObjectiveRules.js`. Current quest data uses explicit meaningful keys rather than index-generated keys. These helpers can compare required objectives with a temporary `completedObjectiveKeys` array, but the completion API and UI do not use that concept yet.
 
-The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion updates `CharacterQuest`, applies rewards, and creates a `quest_completed` ActivityLog atomically.
+The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion now requires all required objectives to be complete, updates `CharacterQuest`, applies rewards, and creates a `quest_completed` ActivityLog atomically.
 
 The Quest UI now shows `Complete Quest` for accepted quests. Successful completion refreshes quest progress and checks the Activity Log endpoint. Completed quests show `Completed` and their completion date instead of action buttons.
 
-Completion does not check objectives or location. It validates and applies static gold, experience, and renown rewards but does not perform level-up calculations.
+Completion checks required objective progress but does not check location. It validates and applies static gold, experience, and renown rewards only after required objectives are complete, but it does not perform level-up calculations.
 
 ## Current Limitations
 
@@ -264,7 +264,8 @@ Completion does not check objectives or location. It validates and applies stati
 - Quest completion controls exist for accepted quests; no quest failure controls exist.
 - Completion rules are wired to both API and UI behavior.
 - Objective completion can be persisted, read safely, and completed from the Quest UI for accepted quests.
-- Quest completion does not enforce required objective completion yet.
+- Quest completion enforces required objective completion server-side.
+- The Quest UI does not yet disable `Complete Quest` before required objectives are complete.
 - Static gold, experience, and renown rewards are applied during completion and shown read-only in the Quest UI.
 - No item rewards exist yet.
 - No separate reward claim flow or level-up logic exists.
@@ -273,4 +274,4 @@ Completion does not check objectives or location. It validates and applies stati
 
 ## Next Recommended Step
 
-Verify objective progress controls in the browser, then enforce required objectives during quest completion in a separate API change. Keep item rewards, level-up logic, and combat for separate later steps.
+Update the Quest UI so `Complete Quest` is disabled or clearly guided until required objectives are complete. Keep item rewards, level-up logic, and combat for separate later steps.

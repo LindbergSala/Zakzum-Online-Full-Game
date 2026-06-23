@@ -52,8 +52,10 @@ validationError
 ## Current Limitations
 
 - Validated rewards are applied by `POST /api/characters/[id]/quests/[questKey]/complete`.
+- Rewards are only applied after the quest is accepted and all required objectives are complete.
 - Gold, experience, and renown are incremented in the same transaction that completes the quest and writes its ActivityLog.
 - A guarded `ACCEPTED` to `COMPLETED` update must succeed before rewards are applied. Repeated or concurrent completion attempts therefore cannot award the same quest twice.
+- Completion attempts rejected for incomplete required objectives do not apply rewards.
 - The protected Quest UI shows gold, experience, and renown previews on quest cards.
 - Successful completion shows the awarded values and updated progression totals returned by the completion API.
 - Completed quests retain their read-only reward summary after refresh.
@@ -66,4 +68,4 @@ validationError
 
 ## Next Recommended Step
 
-Keep level-up behavior and item rewards as separate future systems. Objective completion rules remain the next quest-mechanics gap.
+Keep level-up behavior and item rewards as separate future systems. The next reward-adjacent step is making the Quest UI communicate objective-gated completion before the API rejects it.

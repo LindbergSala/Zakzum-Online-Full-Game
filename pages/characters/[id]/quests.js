@@ -7,6 +7,7 @@ import {
 import {
   acceptCharacterQuest,
   completeCharacterQuest,
+  completeCharacterQuestObjective,
   fetchCharacterActivityLogs,
   fetchCharacterQuests,
 } from "../../../lib/game/characterPageRequests";
@@ -51,6 +52,91 @@ function QuestRewardPreview({ quest }) {
   );
 }
 
+function getFallbackObjectiveProgress(quest) {
+  if (!Array.isArray(quest.objectives)) {
+    return [];
+  }
+
+  return quest.objectives.map((objective, index) => ({
+    key: `read-only-objective-${index + 1}`,
+    text: objective,
+    isRequired: true,
+    isCompleted: false,
+    completedAt: null,
+    isReadOnlyFallback: true,
+  }));
+}
+
+function QuestObjectiveProgress({
+  completingObjectiveKey,
+  onCompleteObjective,
+  quest,
+}) {
+  const questStatus = quest.progress?.status || "AVAILABLE";
+  const objectiveProgress = Array.isArray(quest.objectiveProgress)
+    ? quest.objectiveProgress
+    : getFallbackObjectiveProgress(quest);
+  const canCompleteObjectives = questStatus === "ACCEPTED";
+  const summary = quest.objectiveSummary;
+
+  return (
+    <div className="quest-objective-summary">
+      <p className="item-meta">Objectives</p>
+      {summary ? (
+        <p className="supporting-text">
+          Required objectives: {summary.completedRequiredObjectiveCount}/
+          {summary.requiredObjectiveCount}. Total objectives:{" "}
+          {summary.completedObjectiveCount}/{summary.objectiveCount}.
+        </p>
+      ) : null}
+
+      {objectiveProgress.length > 0 ? (
+        <ul className="quest-objective-list">
+          {objectiveProgress.map((objective) => {
+            const completionKey = `${quest.key}:${objective.key}`;
+            const canCompleteObjective =
+              canCompleteObjectives &&
+              !objective.isCompleted &&
+              !objective.isReadOnlyFallback;
+
+            return (
+              <li className="quest-objective-item" key={objective.key}>
+                <div className="quest-objective-content">
+                  <p className="supporting-text">{objective.text}</p>
+                  <p className="item-meta">
+                    {objective.isRequired ? "Required" : "Optional"} /{" "}
+                    {objective.isCompleted ? "Complete" : "Incomplete"}
+                  </p>
+                  {objective.completedAt ? (
+                    <p className="item-meta">
+                      Completed {formatDate(objective.completedAt)}
+                    </p>
+                  ) : null}
+                </div>
+
+                {canCompleteObjective ? (
+                  <button
+                    className="secondary-button small-action-button"
+                    disabled={completingObjectiveKey === completionKey}
+                    onClick={() => onCompleteObjective(quest, objective)}
+                    type="button"
+                  >
+                    {completingObjectiveKey === completionKey
+                      ? "Completing..."
+                      : "Complete Objective"}
+                  </button>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="supporting-text">No quest objectives are listed yet.</p>
+      )}
+    </div>
+  );
+}
+
 export default function CharacterQuestsPage({ character }) {
   const [quests, setQuests] = useState([]);
   const [questsLoading, setQuestsLoading] = useState(true);
@@ -61,6 +147,9 @@ export default function CharacterQuestsPage({ character }) {
   const [completingQuestKey, setCompletingQuestKey] = useState("");
   const [questCompleteError, setQuestCompleteError] = useState("");
   const [questCompleteSuccess, setQuestCompleteSuccess] = useState("");
+  const [completingObjectiveKey, setCompletingObjectiveKey] = useState("");
+  const [objectiveCompleteError, setObjectiveCompleteError] = useState("");
+  const [objectiveCompleteSuccess, setObjectiveCompleteSuccess] = useState("");
   const [questLocationName, setQuestLocationName] = useState("");
   const [questRealmName, setQuestRealmName] = useState("");
 
@@ -140,6 +229,8 @@ export default function CharacterQuestsPage({ character }) {
     setQuestAcceptSuccess("");
     setQuestCompleteError("");
     setQuestCompleteSuccess("");
+    setObjectiveCompleteError("");
+    setObjectiveCompleteSuccess("");
 
     try {
       await acceptCharacterQuest(character.id, quest.key);
@@ -158,6 +249,8 @@ export default function CharacterQuestsPage({ character }) {
     setQuestCompleteSuccess("");
     setQuestAcceptError("");
     setQuestAcceptSuccess("");
+    setObjectiveCompleteError("");
+    setObjectiveCompleteSuccess("");
 
     try {
       const data = await completeCharacterQuest(character.id, quest.key);
@@ -186,10 +279,38 @@ export default function CharacterQuestsPage({ character }) {
     }
   }
 
+  async function handleCompleteObjective(quest, objective) {
+    const completionKey = `${quest.key}:${objective.key}`;
+
+    setCompletingObjectiveKey(completionKey);
+    setObjectiveCompleteError("");
+    setObjectiveCompleteSuccess("");
+    setQuestAcceptError("");
+    setQuestAcceptSuccess("");
+    setQuestCompleteError("");
+    setQuestCompleteSuccess("");
+
+    try {
+      await completeCharacterQuestObjective(
+        character.id,
+        quest.key,
+        objective.key,
+      );
+      setObjectiveCompleteSuccess(`${objective.text} has been completed.`);
+      await loadQuests();
+    } catch (error) {
+      setObjectiveCompleteError(
+        error.message || "The objective could not be completed.",
+      );
+    } finally {
+      setCompletingObjectiveKey("");
+    }
+  }
+
   return (
     <CharacterPageLayout
       character={character}
-      description="Quest browsing and quest acceptance now live on their own page instead of sharing space with every other system."
+      description="Quest browsing, objective progress, and quest outcomes now live on their own page instead of sharing space with every other system."
       pageTitle="Quests"
     >
       <section className="session-panel" aria-labelledby="quests-title">
@@ -224,6 +345,12 @@ export default function CharacterQuestsPage({ character }) {
         {questCompleteSuccess ? (
           <p className="form-message success">{questCompleteSuccess}</p>
         ) : null}
+        {objectiveCompleteError ? (
+          <p className="form-message error">{objectiveCompleteError}</p>
+        ) : null}
+        {objectiveCompleteSuccess ? (
+          <p className="form-message success">{objectiveCompleteSuccess}</p>
+        ) : null}
 
         {!questsLoading && !questsError && quests.length === 0 ? (
           <p className="empty-state">No local quests are available here yet.</p>
@@ -251,16 +378,11 @@ export default function CharacterQuestsPage({ character }) {
                   <p className="supporting-text">{quest.briefing}</p>
                 </div>
 
-                {quest.objectives.length > 0 ? (
-                  <div>
-                    <p className="item-meta">Objectives</p>
-                    <ul className="placeholder-list">
-                      {quest.objectives.map((objective) => (
-                        <li key={objective}>{objective}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
+                <QuestObjectiveProgress
+                  completingObjectiveKey={completingObjectiveKey}
+                  onCompleteObjective={handleCompleteObjective}
+                  quest={quest}
+                />
 
                 <QuestRewardPreview quest={quest} />
 

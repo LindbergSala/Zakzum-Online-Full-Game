@@ -531,6 +531,38 @@ select:focus {
   padding-top: 0.75rem;
 }
 
+.quest-objective-summary {
+  display: grid;
+  gap: 0.55rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+
+.quest-objective-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quest-objective-item {
+  display: grid;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(211, 178, 92, 0.18);
+  padding-top: 0.7rem;
+}
+
+.quest-objective-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.quest-objective-content {
+  display: grid;
+  gap: 0.25rem;
+}
+
 .quest-reward-grid {
   display: grid;
   gap: 0.55rem;

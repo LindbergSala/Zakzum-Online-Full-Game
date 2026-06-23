@@ -206,7 +206,7 @@ Each quest displays:
 - suggested level
 - short description
 - briefing
-- text-only objectives
+- objective progress with required or optional labels
 - gold, experience, and renown reward preview
 - a starter quest label when applicable
 
@@ -218,11 +218,13 @@ Persisted quests show `Accepted`, `Completed`, or `Failed` instead of an accepta
 
 The UI includes completion controls for accepted quests but does not include failure controls. Quest cards display read-only reward previews, successful completion displays awarded values and updated progression totals, and completed quests retain their reward summary after refresh.
 
+Accepted quests also show `Complete Objective` controls for incomplete objectives. Completing an objective calls the protected objective completion API and refreshes the Quest section. Available, completed, and failed quests keep objective progress read-only.
+
 ## Quest Persistence
 
 The `CharacterQuest` model stores quest progress for a character without duplicating static quest content. Its `questKey` refers by convention to a quest key in `lib/game/questData.js`; there is no database foreign key because static quest definitions are not database rows.
 
-`CharacterQuestObjective` now persists objective completion state. Its `objectiveKey` refers to explicit static objective keys by convention, while objective text and order remain in `lib/game/questData.js`. The protected completion API writes these rows, and protected quest reads expose safe merged objective progress. The UI does not display objective progress yet.
+`CharacterQuestObjective` now persists objective completion state. Its `objectiveKey` refers to explicit static objective keys by convention, while objective text and order remain in `lib/game/questData.js`. The protected completion API writes these rows, protected quest reads expose safe merged objective progress, and the Quest UI can mark objectives complete for accepted quests.
 
 The protected objective completion API can create or update one valid objective progress row for an accepted quest. It validates ownership and static keys, writes one automatic log only for a new completion, and does not yet affect quest completion eligibility.
 
@@ -261,7 +263,7 @@ Completion does not check objectives or location. It validates and applies stati
 - A protected quest completion API exists; no quest failure API exists yet.
 - Quest completion controls exist for accepted quests; no quest failure controls exist.
 - Completion rules are wired to both API and UI behavior.
-- Objective completion can be persisted and read safely, but no objective UI exists yet.
+- Objective completion can be persisted, read safely, and completed from the Quest UI for accepted quests.
 - Quest completion does not enforce required objective completion yet.
 - Static gold, experience, and renown rewards are applied during completion and shown read-only in the Quest UI.
 - No item rewards exist yet.
@@ -271,4 +273,4 @@ Completion does not check objectives or location. It validates and applies stati
 
 ## Next Recommended Step
 
-Add objective progress controls to the Quest UI before enforcing required objectives during quest completion. Keep item rewards, level-up logic, and combat for separate later steps.
+Verify objective progress controls in the browser, then enforce required objectives during quest completion in a separate API change. Keep item rewards, level-up logic, and combat for separate later steps.

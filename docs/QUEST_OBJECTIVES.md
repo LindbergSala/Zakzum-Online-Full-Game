@@ -50,7 +50,7 @@ Validation rejects a missing quest, an objectives value that is present but is n
 
 `completedObjectiveKeys` is currently a simple array of normalized objective keys. `areQuestObjectivesComplete(...)` returns `true` only when every required objective key is present. Optional objectives do not block completion.
 
-Completed objective keys are persisted through the model foundation and included in protected quest reads. The quest completion API still does not require objective completion, and no objective UI exists.
+Completed objective keys are persisted through the model foundation and included in protected quest reads. The Quest UI can mark objectives complete for accepted quests. The quest completion API still does not require objective completion.
 
 Existing quest API responses continue to expose `objectives` as text-only arrays for UI compatibility. Explicit keys also appear in the separate safe `objectiveProgress` field.
 
@@ -76,7 +76,7 @@ The route creates a completed `CharacterQuestObjective` when no row exists or up
 
 When an objective newly becomes complete, the same transaction creates one `objective_completed` ActivityLog. The log stores character and quest identity, objective key and text, required state, completed status, and completion time.
 
-No objective UI exists, and quest completion does not enforce objective completion.
+The Quest UI uses this route for accepted quests. Quest completion does not enforce objective completion.
 
 ## Objective Progress Reads
 
@@ -92,17 +92,37 @@ Quests without a `CharacterQuest` row return every objective as incomplete. Pers
 
 An `objectiveSummary` also reports total, required, completed, and completed-required counts, plus whether all required objectives are complete. This summary is informational only and does not change completion eligibility.
 
+## Objective Progress UI
+
+The protected Quest page displays objective progress for each returned quest:
+
+```text
+/characters/[id]/quests
+```
+
+Quest cards show objective text, required or optional state, complete or incomplete state, completion time when available, and a small objective summary. Available, completed, and failed quests show objectives as read-only.
+
+Accepted quests show a `Complete Objective` button for incomplete objectives. The button calls:
+
+```text
+POST /api/characters/[id]/quests/[questKey]/objectives/[objectiveKey]/complete
+```
+
+After a successful objective completion, the Quest page refreshes quest data so the completed objective state and timestamp are shown. Duplicate objective completion is avoided in the UI because completed objectives no longer show the button; the API remains the server-side protection.
+
+No objective rewards exist, and no schema changes are required for the UI.
+
 ## Current Limitations
 
 - Objective definitions remain static quest data, while a database model now exists for future per-character progress.
 - Current static objectives use explicit stable keys, but the rules retain index-key fallback compatibility.
 - A protected API can mark valid objectives complete, and protected quest reads expose safe merged progress. No reset API exists.
 - The completion API still permits an accepted quest to complete without objective checks.
-- No objective checkboxes, buttons, or progress controls exist.
+- The Quest UI can complete objectives for accepted quests, but it does not enforce objectives before `Complete Quest`.
 - No ActivityLog records are written by these helpers.
 - Reward application and quest completion behavior are unchanged.
 - Combat, shops, map UI, and story progression are not connected.
 
 ## Next Recommended Step
 
-Add objective progress controls to the Quest UI, then enforce required objective completion in a separate API change once that flow is verified.
+Verify objective progress controls in the browser, then enforce required objective completion in a separate quest completion API change once that flow is proven.

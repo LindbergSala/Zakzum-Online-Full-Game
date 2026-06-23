@@ -67,26 +67,70 @@ function getFallbackObjectiveProgress(quest) {
   }));
 }
 
+function getQuestObjectiveProgressState(quest) {
+  const objectiveProgress = Array.isArray(quest.objectiveProgress)
+    ? quest.objectiveProgress
+    : getFallbackObjectiveProgress(quest);
+  const summary = quest.objectiveSummary;
+  const requiredObjectives = objectiveProgress.filter(
+    (objective) => objective.isRequired,
+  );
+  const completedObjectives = objectiveProgress.filter(
+    (objective) => objective.isCompleted,
+  );
+  const completedRequiredObjectives = requiredObjectives.filter(
+    (objective) => objective.isCompleted,
+  );
+  const objectiveCount =
+    typeof summary?.objectiveCount === "number"
+      ? summary.objectiveCount
+      : objectiveProgress.length;
+  const requiredObjectiveCount =
+    typeof summary?.requiredObjectiveCount === "number"
+      ? summary.requiredObjectiveCount
+      : requiredObjectives.length;
+  const completedObjectiveCount =
+    typeof summary?.completedObjectiveCount === "number"
+      ? summary.completedObjectiveCount
+      : completedObjectives.length;
+  const completedRequiredObjectiveCount =
+    typeof summary?.completedRequiredObjectiveCount === "number"
+      ? summary.completedRequiredObjectiveCount
+      : completedRequiredObjectives.length;
+  const areRequiredObjectivesComplete =
+    typeof summary?.areRequiredObjectivesComplete === "boolean"
+      ? summary.areRequiredObjectivesComplete
+      : completedRequiredObjectiveCount >= requiredObjectiveCount;
+
+  return {
+    objectiveProgress,
+    objectiveCount,
+    requiredObjectiveCount,
+    completedObjectiveCount,
+    completedRequiredObjectiveCount,
+    areRequiredObjectivesComplete,
+  };
+}
+
 function QuestObjectiveProgress({
   completingObjectiveKey,
   onCompleteObjective,
   quest,
 }) {
   const questStatus = quest.progress?.status || "AVAILABLE";
-  const objectiveProgress = Array.isArray(quest.objectiveProgress)
-    ? quest.objectiveProgress
-    : getFallbackObjectiveProgress(quest);
+  const objectiveState = getQuestObjectiveProgressState(quest);
+  const objectiveProgress = objectiveState.objectiveProgress;
   const canCompleteObjectives = questStatus === "ACCEPTED";
-  const summary = quest.objectiveSummary;
 
   return (
     <div className="quest-objective-summary">
       <p className="item-meta">Objectives</p>
-      {summary ? (
+      {objectiveState.objectiveCount > 0 ? (
         <p className="supporting-text">
-          Required objectives: {summary.completedRequiredObjectiveCount}/
-          {summary.requiredObjectiveCount}. Total objectives:{" "}
-          {summary.completedObjectiveCount}/{summary.objectiveCount}.
+          Required objectives: {objectiveState.completedRequiredObjectiveCount} /{" "}
+          {objectiveState.requiredObjectiveCount} complete. Total objectives:{" "}
+          {objectiveState.completedObjectiveCount} /{" "}
+          {objectiveState.objectiveCount} complete.
         </p>
       ) : null}
 
@@ -133,6 +177,76 @@ function QuestObjectiveProgress({
       ) : (
         <p className="supporting-text">No quest objectives are listed yet.</p>
       )}
+    </div>
+  );
+}
+
+function QuestActions({
+  acceptingQuestKey,
+  completingQuestKey,
+  onAcceptQuest,
+  onCompleteQuest,
+  quest,
+}) {
+  const status = quest.progress?.status || "AVAILABLE";
+  const objectiveState = getQuestObjectiveProgressState(quest);
+  const canCompleteQuest =
+    status === "ACCEPTED" && objectiveState.areRequiredObjectivesComplete;
+
+  if (status === "AVAILABLE") {
+    return (
+      <button
+        className="secondary-button small-action-button"
+        disabled={acceptingQuestKey === quest.key}
+        onClick={() => onAcceptQuest(quest)}
+        type="button"
+      >
+        {acceptingQuestKey === quest.key ? "Accepting..." : "Accept Quest"}
+      </button>
+    );
+  }
+
+  if (status === "ACCEPTED") {
+    return (
+      <div>
+        <p className="item-action-note">{getQuestStatusLabel(status)}</p>
+        {quest.progress.acceptedAt ? (
+          <p className="item-meta">
+            Accepted {formatDate(quest.progress.acceptedAt)}
+          </p>
+        ) : null}
+        {!canCompleteQuest ? (
+          <p className="supporting-text">
+            Complete all required objectives before finishing this quest.
+          </p>
+        ) : null}
+        <button
+          className="secondary-button small-action-button"
+          disabled={completingQuestKey === quest.key || !canCompleteQuest}
+          onClick={() => onCompleteQuest(quest)}
+          type="button"
+        >
+          {completingQuestKey === quest.key
+            ? "Completing..."
+            : "Complete Quest"}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="item-action-note">{getQuestStatusLabel(status)}</p>
+      {status === "COMPLETED" && quest.progress.completedAt ? (
+        <p className="item-meta">
+          Completed {formatDate(quest.progress.completedAt)}
+        </p>
+      ) : null}
+      {status === "FAILED" && quest.progress.failedAt ? (
+        <p className="item-meta">
+          Failed {formatDate(quest.progress.failedAt)}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -387,57 +501,13 @@ export default function CharacterQuestsPage({ character }) {
                 <QuestRewardPreview quest={quest} />
 
                 <div className="inventory-item-actions">
-                  {(quest.progress?.status || "AVAILABLE") === "AVAILABLE" ? (
-                    <button
-                      className="secondary-button small-action-button"
-                      disabled={acceptingQuestKey === quest.key}
-                      onClick={() => handleAcceptQuest(quest)}
-                      type="button"
-                    >
-                      {acceptingQuestKey === quest.key
-                        ? "Accepting..."
-                        : "Accept Quest"}
-                    </button>
-                  ) : quest.progress.status === "ACCEPTED" ? (
-                    <div>
-                      <p className="item-action-note">
-                        {getQuestStatusLabel(quest.progress.status)}
-                      </p>
-                      {quest.progress.acceptedAt ? (
-                        <p className="item-meta">
-                          Accepted {formatDate(quest.progress.acceptedAt)}
-                        </p>
-                      ) : null}
-                      <button
-                        className="secondary-button small-action-button"
-                        disabled={completingQuestKey === quest.key}
-                        onClick={() => handleCompleteQuest(quest)}
-                        type="button"
-                      >
-                        {completingQuestKey === quest.key
-                          ? "Completing..."
-                          : "Complete Quest"}
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="item-action-note">
-                        {getQuestStatusLabel(quest.progress.status)}
-                      </p>
-                      {quest.progress.status === "COMPLETED" &&
-                      quest.progress.completedAt ? (
-                        <p className="item-meta">
-                          Completed {formatDate(quest.progress.completedAt)}
-                        </p>
-                      ) : null}
-                      {quest.progress.status === "FAILED" &&
-                      quest.progress.failedAt ? (
-                        <p className="item-meta">
-                          Failed {formatDate(quest.progress.failedAt)}
-                        </p>
-                      ) : null}
-                    </div>
-                  )}
+                  <QuestActions
+                    acceptingQuestKey={acceptingQuestKey}
+                    completingQuestKey={completingQuestKey}
+                    onAcceptQuest={handleAcceptQuest}
+                    onCompleteQuest={handleCompleteQuest}
+                    quest={quest}
+                  />
                 </div>
               </article>
             ))}

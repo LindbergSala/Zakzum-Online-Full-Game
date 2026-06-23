@@ -38,7 +38,9 @@ Accepted quests can now be completed from the protected Quest page:
 /characters/[id]/quests
 ```
 
-The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. The API now rejects completion until required objectives are complete. After success, the page shows the awarded gold, experience, and renown with updated progression totals, reloads quest progress, and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
+The `Complete Quest` control calls `POST /api/characters/[id]/quests/[questKey]/complete`. The UI now mirrors the API rule: accepted quests keep `Complete Quest` disabled until required objectives are complete. A short guidance message tells the player to finish required objectives first.
+
+After success, the page shows the awarded gold, experience, and renown with updated progression totals, reloads quest progress, and checks the Activity Log endpoint. The dedicated Activity page displays the new `quest_completed` entry when opened or refreshed.
 
 Completed quests show their persisted status, `completedAt` date, and read-only reward summary instead of completion controls. Failed quests show their failed status and `failedAt` date. Duplicate completion is therefore unavailable through the UI and remains protected by the API transaction.
 
@@ -81,7 +83,7 @@ validationError
 ## Current Limitations
 
 - Required objective completion is enforced by the completion API.
-- The current Quest UI still allows clicking `Complete Quest`; the API returns a safe error when required objectives are incomplete.
+- The Quest UI disables `Complete Quest` while required objectives are incomplete.
 - Character location is not checked yet.
 - Static gold, experience, and renown rewards are applied during completion.
 - Rejected objective-gated completion attempts do not apply rewards or create `quest_completed` logs.
@@ -94,4 +96,4 @@ validationError
 
 ## Next Recommended Step
 
-Update the Quest UI so `Complete Quest` is disabled or clearly guided until required objectives are complete. Keep item rewards and level-up behavior for separate later steps.
+Verify the objective-gated completion UI in the browser. Keep item rewards and level-up behavior for separate later steps.

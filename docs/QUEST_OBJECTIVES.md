@@ -100,7 +100,7 @@ The protected Quest page displays objective progress for each returned quest:
 /characters/[id]/quests
 ```
 
-Quest cards show objective text, required or optional state, complete or incomplete state, completion time when available, and a small objective summary. Available, completed, and failed quests show objectives as read-only.
+Quest cards show objective text, required or optional state, complete or incomplete state, completion time when available, and a small objective summary. The summary reports completed required objectives and completed total objectives.
 
 Accepted quests show a `Complete Objective` button for incomplete objectives. The button calls:
 
@@ -110,7 +110,9 @@ POST /api/characters/[id]/quests/[questKey]/objectives/[objectiveKey]/complete
 
 After a successful objective completion, the Quest page refreshes quest data so the completed objective state and timestamp are shown. Duplicate objective completion is avoided in the UI because completed objectives no longer show the button; the API remains the server-side protection.
 
-No objective rewards exist, and no schema changes are required for the UI.
+The same objective progress state now guides quest completion in the UI. `Complete Quest` is disabled for accepted quests until all required objectives are complete, and the page shows a short guidance message while required objectives are incomplete.
+
+Available, completed, and failed quests show objectives as read-only. No objective rewards exist, and no schema changes are required for the UI.
 
 ## Objective Enforcement
 
@@ -126,11 +128,11 @@ Optional objectives do not block quest completion.
 - Current static objectives use explicit stable keys, but the rules retain index-key fallback compatibility.
 - A protected API can mark valid objectives complete, and protected quest reads expose safe merged progress. No reset API exists.
 - The completion API enforces required objective completion before completing accepted quests.
-- The Quest UI can complete objectives for accepted quests, but `Complete Quest` is not disabled client-side yet.
+- The Quest UI disables `Complete Quest` until required objective progress is complete.
 - No ActivityLog records are written by these helpers.
 - Reward application and quest completion behavior are unchanged.
 - Combat, shops, map UI, and story progression are not connected.
 
 ## Next Recommended Step
 
-Update the Quest UI to disable or guide `Complete Quest` until required objectives are complete.
+Verify the objective-gated completion UI in the browser, then consider adding clearer visual progress treatment only if playtesting needs it.

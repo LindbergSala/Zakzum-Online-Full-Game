@@ -248,7 +248,7 @@ Reusable objective normalization and validation now exist in `lib/game/questObje
 
 The rules are connected to the protected completion API at `POST /api/characters/[id]/quests/[questKey]/complete`. Successful completion now requires all required objectives to be complete, updates `CharacterQuest`, applies rewards, and creates a `quest_completed` ActivityLog atomically.
 
-The Quest UI now shows `Complete Quest` for accepted quests. Successful completion refreshes quest progress and checks the Activity Log endpoint. Completed quests show `Completed` and their completion date instead of action buttons.
+The Quest UI now shows `Complete Quest` for accepted quests only after required objectives are complete. While required objectives are incomplete, the button is disabled and a short guidance message explains what remains. Successful completion refreshes quest progress and checks the Activity Log endpoint. Completed quests show `Completed` and their completion date instead of action buttons.
 
 Completion checks required objective progress but does not check location. It validates and applies static gold, experience, and renown rewards only after required objectives are complete, but it does not perform level-up calculations.
 
@@ -265,7 +265,7 @@ Completion checks required objective progress but does not check location. It va
 - Completion rules are wired to both API and UI behavior.
 - Objective completion can be persisted, read safely, and completed from the Quest UI for accepted quests.
 - Quest completion enforces required objective completion server-side.
-- The Quest UI does not yet disable `Complete Quest` before required objectives are complete.
+- The Quest UI disables `Complete Quest` before required objectives are complete.
 - Static gold, experience, and renown rewards are applied during completion and shown read-only in the Quest UI.
 - No item rewards exist yet.
 - No separate reward claim flow or level-up logic exists.
@@ -274,4 +274,4 @@ Completion checks required objective progress but does not check location. It va
 
 ## Next Recommended Step
 
-Update the Quest UI so `Complete Quest` is disabled or clearly guided until required objectives are complete. Keep item rewards, level-up logic, and combat for separate later steps.
+Verify the objective-gated completion UI in browser testing. Keep item rewards, level-up logic, and combat for separate later steps.

@@ -398,6 +398,19 @@ select:focus {
   overflow-wrap: anywhere;
 }
 
+.level-progress-meter {
+  height: 0.65rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(10, 11, 10, 0.72);
+}
+
+.level-progress-meter span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+}
+
 .placeholder-list {
   display: grid;
   gap: 0.55rem;

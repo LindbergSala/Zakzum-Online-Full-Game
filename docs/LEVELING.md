@@ -69,13 +69,27 @@ canLevelUp
 validationError
 ```
 
+## Read-only UI Feedback
+
+The protected character overview page now shows a read-only Level Progress section:
+
+```text
+/characters/[id]
+```
+
+The section uses `getExperienceProgress(...)` and displays the current level, current experience, next level, next level threshold, experience needed for the next level, and progress percent.
+
+When the current level table has no next level, the overview page shows a safe message that the current level table is complete.
+
+Quest completion feedback can also show level progression details from the completion API response. If a quest completion raises the character's level, the Quest page shows the previous and new level. If no level-up happens, the success message shows progress toward the next level when available.
+
 ## Current Limitations
 
 - Level progression is applied during successful quest completion after validated experience rewards are added.
 - `Character.level` only increases when post-reward experience supports a higher level.
 - Duplicate or concurrent quest completion cannot grant extra levels because completion remains guarded by the `ACCEPTED` quest progress update.
 - No separate level-up API exists.
-- No level-up UI exists.
+- No manual level-up UI or level-up button exists.
 - No stat increases exist yet.
 - No `maxStamina` increases exist yet.
 - No class-based leveling exists yet.
@@ -84,4 +98,4 @@ validationError
 
 ## Next Recommended Step
 
-Expose safe level progress feedback in the character or quest UI without adding stat increases yet.
+Add level progress details to more character surfaces only where they help the player. Keep stat increases and `maxStamina` increases for a separate future system.

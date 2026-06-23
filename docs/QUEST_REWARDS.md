@@ -57,7 +57,7 @@ validationError
 - A guarded `ACCEPTED` to `COMPLETED` update must succeed before rewards are applied. Repeated or concurrent completion attempts therefore cannot award the same quest twice.
 - Completion attempts rejected for incomplete required objectives do not apply rewards.
 - The protected Quest UI shows gold, experience, and renown previews on quest cards.
-- Successful completion shows the awarded values and updated progression totals returned by the completion API.
+- Successful completion shows the awarded values, updated progression totals, and safe level progression feedback returned by the completion API.
 - Completed quests retain their read-only reward summary after refresh.
 - Experience rewards can trigger level progression during successful quest completion.
 - Gold and renown reward behavior is unchanged.
@@ -70,4 +70,4 @@ validationError
 
 ## Next Recommended Step
 
-Add safe reward and level progress feedback where useful. Keep item rewards as a separate future system.
+Add item rewards only as a separate future system after the current gold, experience, renown, and level feedback stays stable.

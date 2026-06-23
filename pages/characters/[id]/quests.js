@@ -21,6 +21,33 @@ function formatRewards(rewards) {
   return `${rewards.gold} gold, ${rewards.experience} experience, and ${rewards.renown} renown`;
 }
 
+function formatCharacterProgress(progress) {
+  if (!progress) {
+    return "";
+  }
+
+  const levelText =
+    typeof progress.level === "number" ? `, level ${progress.level}` : "";
+
+  return ` Current totals: ${progress.gold} gold, ${progress.experience} experience, ${progress.renown} renown${levelText}.`;
+}
+
+function formatLevelProgression(levelProgression) {
+  if (!levelProgression) {
+    return "";
+  }
+
+  if (levelProgression.leveledUp) {
+    return ` Level increased from ${levelProgression.levelBefore} to ${levelProgression.levelAfter}.`;
+  }
+
+  if (levelProgression.nextLevel !== null) {
+    return ` Level remains ${levelProgression.levelAfter}. ${levelProgression.experienceNeededForNextLevel} experience needed for level ${levelProgression.nextLevel}.`;
+  }
+
+  return ` Level remains ${levelProgression.levelAfter}. Current level table complete.`;
+}
+
 function QuestRewardPreview({ quest }) {
   const rewardSummary = getQuestRewardSummary(quest);
   const isCompleted = quest.progress?.status === "COMPLETED";
@@ -371,13 +398,13 @@ export default function CharacterQuestsPage({ character }) {
       const rewards = getQuestRewards({
         rewards: data.rewards || quest.rewards,
       });
-      const progress = data.characterProgress;
-      const progressMessage = progress
-        ? ` Current totals: ${formatRewards(progress)}.`
-        : "";
+      const progressMessage = formatCharacterProgress(data.characterProgress);
+      const levelProgressMessage = formatLevelProgression(
+        data.levelProgression,
+      );
 
       setQuestCompleteSuccess(
-        `${quest.title} has been completed. Awarded ${formatRewards(rewards)}.${progressMessage}`,
+        `${quest.title} has been completed. Awarded ${formatRewards(rewards)}.${progressMessage}${levelProgressMessage}`,
       );
       await loadQuests();
 

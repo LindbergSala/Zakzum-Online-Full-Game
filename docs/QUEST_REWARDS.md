@@ -59,8 +59,9 @@ validationError
 - The protected Quest UI shows gold, experience, and renown previews on quest cards.
 - Successful completion shows the awarded values and updated progression totals returned by the completion API.
 - Completed quests retain their read-only reward summary after refresh.
-- Quest rewards grant experience, but character level remains unchanged because level-up application is not wired yet.
-- Reusable level progression rules now exist in `lib/game/levelRules.js` for future level-up behavior.
+- Experience rewards can trigger level progression during successful quest completion.
+- Gold and renown reward behavior is unchanged.
+- Reusable level progression rules exist in `lib/game/levelRules.js`.
 - Rewards are applied only by the completion API; the UI has no separate claim flow.
 - No item or equipment rewards exist.
 - No random reward tables exist.
@@ -69,4 +70,4 @@ validationError
 
 ## Next Recommended Step
 
-Apply level-up rules during quest completion in a separate API change. Keep item rewards as a separate future system.
+Add safe reward and level progress feedback where useful. Keep item rewards as a separate future system.

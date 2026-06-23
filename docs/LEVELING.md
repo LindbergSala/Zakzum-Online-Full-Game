@@ -1,8 +1,8 @@
 # Zakzum Online Level Progression Rules
 
-The level progression rules foundation gives Zakzum Online one small, reusable place for early experience and level calculations. It prepares future level-up behavior without changing character data yet.
+The level progression rules foundation gives Zakzum Online one small, reusable place for early experience and level calculations.
 
-Progression should stay grounded and gradual. Early quests can grant experience, but level increases are not applied automatically yet.
+Progression should stay grounded and gradual. Quest completion can now raise `Character.level` when the post-reward experience total reaches a higher threshold.
 
 ## Level Thresholds
 
@@ -71,10 +71,11 @@ validationError
 
 ## Current Limitations
 
-- Level-ups are not applied yet.
-- No level-up API exists.
+- Level progression is applied during successful quest completion after validated experience rewards are added.
+- `Character.level` only increases when post-reward experience supports a higher level.
+- Duplicate or concurrent quest completion cannot grant extra levels because completion remains guarded by the `ACCEPTED` quest progress update.
+- No separate level-up API exists.
 - No level-up UI exists.
-- Quest completion still only increments experience; it does not update `Character.level`.
 - No stat increases exist yet.
 - No `maxStamina` increases exist yet.
 - No class-based leveling exists yet.
@@ -83,4 +84,4 @@ validationError
 
 ## Next Recommended Step
 
-Apply level-up rules during quest completion in a separate API change, then expose safe level progress feedback in the character or quest UI.
+Expose safe level progress feedback in the character or quest UI without adding stat increases yet.

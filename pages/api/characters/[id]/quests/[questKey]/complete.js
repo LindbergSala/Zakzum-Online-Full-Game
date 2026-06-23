@@ -1,5 +1,9 @@
 import { getCurrentUser } from "../../../../../../lib/auth/currentUser";
 import { createActivityLog } from "../../../../../../lib/game/activityLog";
+import {
+  getExperienceProgress,
+  getLevelForExperience,
+} from "../../../../../../lib/game/levelRules";
 import { getQuestCompletionValidationError } from "../../../../../../lib/game/questCompletionRules";
 import { getQuestByKey } from "../../../../../../lib/game/questData";
 import {
@@ -53,6 +57,31 @@ function getObjectiveCompletionSummary(quest, completedObjectiveKeys) {
   };
 }
 
+function getLevelProgression({ levelBefore, experienceBefore, experienceAfter }) {
+  const supportedLevel = getLevelForExperience(experienceAfter);
+  const levelAfter =
+    supportedLevel !== null && supportedLevel > levelBefore
+      ? supportedLevel
+      : levelBefore;
+  const progress = getExperienceProgress({
+    level: levelAfter,
+    experience: experienceAfter,
+  });
+  const levelsGained = Math.max(0, levelAfter - levelBefore);
+
+  return {
+    levelBefore,
+    levelAfter,
+    levelsGained,
+    leveledUp: levelsGained > 0,
+    experienceBefore,
+    experienceAfter,
+    nextLevel: progress.nextLevel,
+    nextLevelThreshold: progress.nextLevelThreshold,
+    experienceNeededForNextLevel: progress.experienceNeededForNextLevel,
+  };
+}
+
 async function getOwnedCharacter(characterId, userId) {
   if (!characterId) {
     return null;
@@ -66,6 +95,8 @@ async function getOwnedCharacter(characterId, userId) {
     select: {
       id: true,
       name: true,
+      level: true,
+      experience: true,
     },
   });
 }
@@ -183,17 +214,35 @@ export default async function handler(req, res) {
           throw completionConflict;
         }
 
+        const characterBeforeRewards = await tx.character.findUnique({
+          where: { id: character.id },
+          select: {
+            level: true,
+            experience: true,
+          },
+        });
+        const levelProgression = getLevelProgression({
+          levelBefore: characterBeforeRewards.level,
+          experienceBefore: characterBeforeRewards.experience,
+          experienceAfter:
+            characterBeforeRewards.experience + rewards.experience,
+        });
+
         const updatedCharacter = await tx.character.update({
           where: { id: character.id },
           data: {
             gold: { increment: rewards.gold },
             experience: { increment: rewards.experience },
             renown: { increment: rewards.renown },
+            ...(levelProgression.leveledUp
+              ? { level: levelProgression.levelAfter }
+              : {}),
           },
           select: {
             gold: true,
             experience: true,
             renown: true,
+            level: true,
           },
         });
 
@@ -236,6 +285,10 @@ export default async function handler(req, res) {
               characterRenownBefore:
                 updatedCharacter.renown - rewards.renown,
               characterRenownAfter: updatedCharacter.renown,
+              levelBefore: levelProgression.levelBefore,
+              levelAfter: levelProgression.levelAfter,
+              levelsGained: levelProgression.levelsGained,
+              leveledUp: levelProgression.leveledUp,
               objectiveSummary,
               completedObjectiveKeys,
               requiredObjectivesComplete:
@@ -245,9 +298,33 @@ export default async function handler(req, res) {
           tx,
         );
 
+        if (levelProgression.leveledUp) {
+          await createActivityLog(
+            {
+              characterId: character.id,
+              type: "level_gained",
+              title: "Level Gained",
+              description:
+                "Experience hardened the character into something greater.",
+              details: {
+                characterName: character.name,
+                levelBefore: levelProgression.levelBefore,
+                levelAfter: levelProgression.levelAfter,
+                levelsGained: levelProgression.levelsGained,
+                experienceBefore: levelProgression.experienceBefore,
+                experienceAfter: levelProgression.experienceAfter,
+                questKey: quest.key,
+                questTitle: quest.title,
+              },
+            },
+            tx,
+          );
+        }
+
         return {
           completedQuest: updatedQuest,
           characterProgress: updatedCharacter,
+          levelProgression,
         };
       });
 
@@ -269,6 +346,7 @@ export default async function handler(req, res) {
         rewards,
         objectiveSummary,
         characterProgress: completionResult.characterProgress,
+        levelProgression: completionResult.levelProgression,
       });
     } catch (error) {
       if (error?.code === "QUEST_COMPLETION_CONFLICT") {

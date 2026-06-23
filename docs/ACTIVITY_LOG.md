@@ -351,11 +351,38 @@ The log details store:
 - `characterExperienceAfter`
 - `characterRenownBefore`
 - `characterRenownAfter`
+- `levelBefore`
+- `levelAfter`
+- `levelsGained`
+- `leveledUp`
 - `objectiveSummary`
 - `completedObjectiveKeys`
 - `requiredObjectivesComplete`
 
 The reward details are written in the same transaction as quest completion and character progression updates. No `quest_completed` log or reward is created for invalid, unaccepted, completed, failed, missing, unauthorized, conflicting, or failed requests.
+
+### Level Gained
+
+When quest completion raises the character's level after applying experience rewards, the same transaction creates one ActivityLog record.
+
+The log uses:
+
+- `type`: `level_gained`
+- `title`: `Level Gained`
+- `description`: `Experience hardened the character into something greater.`
+
+The log details store:
+
+- `characterName`
+- `levelBefore`
+- `levelAfter`
+- `levelsGained`
+- `experienceBefore`
+- `experienceAfter`
+- `questKey`
+- `questTitle`
+
+No `level_gained` log is created when quest completion does not change the character's level. Duplicate or concurrent completion attempts cannot create extra level logs because quest completion remains guarded by the accepted quest status update.
 
 ### Objective Completed
 
@@ -421,7 +448,7 @@ When the character detail page equips or unequips an item through the inventory 
 
 When the Quest section accepts a quest, it refreshes this section so the new `quest_accepted` log appears without a full page reload.
 
-When the Quest page completes a quest, it checks the Activity Log endpoint after refreshing progress. The dedicated Activity page shows the new `quest_completed` entry when opened or refreshed.
+When the Quest page completes a quest, it checks the Activity Log endpoint after refreshing progress. The dedicated Activity page shows the new `quest_completed` entry, and `level_gained` when a level was earned, when opened or refreshed.
 
 ## Relation To Character
 
@@ -480,6 +507,8 @@ Future activity logs may record:
 - No quest acceptance logs are written for invalid, unavailable, duplicate, not found, unauthorized, or failed requests.
 - Quest completion writes one automatic `quest_completed` log when an accepted quest with complete required objectives becomes completed.
 - No quest completion logs are written for incomplete required objectives, invalid, unaccepted, completed, failed, not found, unauthorized, conflicting, or failed requests.
+- Quest completion writes one automatic `level_gained` log only when post-reward experience increases `Character.level`.
+- No `level_gained` log is written when quest completion does not change level or when completion is rejected.
 - Objective completion writes one automatic `objective_completed` log when a valid objective for an accepted quest newly becomes completed.
 - No duplicate objective logs are written for repeated or concurrent completion requests.
 - Travel UI and map systems have not been added.
@@ -489,4 +518,4 @@ Future activity logs may record:
 
 ## Next Recommended Step
 
-Add the next deliberate automatic log source only when its owning server-side system exists. Quests, combat, and story systems have not been added yet.
+Add the next deliberate automatic log source only when its owning server-side system exists. Combat and story systems have not been added yet.
